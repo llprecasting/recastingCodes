@@ -2,6 +2,13 @@
 
 This repository holds example codes for recasting long-lived particle (LLP) searches.
 
+## Adding your recasting code ##
+
+This is an open repository and if you have developed a code for recasting a LLP analysis, 
+we encourage you to include it here.
+Please contact <llp-recasting@googlegroups.com> and we will provide you with the necessary information
+for including your code.
+
 ## Repository Structure ##
 
 The repository folder structure is organized according to the type of LLP signature and the
@@ -42,3 +49,8 @@ Finally the compiled code can be run and its options displayed running:
 ## Citation ##
 
 If you use any of the recasting code stored in this repository please cite ...
+
+## Contact ##
+
+If you have any questions, comments or want to contact the repository maintainers,
+please send an e-mail to <lp-recasting@googlegroups.com>

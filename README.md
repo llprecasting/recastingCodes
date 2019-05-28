@@ -1,6 +1,8 @@
 # LLP Recasting Repository
 
 This repository holds example codes for recasting long-lived particle (LLP) searches.
+The code authors and repository maintainers are not responsible for how the code is used and the user should
+use discretion when applying it to new models.
 
 ## Adding your recasting code ##
 
@@ -46,9 +48,6 @@ Finally the compiled code can be run and its options displayed running:
 ./main_hscp.exe --help
 ```
 
-## Citation ##
-
-If you use any of the recasting code stored in this repository please cite ...
 
 ## Contact ##
 

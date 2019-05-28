@@ -1,0 +1,132 @@
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  2977 29.77 29.77
+ Jet Cut  2209 74.2022 22.09
+ DV Reconstruction 2977 134.767 29.77
+ DV Fidutial 2230 74.9076 22.3
+ DV Ntrk 1041 46.6816 10.41
+ DV Mass 467 44.8607 4.67
+ DV Eff 86 18.4154 0.86
+ Evt Eff 52 165.385 0.52
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  2932 29.32 29.32
+ Jet Cut  2206 75.2387 22.06
+ DV Reconstruction 2932 132.91 29.32
+ DV Fidutial 2237 76.296 22.37
+ DV Ntrk 1668 74.5641 16.68
+ DV Mass 1215 72.8417 12.15
+ DV Eff 299 24.6091 2.99
+ Evt Eff 204 146.569 2.04
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  3055 30.55 30.55
+ Jet Cut  2305 75.4501 23.05
+ DV Reconstruction 3055 132.538 30.55
+ DV Fidutial 2389 78.1997 23.89
+ DV Ntrk 2115 88.5308 21.15
+ DV Mass 1824 86.2411 18.24
+ DV Eff 572 31.3596 5.72
+ Evt Eff 394 145.178 3.94
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  3180 31.8 31.8
+ Jet Cut  2400 75.4717 24
+ DV Reconstruction 3180 132.5 31.8
+ DV Fidutial 2450 77.044 24.5
+ DV Ntrk 2269 92.6122 22.69
+ DV Mass 2093 92.2433 20.93
+ DV Eff 700 33.4448 7
+ Evt Eff 482 145.228 4.82
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  3554 35.54 35.54
+ Jet Cut  2670 75.1266 26.7
+ DV Reconstruction 3554 133.109 35.54
+ DV Fidutial 2791 78.5312 27.91
+ DV Ntrk 2700 96.7395 27
+ DV Mass 2538 94 25.38
+ DV Eff 925 36.446 9.25
+ Evt Eff 635 145.669 6.35
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  4970 49.7 49.7
+ Jet Cut  3742 75.2918 37.42
+ DV Reconstruction 4970 132.817 49.7
+ DV Fidutial 3894 78.3501 38.94
+ DV Ntrk 3846 98.7673 38.46
+ DV Mass 3744 97.3479 37.44
+ DV Eff 1604 42.8419 16.04
+ Evt Eff 1095 146.484 10.95
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  7508 75.08 75.08
+ Jet Cut  5612 74.7469 56.12
+ DV Reconstruction 7508 133.785 75.08
+ DV Fidutial 6082 81.0069 60.82
+ DV Ntrk 6048 99.441 60.48
+ DV Mass 6010 99.3717 60.1
+ DV Eff 3018 50.2163 30.18
+ Evt Eff 2391 126.223 23.91
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  8451 84.51 84.51
+ Jet Cut  6352 75.1627 63.52
+ DV Reconstruction 8451 133.045 84.51
+ DV Fidutial 6777 80.1917 67.77
+ DV Ntrk 6757 99.7049 67.57
+ DV Mass 6728 99.5708 67.28
+ DV Eff 3512 52.1998 35.12
+ Evt Eff 2959 118.689 29.59
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  8806 88.06 88.06
+ Jet Cut  6590 74.8353 65.9
+ DV Reconstruction 8806 133.627 88.06
+ DV Fidutial 7100 80.6268 71
+ DV Ntrk 7080 99.7183 70.8
+ DV Mass 7065 99.7881 70.65
+ DV Eff 3802 53.8146 38.02
+ Evt Eff 3276 116.056 32.76
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  8987 89.87 89.87
+ Jet Cut  6751 75.1196 67.51
+ DV Reconstruction 8987 133.121 89.87
+ DV Fidutial 7277 80.9725 72.77
+ DV Ntrk 7260 99.7664 72.6
+ DV Mass 7243 99.7658 72.43
+ DV Eff 3959 54.6597 39.59
+ Evt Eff 3519 112.504 35.19
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  9061 90.61 90.61
+ Jet Cut  6817 75.2345 68.17
+ DV Reconstruction 9061 132.918 90.61
+ DV Fidutial 7386 81.5142 73.86
+ DV Ntrk 7374 99.8375 73.74
+ DV Mass 7360 99.8101 73.6
+ DV Eff 4171 56.6712 41.71
+ Evt Eff 3746 111.345 37.46
+ CutFlow for ctau, tau = 299.792 , 1
+ CutFlow for tau = 299.792
+ All events 10000 100 100
+ MET Cut  9003 90.03 90.03
+ Jet Cut  6748 74.9528 67.48
+ DV Reconstruction 9003 133.417 90.03
+ DV Fidutial 7251 80.5398 72.51
+ DV Ntrk 7239 99.8345 72.39
+ DV Mass 7230 99.8757 72.3
+ DV Eff 4054 56.0719 40.54
+ Evt Eff 3563 113.781 35.63

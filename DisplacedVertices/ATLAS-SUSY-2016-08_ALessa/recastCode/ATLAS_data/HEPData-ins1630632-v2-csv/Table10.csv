@@ -1,0 +1,75 @@
+#: table_doi: 10.17182/hepdata.78697.v2/t10
+#: name: Table 10
+#: description: Upper 95% CL limits on the signal cross section for $m_{\tilde{g}}=1.4$ TeV and fixed $\Delta m=100$ GeV as a function of lifetime $\tau$.
+#: data_file: data16.yaml
+#: data_license:   
+#: keyword reactions: P P --> GLUINO GLUINO
+#: keyword observables: SIG
+#: keyword phrases: Proton-Proton Scattering | Supersymmetry | SUSY
+#: keyword cmenergies: 13000.0
+#: SQRT(S) [GeV],13000
+'Lifetime [ns]','Observed limit [pb]'
+0.003,0.739826
+0.01,0.0205294
+0.04,0.00342003
+0.1,0.00245111
+1.0,0.00392301
+3.0,0.00767325
+10.0,0.0288558
+24.538,0.0884243
+
+#: SQRT(S) [GeV],13000
+'Lifetime [ns]','Expected limit [pb]'
+0.003,0.744579
+0.01,0.0209071
+0.04,0.00343961
+0.1,0.00246246
+1.0,0.00393658
+3.0,0.0077054
+10.0,0.0290134
+24.538,0.0893825
+
+#: SQRT(S) [GeV],13000
+'Lifetime [ns]','Expected ($-1\sigma$) limit [pb]'
+0.003,0.571079
+0.01,0.0179023
+0.04,0.00261476
+0.1,0.00207751
+1.0,0.00323805
+3.0,0.00588793
+10.0,0.0235503
+24.538,0.0752249
+
+#: SQRT(S) [GeV],13000
+'Lifetime [ns]','Expected ($+1\sigma$) limit [pb]'
+0.003,0.992751
+0.01,0.0296042
+0.04,0.00402955
+0.1,0.00286723
+1.0,0.00458508
+3.0,0.00916464
+10.0,0.0419211
+24.538,0.136921
+
+#: SQRT(S) [GeV],13000
+'Lifetime [ns]','Expected ($-2\sigma$) limit [pb]'
+0.003,0.502164
+0.01,0.0135492
+0.04,0.00241241
+0.1,0.00177811
+1.0,0.00272611
+3.0,0.00548896
+10.0,0.0145553
+24.538,0.05669
+
+#: SQRT(S) [GeV],13000
+'Lifetime [ns]','Expected ($+2\sigma$) limit [pb]'
+0.003,1.41634
+0.01,0.0419977
+0.04,0.00509215
+0.1,0.00348575
+1.0,0.00563585
+3.0,0.0114252
+10.0,0.0625296
+24.538,0.206534
+

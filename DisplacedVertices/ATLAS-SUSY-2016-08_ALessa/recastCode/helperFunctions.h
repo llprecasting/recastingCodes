@@ -15,6 +15,7 @@ class DisplacedVertex: public Particle {
     virtual ~DisplacedVertex() {}
 
     vector<Particle*> decayProducts;
+    double DVeff;
     int nTracks() const {return decayProducts.size();}
     double mDV() const {
         Vec4 pCharged;
@@ -165,9 +166,7 @@ std::vector<Particle*> getRhadrons(Event &event)
 }
 
 
-std::vector<DisplacedVertex> getDVs(Event &event, double minPVdistance,
-        double maxRDV, double maxZDV, double minTrackPT, double minTrackD0,
-        double minDecProd,    double minDVmass){
+std::vector<DisplacedVertex> getDVs(Event &event,double minTrackPT, double minTrackD0){
 //Returns a vector with displaced vertices satisfying minimum selection criterium
 
     std::vector<DisplacedVertex> DVs;  //Store DVs that passes the cuts
@@ -175,16 +174,7 @@ std::vector<DisplacedVertex> getDVs(Event &event, double minPVdistance,
     std::vector<Particle*> Rhadrons = getRhadrons(event);
     int nRhadrons = Rhadrons.size();
     for (int i = 0; i < nRhadrons; ++i) {
-        float effCut = (std::rand()/(float)RAND_MAX); //effCut = random(0,1)
-
-
         Vec4 RhadronVertex = Rhadrons[i]->vDec();
-
-        //Apply basic selection efficiency
-        if (RhadronVertex.pT() < minPVdistance) continue;  //Transverse plane separation from PV > 4mm
-        if (RhadronVertex.pT() > maxRDV) continue;  //|R_DV| < 300 mm
-        if (fabs(RhadronVertex.pz()) > maxZDV) continue;  //|z_DV| < 300 mm
-
         //Get daughters from R-hadron:
         std::vector<Particle*> daughters = getDaughters(Rhadrons[i],event);
         //Define DV candidate object to store candidate tracks as well:
@@ -202,18 +192,6 @@ std::vector<DisplacedVertex> getDVs(Event &event, double minPVdistance,
             if (fabs(d0) < minTrackD0) continue;  //|d_0| > 2mm for tracks
             DV.decayProducts.push_back(daughters[j]);
         }
-
-        //Apply vertex cuts:
-        if (DV.decayProducts.size() < minDecProd){continue;}
-        if (DV.mDV() < minDVmass){continue;}
-
-
-        //Apply DV reconstruction efficiency:
-        Rdecay = RhadronVertex.pT();
-        DVeff = getDVEff(DV.mDV(),DV.decayProducts.size(),Rdecay);
-//        cout << DV.mDV() << " " << DV.decayProducts.size()
-//                << " " << Rdecay << " " << DVeff << " " << effCut << endl;
-        if (DVeff < effCut){continue;} // skip if DV_eff > effcut
         DVs.push_back(DV);
     } //End of loop over R-hadrons
     return DVs;
@@ -227,6 +205,7 @@ Vec4 getMissingMomentum(Event &event)
     for (int i = 0; i < event.size(); ++i) {
       // Final state only
       if (!event[i].isFinal()) continue; //Ignore intermediate states
+      if (event[i].isVisible()) continue; //Ignore intermediate states
       if (!event[i].isNeutral()) continue; //Ignore charged particles
       if (event[i].isHadron()) continue;  //Ignore usual hadrons
       if (event[i].colType() != 0) continue; //Ignore charged particles
@@ -286,25 +265,4 @@ bool applyJetCuts(Event &event, fastjet::JetDefinition jetDef,
 
 }
 
-bool applyCuts(Event &event, double missingETcut,
-        vector<DisplacedVertex> DVs)
-//Apply basic pre-selections cuts for fiducial phase space
-{
-
-    double MET = getMissingMomentum(event).pT();
-    if (MET < missingETcut) {return false;}
-
-    if (DVs.size() < 1){return false;}
-
-    //Get event selection efficiency:
-    double Rmax = 0.;
-    for (int i =0; i < DVs.size(); ++i){
-        Rmax = max(Rmax,DVs[i].vDec().pT());
-    }
-    double evEff = getEvEff(MET,Rmax);
-    float effCut = (std::rand()/(float)RAND_MAX); //effCut = random(0,1)
-    if (evEff < effCut){return false;} // skip if evEff > effcut
-
-    return true;
-}
 

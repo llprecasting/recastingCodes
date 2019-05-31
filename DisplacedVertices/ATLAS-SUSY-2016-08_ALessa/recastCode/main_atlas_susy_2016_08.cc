@@ -31,7 +31,7 @@ int run(int nevents, const string & cfgfile, const string & slhafile, const stri
 	double minTrackD0 = confFile.get<double>("Cuts.minTrackD0");
 	double minDVmass = confFile.get<double>("Cuts.minDVmass");
 	int minDecProd = confFile.get<int>("Cuts.minDecProd");
-	double MET = confFile.get<double>("Cuts.MET");
+	double METcut = confFile.get<double>("Cuts.MET");
 	double maxJetChargedPT = confFile.get<double>("Cuts.maxJetChargedPT");
 	double minJetPt1 =  confFile.get<double>("Cuts.minJetPt1");
 	double minJetPt2 =  confFile.get<double>("Cuts.minJetPt2");
@@ -56,7 +56,7 @@ int run(int nevents, const string & cfgfile, const string & slhafile, const stri
   fastjet::JetDefinition jetDef(fastjet::antikt_algorithm, Rjet);
 
   int iAbort = 0;
-  int nCuts = 0;
+  double nCuts = 0.;
 
   // Begin event loop.
   for (int iEvent = 0; iEvent < nevents; ++iEvent) {
@@ -78,24 +78,63 @@ int run(int nevents, const string & cfgfile, const string & slhafile, const stri
     else {passCuts = true;}
     if (!passCuts){continue;}
 
-    //Get good displaced vertices:
-    vector<DisplacedVertex> DVs = getDVs(event,minPVdistance,maxRDV,maxZDV,
-                                        minTrackPT, minTrackD0, minDecProd,	minDVmass);
+    //Get displaced vertex candidates:
+    vector<DisplacedVertex> DV_candidates = getDVs(event,minTrackPT, minTrackD0);
 
-    passCuts = applyCuts(event, MET, DVs);
+    //Get good DVs:
+    vector<DisplacedVertex> DVs;
+    DisplacedVertex DV;
+    Vec4 vertex;
+    for (int i=0; i < DV_candidates.size(); ++i){
+        DV  = DV_candidates[i];
+        vertex = DV.vDec();
+        //Apply basic selection efficiency
+        if (vertex.pT() < minPVdistance) continue;  //Transverse plane separation from PV > 4mm
+        if (vertex.pT() > maxRDV) continue;  //|R_DV| < 300 mm
+        if (fabs(vertex.pz()) > maxZDV) continue;  //|z_DV| < 300 mm
 
-    if (!passCuts) continue;
-    nCuts += 1;
+        //Apply vertex cuts:
+        if (DV.decayProducts.size() < minDecProd){continue;}
+        if (DV.mDV() < minDVmass){continue;}
+
+        //Get DV reconstruction efficiency:
+        DV.DVeff = getDVEff(DV.mDV(),DV.decayProducts.size(),vertex.pT());
+        DVs.push_back(DV);
+    }
+
+    //Apply pre-selection MET cut:
+    double MET = getMissingMomentum(event).pT();
+    if (MET < METcut) {continue;}
+
+    //Apply pres-selection DV cut:
+    if (DVs.size() < 1){continue;}
+
+    //Get event selection efficiency:
+    double Rmax = 0.;
+    for (int i =0; i < DVs.size(); ++i){
+        Rmax = max(Rmax,DVs[i].vDec().pT());
+    }
+    double evEff = getEvEff(MET,Rmax);
+
+    //Get probability for reconstructing at least one DV:
+    double dvEff = 1.;
+    for(int i = 0; i < DVs.size(); ++i){
+        dvEff *= 1.-DVs[i].DVeff;
+    }
+    dvEff = 1. - dvEff;
+
+    //Compute event weight:
+    double eventWeight = evEff*dvEff;
+
+    nCuts += eventWeight;
 
 
   // End of event loop.
   }
 
-  // Final statistics, flavor composition and histogram output.
-//  pythia.stat(); config file [pythia8.cfg]
-  cout << " Efficiency = " << float(nCuts)/float(nevents)
+  cout << " Efficiency = " << nCuts/float(nevents)
                            << " ( " << nCuts << " evts )" << endl;
-  fprintf(OutputFile,"Efficiency = %1.3e, Total Number of Events = %i, Number of Events after cuts = %i \n",float(nCuts)/float(nevents),nevents,nCuts);
+  fprintf(OutputFile,"Efficiency = %1.3e, Total Number of Events = %i, Effective Number of Events after cuts = %1.3e \n",nCuts/float(nevents),nevents,nCuts);
   fclose(OutputFile);
 
 

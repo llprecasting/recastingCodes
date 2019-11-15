@@ -93,17 +93,21 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
       break;
     }
 
+    ++iEvent;
 
 
     // All events
     double Etmiss = getMissingMomentum(event).pT();
+    //cout << "MET = " << Etmiss << endl;
     // Trigger decision
     if (Etmiss < 300.) {
         int   bin     = EtmissTurnOn->GetXaxis()->FindBin(Etmiss);
         float eff_Met = EtmissTurnOn->GetBinContent(bin);
         float metRandom = (std::rand()/(float)RAND_MAX); //lumCut = random(0,1)
         if (metRandom > eff_Met) continue;
+//        cout << "Passed MET cut: " << metRandom << " > " << Etmiss << endl;
     }
+//    cout << "Passed MET" << endl;
 
     // Events that passed the trigger
 	std::vector<Particle> candidates;
@@ -114,13 +118,23 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 		// isPrimaryRHadron identifies the initial R-Hadrons in the event record
 		if (!isPrimaryRHadron(particle)) continue;
 
+//		cout << "index = " << i << endl;
+//		cout << "R-hadron = " << particle.name() << endl;
+//		cout << "R-hadron charge = " << particle.charge() << endl;
+//		cout << "Decay before endCal = " << decayBeforeEndHcal(particle) << endl;
+//		cout << "Decay vertex = " << particle.vDec() << endl;
+
 		// RhadCharge returns the charge of an R-hadron,
 		// so we consider only R-hadrons charged after hadronisation
 		if (abs(particle.charge()) != 1) continue;
 
+
+
 		// decayBeforeEndHcal checks for a decay vertex before the end of the tile calorimeter,
-		// so we only consider only R-hadrons that decay after that (see measures above)
+		// so we only consider R-hadrons that decay after that (see measures above)
 		if (decayBeforeEndHcal(particle)) continue;
+
+//		cout << "Good candidate = " << particle.name() << " pT = " << particle.pT() << " p = " << particle.pAbs() << endl;
 
 		// Consider only particles with minimum (transverse) momentum
 		if (particle.pAbs() < 200.) continue;
@@ -128,12 +142,14 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
 		//Estimated decision
 		float eta  = particle.eta();
-		float beta     = particle.e()/particle.pAbs();
+		float beta     = particle.pAbs()/particle.e();
 		int   bin_eta  = IDCaloEff->GetXaxis()->FindBin(fabs(eta));
 		int   bin_beta = IDCaloEff->GetYaxis()->FindBin(beta);
 		float effCand  = IDCaloEff->GetBinContent(bin_eta, bin_beta);
 
 		float candRandom = (std::rand()/(float)RAND_MAX); //lumCut = random(0,1)
+//		cout << "beta = " << beta << " eta = " << eta << endl;
+//		cout << "Calorimeter eff = " << effCand << " random = " << candRandom << endl;
 		if (candRandom > effCand) continue;
 
 		candidates.push_back(particle);
@@ -177,7 +193,8 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 		++nEvts_SR[j];
 	}
 
-    ++iEvent;
+
+//    cout << "-------------- Event " << iEvent << "----------------" << endl;
   // End of event loop.
   }
 

@@ -1,0 +1,79 @@
+// CutflowMSagno - examplary cutflow histogram
+// EtmissTurnOn - provided turn-on histogram for Etmiss trigger
+// IDCaloEff - provided efficiency histogramm for MS-agnostic candidates
+// MToFMSagno - provided mass resolution histogram (dE/dx)
+// MdedxMSagno - provided mass resolution histogram (ToF)
+// isPrimaryRHadron - function identifying the initial R-Hadrons in the event record
+// RhadCharge - function returning the charge of an R-hadron
+// decayBeforeEndHcal - function to check for a decay vertex inside or before tile calorimeter
+// lowerLimit_MdEdx - lower mass limit for signal region (dE/dx)
+// lowerLimit_MToF - lower mass limit for signal region (ToF)
+// Particles - list of generator-level particles in the event
+// trandom - e.g. a TRandom3 object
+
+// All events
+CutflowMSagno->Fill("all Events", weight);
+
+// Trigger decision
+if (Etmiss < 300.) {
+    int   bin     = EtmissTurnOn->GetXaxis()->FindBin(Etmiss);
+    float eff_Met = EtmissTurnOn->GetBinContent(bin);
+    if (trandom.Uniform() > eff_Met) return;
+}
+
+// Events that passed the trigger
+CutflowMSagno->Fill("passedTrigger", weight);
+
+// Candidate efficiency decision
+int MSagnoCount = 0;
+// Particles is a vector of TLorentzVectors of particles in the event record
+for (const auto& Particle: *Particles) {
+	// isPrimaryRHadron identifies the initial R-Hadrons in the event record
+  if (!isPrimaryRHadron(*Particle)) continue;
+
+  // RhadCharge returns the charge of an R-hadron,
+  // so we consider only R-hadrons charged after hadronisation
+  if (RhadCharge(*Particle) == 0) continue;
+
+  // decayBeforeEndHcal checks for a decay vertex before the end of the tile calorimeter,
+  // so we only consider only R-hadrons that decay after that (see measures above)
+  if (decayBeforeEndHcal(*Particle)) continue;
+
+  // Consider only particles with minimum (transverse) momentum
+  if (Particle->P() < 200.) continue;
+  if (Particle->Pt() < 50.) continue;
+
+  //Estimated decision
+  float eta      = Particle->Eta();
+  float beta     = Particle->Beta();
+  int   bin_eta  = IDCaloEff->GetXaxis()->FindBin(fabs(eta));
+  int   bin_beta = IDCaloEff->GetYaxis()->FindBin(beta);
+  float effCand  = IDCaloEff->GetBinContent(bin_eta, bin_beta);
+
+  if (trandom.Uniform() > effCand)) continue;
+  ++MSagnoCount;
+}
+if (MSagnoCount() == 0) return;
+
+// Events with at least one candiate
+CutflowMSagno->Fill("candidateEff", weight);
+
+// Sample the masses and apply the final mass window requirements
+int bin_massToF  = MToFMSagno->GetXaxis()->FindBin(Mass);
+int bin_massdEdx = MdedxMSagno->GetXaxis()->FindBin(Mass);
+
+// Sample the ToF mass for ID+Calo candidates
+float massToF_mean       = MToFMSagno->GetBinContent(bin_massToF);
+float massToF_resolution = MToFMSagno->GetBinError(bin_massToF);
+float massToF            = random.Gaus(massToF_mean, massToF_resolution);
+
+ // Sample the dEdx mass for ID+Calo candidates
+float massdEdx_mean       = MdedxMSagno->GetBinContent(bin_massdEdx);
+float massdEdx_resolution = MdedxMSagno->GetBinError(bin_massdEdx);
+float massdEdx            = random.Gaus(massdEdx_mean, massdEdx_resolution);
+
+// Apply final mass requirements
+if (massToF < lowerLimit_MToF || massdEdx < lowerLimit_MdEdx) return;
+
+// Events in the signal region
+CutflowMSagno->Fill("Final mass window", weight);

@@ -1,0 +1,116 @@
+// Cutflow2Cand - examplary cutflow histogram
+// EtmissTurnOn - provided turn-on histogram for Etmiss trigger
+// SingleMuTurnOn - provided turn-on histogram for single-muon trigger
+// LooseEff - provided efficiency histogramm for loose candidates
+// TightPromotionEff - provided efficiency histogramm for promoting loose candidates to tight ones
+// MToFFullDet - provided mass resolution histogram
+// decayInsideAtlas - function to check for a decay vertex inside the ATLAS detector
+// lowerLimit_MToF - lower mass limit for signal region (ToF)
+// Particles - list of generator-level particles in the event
+// trandom - e.g. a TRandom3 object
+
+// All events
+Cutflow2Cand->Fill("all Events", weight);
+Cutflow1Cand->Fill("all Events", weight);
+
+// Estimate Trigger efficiency
+bool TriggerAccept = false;
+
+// Single muon trigger accept
+// Trigger accept for the hclp candidates possible for each of the candidates
+for (const auto& Particle: *Particles) {
+  // decayInsideAtlas checks for a decay vertex inside the ATLAS detector,
+  // so we only consider only R-hadrons that stable inside ATLAS (see measures above)
+  if (decayInsideAtlas(*Particle)) continue;
+
+  // Estimate trigger efficiency for candidate
+  float eta       = Particle->Eta();
+  float beta      = Particle->Beta();
+  int   bin_eta   = SingleMuTurnOn->GetXaxis()->FindBin(fabs(eta);
+  int   bin_beta  = SingleMuTurnOn->GetYaxis()->FindBin(beta);
+  float effTrig   = SingleMuTurnOn->GetBinContent(bin_eta, bin_beta);
+
+  if (trandom.Uniform() < effTrig)) TriggerAccept = true;
+}
+
+// Etmiss trigger accept
+if (Etmiss > 300.) TriggerAccept = true;
+int   bin     = EtmissTurnOn->GetXaxis()->FindBin(Etmiss);
+float eff_Met = EtmissTurnOn->GetBinContent(bin);
+if (trandom.Uniform() < eff_Met)) TriggerAccept = true;
+
+// If at least one trigger is expected to fire keep the event
+if (!TriggerAccept) return;
+
+// Events that passed the trigger
+Cutflow2Cand->Fill("passedTrigger", weight);
+Cutflow1Cand->Fill("passedTrigger", weight);
+
+// Sample number of candidates passing the respective preselection
+int countLoose = 0;
+int countTight = 0;
+
+for (const auto& Particle: *Particles) {
+  // decayInsideAtlas checks for a decay vertex inside the ATLAS detector,
+  // so we only consider only R-hadrons that stable inside ATLAS (see measures above)
+  if (decayInsideAtlas(*Particle)) continue;
+
+  float eta      = Particle->Eta();
+  float beta     = Particle->Beta();
+  float momentum = Particle->P();
+  float transmom = Particle->Pt();
+
+  // Estimate efficiencies
+  int bin_eta        = LooseEff->GetXaxis()->FindBin(fabs(eta));
+  int bin_beta       = LooseEff->GetYaxis()->FindBin(beta);
+  float effLoose     = LooseEff->GetBinContent(bin_eta, bin_beta);
+  float effPromotion = TightPromotionEff->GetBinContent(bin_eta, bin_beta);
+
+  // Momentum cut loose selection
+  if (momentum < 100.) continue;
+  if (transmom < 70.) continue;
+
+  if (trandom.Uniform() < effLoose) {
+    ++countLoose;
+
+    // Momentum cut tight selection
+    if (momentum < 200.) continue;
+
+    // Sample tight promotion of candidate
+    if (trandom.Uniform() < effPromotion) ++countTight;
+  }
+}
+
+// Final definition of the different signal regions
+if (countLoose == 2) {
+  // Events with exactly two loose candiates
+  Cutflow2Cand->Fill("2 Loose candidates", weight);
+
+  // Sample the ToF mass for two full-detector candidates
+  int   bin_massToF        = MToFFullDet->GetXaxis()->FindBin(Mass);
+  float massToF_mean       = MToFFullDet->GetBinContent(bin_massToF);
+  float massToF_resolution = MToFFullDet->GetBinError(bin_massToF);
+  float massToF1           = trandom.Gaus(massToF_mean, massToF_resolution);
+  float massToF2           = trandom.Gaus(massToF_mean, massToF_resolution);
+
+  // Apply the lower mass cuts for the respective signal region
+  if (std::min(massToF1, massToF2) > lowerLimit_MToF) {
+    // Events in the signal region SR-FullDet-2Cand
+    Cutflow2Cand->Fill("Final mass window", weight);
+  }
+} else if (countTight == 1) {
+  // Events with exactly one tight candiate and not two loose ones
+  Cutflow1Cand->Fill("1 Tight candidate", weight);
+
+  // Sample the ToF mass for one full-detector candidate
+  int   bin_massToF        = MToFFullDet->GetXaxis()->FindBin(Mass);
+  float massToF_mean       = MToFFullDet->GetBinContent(bin_massToF);
+  float massToF_resolution = MToFFullDet->GetBinError(bin_massToF);
+  float massToF            = trandom.Gaus(massToF_mean, massToF_resolution);
+
+  // Apply the lower mass cuts for the respective signal region
+  if (massToF > lowerLimit_MToF){
+    // Events in the signal region SR-FullDet-1Cand
+    Cutflow1Cand->Fill("Final mass window", weight);
+  }
+}

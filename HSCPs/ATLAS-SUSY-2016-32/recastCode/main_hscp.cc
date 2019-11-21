@@ -66,6 +66,12 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
   TH1F* MToFMSagno = (TH1F*) InputFile->GetDirectory("Table 28")->Get("Hist1D_y1");
   TH1F* MdedxMSagno = (TH1F*) InputFile->GetDirectory("Table 27")->Get("Hist1D_y1");
 
+
+  // Book histograms.
+  TH2F *recHist = new TH2F("Reconstruction","", 20, 0., 2.,20,0.,1.);
+  TH2F *massHist = new TH2F("mRec","", 80, -2000., 4000.,80, -2000., 4000.);
+
+
   //Create vectors for storing the number of event in each SR/mass window
   std::vector<float> massToF_min  = {350.,550.,700.,850.};
   std::vector<float> massdEdx_min = {300.,450.,600.,750.};
@@ -81,6 +87,12 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
   int iAbort = 0;
   // Begin event loop.
   int iEvent = 0;
+
+  int nMET = 0;
+  int nCandidate = 0;
+  int nMassWindow = 0;
+  float avgCandEff = 0.;
+
   while (iEvent < nevents or nevents < 0){
 
     // If failure because reached end of file then exit event loop.
@@ -109,15 +121,18 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
     }
 //    cout << "Passed MET" << endl;
 
+    ++nMET;
+
     // Events that passed the trigger
 	std::vector<Particle> candidates;
+	int nRhadrons = 0;
     for (int i = 0; i < event.size(); ++i) {
 
     	Particle particle = event[i];
 
 		// isPrimaryRHadron identifies the initial R-Hadrons in the event record
-		if (!isPrimaryRHadron(particle)) continue;
-
+		if (!isPrimaryRHadron(particle,event)) continue;
+		++nRhadrons;
 //		cout << "index = " << i << endl;
 //		cout << "R-hadron = " << particle.name() << endl;
 //		cout << "R-hadron charge = " << particle.charge() << endl;
@@ -136,9 +151,11 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
 //		cout << "Good candidate = " << particle.name() << " pT = " << particle.pT() << " p = " << particle.pAbs() << endl;
 
-		// Consider only particles with minimum (transverse) momentum
+		// Consider only particles with minimum (transverse) momentum and maximum eta
 		if (particle.pAbs() < 200.) continue;
 		if (particle.pT() < 50.) continue;
+		if (fabs(particle.eta()) > 1.65) continue;
+
 
 		//Estimated decision
 		float eta  = particle.eta();
@@ -146,6 +163,10 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 		int   bin_eta  = IDCaloEff->GetXaxis()->FindBin(fabs(eta));
 		int   bin_beta = IDCaloEff->GetYaxis()->FindBin(beta);
 		float effCand  = IDCaloEff->GetBinContent(bin_eta, bin_beta);
+
+		avgCandEff += effCand;
+
+		recHist->Fill(fabs(eta),beta);
 
 		float candRandom = (std::rand()/(float)RAND_MAX); //lumCut = random(0,1)
 //		cout << "beta = " << beta << " eta = " << eta << endl;
@@ -158,11 +179,13 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
 	if (candidates.size() == 0) continue;
 
+	++nCandidate;
+
 	float Mass = 0.0;
 	std::vector<int> passed_SR = {0,0,0,0};
 	for (int i = 0; i < candidates.size(); ++i){
 
-		Mass = candidates[i].m();
+		Mass = fabs(candidates[i].m());
 		// Events with at least one candidate
 		// Sample the masses and apply the final mass window requirements
 		int bin_massToF  = MToFMSagno->GetXaxis()->FindBin(Mass);
@@ -180,6 +203,10 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 		std::normal_distribution<double> gaussdEdx(massdEdx_mean, massdEdx_resolution);
 		float massdEdx   = gaussdEdx(engine);
 
+
+		massHist->Fill(massdEdx,massToF);
+//		cout << "Mass = " << Mass << " massToF = " << massToF << " massdEdx = " << massdEdx << endl;
+
 		for (int j = 0; j < nEvts_SR.size(); ++j){
 			// Apply final mass requirements for each SR
 			if (massToF < massToF_min[j] || massdEdx < massdEdx_min[j]) continue;
@@ -193,20 +220,53 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 		++nEvts_SR[j];
 	}
 
+	if (passed_SR[1] > 0) ++nMassWindow;
 
 //    cout << "-------------- Event " << iEvent << "----------------" << endl;
   // End of event loop.
   }
 
-  pythia.stat();
+//  pythia.stat();
+
+  cout << "MET trigger eff = " << float(nMET)/float(iEvent) << endl;
+  cout << "Candidate eff = " << float(nCandidate)/float(iEvent) << "  (average candidate eff = " << avgCandEff/float(recHist->GetEntries()) << ")" << endl;
+  cout << "Mass window eff = " << float(nMassWindow)/float(iEvent) << endl;
+
+  //Save histograms to file:
+  FILE* OutputFileA = fopen("massHist.dat", "w");
+  double xbin,ybin,binContent;
+  fprintf(OutputFileA,"# massdEdx,massToF,Entries\n");
+  for (int i=1; i<=massHist->GetNbinsX();i++) {
+	  for (int j=1; j<=massHist->GetNbinsY();j++) {
+		  xbin = massHist->GetXaxis()->GetBinCenter(i);
+		  ybin = massHist->GetYaxis()->GetBinCenter(j);
+		  binContent = massHist->GetBinContent(i,j);
+		  fprintf(OutputFileA,"%1.3e, %1.3e, %1.3e\n",xbin,ybin,binContent);
+	  }
+  }
+  fclose(OutputFileA);
+  FILE* OutputFileB = fopen("recHist.dat", "w");
+  fprintf(OutputFileB,"# eta,beta,Entries\n");
+  for (int i=1; i<=recHist->GetNbinsX();i++) {
+	  for (int j=1; j<=recHist->GetNbinsY();j++) {
+		  xbin = recHist->GetXaxis()->GetBinCenter(i);
+		  ybin = recHist->GetYaxis()->GetBinCenter(j);
+		  binContent = recHist->GetBinContent(i,j);
+		  fprintf(OutputFileB,"%1.3e, %1.3e, %1.3e\n",xbin,ybin,binContent);
+	  }
+  }
+  fclose(OutputFileB);
+
 
   for (int i = 0; i < nEvts_SR.size(); ++i){
-        //fprintf(OutputFile,"M>%3i Total Efficiency: %1.3e +- %1.3e\n",Mi*100,totalEffs[Mi].first/iEvent,err);
-        fprintf(stdout,"(mTOF>%3.0f, mdEdx > %3.0f) total Efficiency: %1.3e\n", massToF_min[i],massdEdx_min[i],
+      fprintf(OutputFile,"(mTOF>%3.0f, mdEdx > %3.0f) total Efficiency: %1.3e\n", massToF_min[i],massdEdx_min[i],
+      		float(nEvts_SR[i])/float(iEvent));
+
+      fprintf(stdout,"(mTOF>%3.0f, mdEdx > %3.0f) total Efficiency: %1.3e\n", massToF_min[i],massdEdx_min[i],
         		float(nEvts_SR[i])/float(iEvent));
   }
   //fprintf(OutputFile,"<\\total>\n");
-  //fclose(OutputFile);
+  fclose(OutputFile);
     
 
   // Done.
@@ -230,7 +290,7 @@ int main( int argc, const char * argv[] ) {
   int nevents = 100;
   double width = 0.;
   string cfgfile = "pythia8.cfg";
-  string outfile = "test.lhe";
+  string outfile = "test.dat";
   string infile = "";
   for ( int i=1; i!=argc ; ++i )
   {

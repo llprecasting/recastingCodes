@@ -11,15 +11,20 @@ using namespace Pythia8;
 
 
 
-bool isPrimaryRHadron(Particle &particle)
+bool isPrimaryRHadron(Particle &particle, Event &event)
 //Return True (False) if the particle is (is not) a primary R-hadron
 {
 
-	if (abs(particle.status()) == 104) {
-        return true;
+	if (abs(particle.status()) != 104) {return false;}
+	//Check if it is not an intermediate R-hadron (has an R-hadron as daughter)
+	std::vector<int> daughters = particle.daughterListRecursive();
+	for (int i = 0; i < daughters.size(); ++i){
+		int idaughter = daughters[i];
+		Particle daughterParticle = event[idaughter];
+		if (abs(daughterParticle.status()) == 104){return false;}
 	}
 
-	return false;
+	return true;
 }
 
 bool decayBeforeEndHcal(Particle &particle)
@@ -27,7 +32,8 @@ bool decayBeforeEndHcal(Particle &particle)
 {
 	if (particle.isFinal()){return false;}
     Vec4 decayVertex = particle.vDec();
-    if (decayVertex.pT() < 6000.){return true;}
+    if (decayVertex.pT() < 3900.){return true;}
+    if (abs(decayVertex.pz()) < 6100.){return true;}
 
 	return false;
 }
@@ -44,10 +50,10 @@ Vec4 getMissingMomentum(Event &event)
     	Particle ptc = event[i];
     	if (!ptc.isFinal()) continue;
     	//If particle has been produced inside or after the calorimeter, skip it and include its parent
-    	if (abs(ptc.vProd().pz()) > 6100. || abs(ptc.vProd().pT()) > 2300.){
+    	if (abs(ptc.vProd().pz()) > 6100. || ptc.vProd().pT() > 2300.){
     		int mom = ptc.mother1();
     		//cout << "Adding mom " << mom << " from " << ptc.name() << " and index " << i << endl;
-    		if(std::find(metaStableMothers.begin(), metaStableMothers.end(), mom) != metaStableMothers.end()) {
+    		if(std::find(metaStableMothers.begin(), metaStableMothers.end(), mom) == metaStableMothers.end()) {
     			metaStableMothers.push_back(mom);
     		}
     		continue;

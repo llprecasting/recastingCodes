@@ -35,20 +35,17 @@ The basic required input is a (parton level) LHE or SLHA file.
 For instance, running:
 
 ```
-./main_hscp.exe -f example.slha -n 100 -o example.lhe
+./main_hscp.exe -f example.slha -n 100
 ```
 
 should generate 100 events and display the efficiencies for the given input file.
-A simplified LHE output file (example.lhe) is also generated with the isolated HSCPs, their momentum,
-the efficiency for each particle and the final efficiency.
-This information can then be used later to rescale the efficiencies according to the HSCP lifetime.
+
 
 ## Validation ##
 
-The validation of the signal efficiencies (efficiency times acceptance)
-for direct production of staus can be found in the [validation folder](validation).
-The output (.lhe files) was generated using the SLHA files and pythia8.cfg file stored in the folder.
-The following validation plot can be generated running this [ipython notebook](validation/validation.ipynb):
+The validation of the signal efficiencies (efficiency times acceptance) can be found in the [validation folder](validation).
+The efficiencies were computed using the SLHA files and the pythia8.cfg file stored in the folder.
+The following validation plot can be generated running this [ipython notebook](validation/validationGluino.ipynb):
 
 
-![Alt text](validation/validationPlot.png?raw=true "Validation Plot")
+![Alt text](validation/validationGluino.png?raw=true "Validation Plot")

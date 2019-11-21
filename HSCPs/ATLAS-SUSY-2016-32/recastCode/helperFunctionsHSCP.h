@@ -2,13 +2,31 @@
 #include <string>
 #include <vector>
 #include <vector>
-#include "TLorentzVector.h"
-#include "TROOT.h"
-#include "TH3.h"
 
 
 using namespace Pythia8;
 
+bool isHSCP(Particle &particle, Event &event)
+//Return True (False) if the particle is (is not) a HSCP
+{
+
+	//Skip neutral particles
+	if (!particle.isCharged()) return false;
+	//Skip color charged particles or hadrons
+	if (particle.colType() != 0) return false;
+	if (particle.isHadron()) return false;
+	//Skip light particles
+	if (fabs(particle.m()) < 20.) return false;
+	//Check if it is not an intermediate state (has itself as daughter)
+	std::vector<int> daughters = particle.daughterListRecursive();
+	for (int i = 0; i < daughters.size(); ++i){
+		int idaughter = daughters[i];
+		Particle daughterParticle = event[idaughter];
+		if (daughterParticle.id() == particle.id()) return false;
+	}
+
+	return true;
+}
 
 
 bool isPrimaryRHadron(Particle &particle, Event &event)
@@ -28,12 +46,23 @@ bool isPrimaryRHadron(Particle &particle, Event &event)
 }
 
 bool decayBeforeEndHcal(Particle &particle)
-//Return True (False) if the particle is (is not) a primary R-hadron
+//Return True (False) if the particle decays before (after) the hadronic calorimeter
 {
 	if (particle.isFinal()){return false;}
     Vec4 decayVertex = particle.vDec();
     if (decayVertex.pT() < 3900.){return true;}
     if (abs(decayVertex.pz()) < 6100.){return true;}
+
+	return false;
+}
+
+bool decayInsideAtlas(Particle &particle)
+//Return True (False) if the particle decays inside the detector
+{
+	if (particle.isFinal()){return false;}
+    Vec4 decayVertex = particle.vDec();
+    if (decayVertex.pT() < 12000.){return true;}
+    if (abs(decayVertex.pz()) < 23000.){return true;}
 
 	return false;
 }

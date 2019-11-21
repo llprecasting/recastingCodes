@@ -15,7 +15,7 @@ main_Rhadron.exe: recastCode/main_Rhadron.cc recastCode/helperFunctionsHSCP.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  recastCode/main_Rhadron.cc -lpythia8 -ldl -L$(ROOTSYS)/lib -Wl,-rpath,$(ROOTSYS)/lib `$(ROOTSYS)/bin/root-config --glibs`
 
 
-main_Rhadron.exe: recastCode/main_HSCP.cc recastCode/helperFunctionsHSCP.h 
+main_HSCP.exe: recastCode/main_HSCP.cc recastCode/helperFunctionsHSCP.h 
 	echo $(XMLDOC) > xml.doc
     
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  recastCode/main_HSCP.cc -lpythia8 -ldl -L$(ROOTSYS)/lib -Wl,-rpath,$(ROOTSYS)/lib `$(ROOTSYS)/bin/root-config --glibs`

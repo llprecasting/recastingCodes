@@ -1,8 +1,6 @@
 // Reads an input LHE or an input SLHA file and generate events using Pythia 8.
-// The HSCP efficiencies for each event as well as the 4-momentum of each isolated HSCP
-// are stored in the output in a simplified LHE format.
-// All the HSCPs are assumed to stable.
-// For including finite lifetime effects, the events must be reweighted by Flong = exp(-width*l_out/gamma*beta).
+// The efficiencies for MS-Agnostic search are displayed and
+// stored in the output file.
 
 #include <iostream>
 #include "Pythia8/Pythia.h"
@@ -65,6 +63,8 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
   TH2F* IDCaloEff = (TH2F*) InputFile->GetDirectory("Table 24")->Get("Hist2D_y1");
   TH1F* MToFMSagno = (TH1F*) InputFile->GetDirectory("Table 28")->Get("Hist1D_y1");
   TH1F* MdedxMSagno = (TH1F*) InputFile->GetDirectory("Table 27")->Get("Hist1D_y1");
+  TH1F* MToFMSagnoErr = (TH1F*) InputFile->GetDirectory("Table 28")->Get("Hist1D_y1_e1");
+  TH1F* MdedxMSagnoErr = (TH1F*) InputFile->GetDirectory("Table 27")->Get("Hist1D_y1_e1");
 
 
   // Book histograms.
@@ -115,7 +115,7 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
     if (Etmiss < 300.) {
         int   bin     = EtmissTurnOn->GetXaxis()->FindBin(Etmiss);
         float eff_Met = EtmissTurnOn->GetBinContent(bin);
-        float metRandom = (std::rand()/(float)RAND_MAX); //lumCut = random(0,1)
+        float metRandom = (std::rand()/(float)RAND_MAX);
         if (metRandom > eff_Met) continue;
 //        cout << "Passed MET cut: " << metRandom << " > " << Etmiss << endl;
     }
@@ -168,7 +168,7 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
 		recHist->Fill(fabs(eta),beta);
 
-		float candRandom = (std::rand()/(float)RAND_MAX); //lumCut = random(0,1)
+		float candRandom = (std::rand()/(float)RAND_MAX);
 //		cout << "beta = " << beta << " eta = " << eta << endl;
 //		cout << "Calorimeter eff = " << effCand << " random = " << candRandom << endl;
 		if (candRandom > effCand) continue;
@@ -189,20 +189,19 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 		// Events with at least one candidate
 		// Sample the masses and apply the final mass window requirements
 		int bin_massToF  = MToFMSagno->GetXaxis()->FindBin(Mass);
-		int bin_massdEdx = MdedxMSagno->GetXaxis()->FindBin(Mass);
-
-		// Sample the ToF mass for ID+Calo candidates
 		float massToF_mean = MToFMSagno->GetBinContent(bin_massToF);
-		float massToF_resolution = MToFMSagno->GetBinError(bin_massToF);
+		bin_massToF  = MToFMSagnoErr->GetXaxis()->FindBin(Mass);
+		float massToF_resolution = MToFMSagnoErr->GetBinContent(bin_massToF);
 		std::normal_distribution<double> gaussToF(massToF_mean, massToF_resolution);
 		float massToF = gaussToF(engine);
 
-		 // Sample the dEdx mass for ID+Calo candidates
-		float massdEdx_mean       = MdedxMSagno->GetBinContent(bin_massdEdx);
-		float massdEdx_resolution = MdedxMSagno->GetBinError(bin_massdEdx);
+
+		int bin_massdEdx = MdedxMSagno->GetXaxis()->FindBin(Mass);
+		float massdEdx_mean = MdedxMSagno->GetBinContent(bin_massdEdx);
+		bin_massdEdx = MdedxMSagnoErr->GetXaxis()->FindBin(Mass);
+		float massdEdx_resolution = MdedxMSagnoErr->GetBinContent(bin_massdEdx);
 		std::normal_distribution<double> gaussdEdx(massdEdx_mean, massdEdx_resolution);
 		float massdEdx   = gaussdEdx(engine);
-
 
 		massHist->Fill(massdEdx,massToF);
 //		cout << "Mass = " << Mass << " massToF = " << massToF << " massdEdx = " << massdEdx << endl;
@@ -289,7 +288,7 @@ int main( int argc, const char * argv[] ) {
   float weight = 1.;
   int nevents = 100;
   double width = 0.;
-  string cfgfile = "pythia8.cfg";
+  string cfgfile = "pythia8_gluino.cfg";
   string outfile = "test.dat";
   string infile = "";
   for ( int i=1; i!=argc ; ++i )

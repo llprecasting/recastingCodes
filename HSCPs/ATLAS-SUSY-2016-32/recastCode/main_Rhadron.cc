@@ -7,13 +7,13 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <ctime>
-#include "helperFunctionsHSCP.h"
 #include "TROOT.h"
 #include "TFile.h"
 #include "TH1.h"
 #include "TH2.h"
 #include <string>
 #include <random>
+#include "helperFunctions.h"
 
 
 
@@ -43,6 +43,7 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
     cout << "Using LHE file as input" << endl;
     pythia.readString("Beams:frameType = 4");
     pythia.readString("Beams:LHEF = " + infile);
+    nevents = -1;
   }
 
   // EtmissTurnOn - provided turn-on histogram for Etmiss trigger
@@ -69,7 +70,9 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
   // Book histograms.
   TH2F *recHist = new TH2F("Reconstruction","", 20, 0., 2.,20,0.,1.);
-  TH2F *massHist = new TH2F("mRec","", 80, -2000., 4000.,80, -2000., 4000.);
+  TH2F *massHist = new TH2F("mRec","", 40, 0., 4000.,40, 0., 4000.);
+  TH1F *zdecHist = new TH1F("z-Decay","", 100, 0., 10000.);
+  TH1F *rdecHist = new TH1F("R-Decay","", 100, 0., 10000.);
 
 
   //Create vectors for storing the number of event in each SR/mass window
@@ -89,6 +92,7 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
   int iEvent = 0;
 
   int nMET = 0;
+  int nDecay = 0;
   int nCandidate = 0;
   int nMassWindow = 0;
   float avgCandEff = 0.;
@@ -110,7 +114,7 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
     // All events
     double Etmiss = getMissingMomentum(event).pT();
-    //cout << "MET = " << Etmiss << endl;
+//    cout << "MET = " << Etmiss << endl;
     // Trigger decision
     if (Etmiss < 300.) {
         int   bin     = EtmissTurnOn->GetXaxis()->FindBin(Etmiss);
@@ -129,6 +133,10 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
     for (int i = 0; i < event.size(); ++i) {
 
     	Particle particle = event[i];
+		float eta  = fabs(particle.eta());
+		float beta = particle.pAbs()/particle.e();
+		float zDec = fabs(particle.vDec().pz());
+		float RDec = particle.vDec().pT();
 
 		// isPrimaryRHadron identifies the initial R-Hadrons in the event record
 		if (!isPrimaryRHadron(particle,event)) continue;
@@ -139,15 +147,18 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 //		cout << "Decay before endCal = " << decayBeforeEndHcal(particle) << endl;
 //		cout << "Decay vertex = " << particle.vDec() << endl;
 
+		zdecHist->Fill(zDec);
+		rdecHist->Fill(RDec);
+		recHist->Fill(eta,beta);
 		// RhadCharge returns the charge of an R-hadron,
 		// so we consider only R-hadrons charged after hadronisation
 		if (abs(particle.charge()) != 1) continue;
 
-
-
 		// decayBeforeEndHcal checks for a decay vertex before the end of the tile calorimeter,
 		// so we only consider R-hadrons that decay after that (see measures above)
 		if (decayBeforeEndHcal(particle)) continue;
+
+		++nDecay;
 
 //		cout << "Good candidate = " << particle.name() << " pT = " << particle.pT() << " p = " << particle.pAbs() << endl;
 
@@ -158,15 +169,11 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
 
 		//Estimated decision
-		float eta  = particle.eta();
-		float beta     = particle.pAbs()/particle.e();
 		int   bin_eta  = IDCaloEff->GetXaxis()->FindBin(fabs(eta));
 		int   bin_beta = IDCaloEff->GetYaxis()->FindBin(beta);
 		float effCand  = IDCaloEff->GetBinContent(bin_eta, bin_beta);
 
 		avgCandEff += effCand;
-
-		recHist->Fill(fabs(eta),beta);
 
 		float candRandom = (std::rand()/(float)RAND_MAX);
 //		cout << "beta = " << beta << " eta = " << eta << endl;
@@ -227,7 +234,9 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
 //  pythia.stat();
 
+  cout << iEvent << " events generated" << endl;
   cout << "MET trigger eff = " << float(nMET)/float(iEvent) << endl;
+  cout << "Decay outside eff = " << float(nDecay)/float(iEvent) << endl;
   cout << "Candidate eff = " << float(nCandidate)/float(iEvent) << "  (average candidate eff = " << avgCandEff/float(recHist->GetEntries()) << ")" << endl;
   cout << "Mass window eff = " << float(nMassWindow)/float(iEvent) << endl;
 
@@ -255,6 +264,24 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 	  }
   }
   fclose(OutputFileB);
+
+  FILE* OutputFileC = fopen("zdecHist.dat", "w");
+  fprintf(OutputFileC,"# z-dec,Entries\n");
+  for (int i=1; i<=zdecHist->GetNbinsX();i++) {
+	  xbin = zdecHist->GetXaxis()->GetBinCenter(i);
+	  binContent = zdecHist->GetBinContent(i);
+	  fprintf(OutputFileC,"%1.3e, %1.3e\n",xbin,binContent);
+	  }
+  fclose(OutputFileC);
+
+  FILE* OutputFileD = fopen("rdecHist.dat", "w");
+  fprintf(OutputFileD,"# R-dec,Entries\n");
+  for (int i=1; i<=rdecHist->GetNbinsX();i++) {
+	  xbin = rdecHist->GetXaxis()->GetBinCenter(i);
+	  binContent = rdecHist->GetBinContent(i);
+	  fprintf(OutputFileD,"%1.3e, %1.3e\n",xbin,binContent);
+	  }
+  fclose(OutputFileD);
 
 
   for (int i = 0; i < nEvts_SR.size(); ++i){

@@ -7,13 +7,13 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <ctime>
-#include "helperFunctionsHSCP.h"
 #include "TROOT.h"
 #include "TFile.h"
 #include "TH1.h"
 #include "TH2.h"
 #include <string>
 #include <random>
+#include "helperFunctions.h"
 
 
 
@@ -144,8 +144,6 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 		if (triggerRandom < effTrig) TriggerAccept = true;
 
 		// Consider only particles with minimum transverse momentum and beta and maximum eta
-		float eta  = fabs(particle.eta());
-		float beta  = particle.pAbs()/particle.e();
 		if (beta < 0.2) continue;
 		if (particle.pT() < 26.) continue;
 		if (eta > 2.5) continue;

@@ -21,12 +21,12 @@ using namespace Pythia8;
 
 
 
-int run(const string & infile, int nevents, const string & cfgfile, const string & outfile, double width = 0.)
+int run(const string & infile, int nevents, const string & cfgfile, const string & outlabel, double width = 0.)
 {
 
 
   std::srand(500);
-  FILE* OutputFile = fopen(outfile.c_str(), "w");
+  FILE* OutputFile = fopen((outlabel+".out").c_str(), "w");
   // Generator. Shorthand for the event.
   Pythia pythia("",false); //Set printBanner to false
   Event& event = pythia.event;
@@ -66,11 +66,20 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
   TH1F* MToFFullDetErr = (TH1F*) InputFile->GetDirectory("Table 29")->Get("Hist1D_y1_e1");
 
 
+  // Book histograms.
+  TH2F *recHist = new TH2F("Reconstruction","", 20, 0., 2.,20,0.,1.);
+  TH1F *massLooseHist = new TH1F("mToFLoose","", 100, 0., 1000.);
+  TH1F *massTightHist = new TH1F("mToFTight","", 100, 0., 1000.);
+  TH1F *pTHist = new TH1F("pT","", 100, 0., 2000.);
+  TH1F *betaHist = new TH1F("beta","", 100, 0., 1.);
+  TH1F *metHist = new TH1F("MET","", 100, 0., 1000.);
+
+
   //Create vectors for storing the number of event in each SR/mass window
-  std::vector<float> massToFLoose_min  = {175.,375.,600.,825.};
-  std::vector<float> massToFTight_min  = {150.,350.,575.,80.};
-  std::vector<int> nEvts_SRLoose = {0,0,0,0};
-  std::vector<int> nEvts_SRTight = {0,0,0,0};
+  std::vector<float> massToF2Cand_min  = {150.,350.,575.,800.};
+  std::vector<float> massToF1Cand_min  = {175.,375.,600.,825.};
+  std::vector<int> nEvts_SR1Cand = {0,0,0,0};
+  std::vector<int> nEvts_SR2Cand = {0,0,0,0};
 
 
   // Initialize.
@@ -83,10 +92,12 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
   // Begin event loop.
   int iEvent = 0;
 
-  int nMET = 0;
+  int nTrigger = 0;
   int nCandidate = 0;
   int nMassWindow = 0;
+  int nDecay = 0;
   float avgCandEff = 0.;
+  int nHSCPs = 0;
 
   while (iEvent < nevents or nevents < 0){
 
@@ -102,14 +113,11 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
     ++iEvent;
 
-
     // All events
     double Etmiss = getMissingMomentum(event).pT();
-    //cout << "MET = " << Etmiss << endl;
 
+    metHist->Fill(Etmiss);
 
-	std::vector<Particle> candidates;
-	int nHSCPs = 0;
 	bool TriggerAccept = false;
 	// Etmiss trigger accept
 	if (Etmiss > 300.) TriggerAccept = true;
@@ -118,50 +126,61 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 	float metRandom = (std::rand()/(float)RAND_MAX);
 	if (metRandom < eff_Met) TriggerAccept = true;
 
-    for (int i = 0; i < event.size(); ++i) {
+	//If the MET trigger was not activated, check for the muon trigger:
+	if (!TriggerAccept){
+		for (int i = 0; i < event.size(); ++i) {
 
-    	Particle particle = event[i];
+			Particle particle = event[i];
+			// isHSCP identifies the HSCP candidates in the event record
+			if (!isHSCP(particle,event)) continue;
+
+			if (decayInsideAtlas(particle)) continue;
+			//Only single charged particles are considered
+			if (abs(particle.charge()) != 1) continue;
+
+			float eta  = fabs(particle.eta());
+			float beta  = particle.pAbs()/particle.e();
+			int bin_eta   = SingleMuTurnOn->GetXaxis()->FindBin(eta);
+			int bin_beta  = SingleMuTurnOn->GetYaxis()->FindBin(beta);
+			float effTrig   = SingleMuTurnOn->GetBinContent(bin_eta, bin_beta);
+			float triggerRandom = (std::rand()/(float)RAND_MAX);
+			if (triggerRandom < effTrig) {
+				TriggerAccept = true;
+				break;
+			}
+		}
+	}
+	if (!TriggerAccept) continue;
+	++nTrigger;
+
+	//Get HSCP candidates:
+	std::vector<Particle> looseCandidates;
+	std::vector<Particle> tightCandidates;
+	for (int i = 0; i < event.size(); ++i) {
+
+		Particle particle = event[i];
 		// isHSCP identifies the HSCP candidates in the event record
 		if (!isHSCP(particle,event)) continue;
-		++nHSCPs;
-
-		//		cout << "index = " << i << endl;
-		//		cout << "HSCP = " << particle.name() << endl;
-		//		cout << "HSCP charge = " << particle.charge() << endl;
-		//		cout << "Decay inside ATLAS = " << decayInsideAtlas(particle) << endl;
-		//		cout << "Decay vertex = " << particle.vDec() << endl;
-
-		if (decayInsideAtlas(particle)) continue;
 		//Only single charged particles are considered
 		if (abs(particle.charge()) != 1) continue;
+		++nHSCPs;
+		if (decayInsideAtlas(particle)) continue;
+		++nDecay;
 
 		float eta  = fabs(particle.eta());
 		float beta  = particle.pAbs()/particle.e();
-		int bin_eta   = SingleMuTurnOn->GetXaxis()->FindBin(eta);
-		int bin_beta  = SingleMuTurnOn->GetYaxis()->FindBin(beta);
-		float effTrig   = SingleMuTurnOn->GetBinContent(bin_eta, bin_beta);
-		float triggerRandom = (std::rand()/(float)RAND_MAX);
-		if (triggerRandom < effTrig) TriggerAccept = true;
+		float pT = particle.pT();
+		float p = particle.pAbs();
 
-		// Consider only particles with minimum transverse momentum and beta and maximum eta
-		if (beta < 0.2) continue;
-		if (particle.pT() < 26.) continue;
-		if (eta > 2.5) continue;
-		candidates.push_back(particle);
-    }
-    // End of particle loop.
+		//Pre-selection:
+		if (eta > 2.0) continue;
+		if (pT < 70.0) continue;
+		if (p < 100.0) continue;
 
-	if (!TriggerAccept) continue;
-	if (candidates.size() == 0) continue;
-	++nCandidate;
+		betaHist->Fill(beta);
+		recHist->Fill(eta,beta);
+		pTHist->Fill(pT);
 
-	std::vector<Particle> looseCandidates;
-	std::vector<Particle> tightCandidates;
-	for (int i = 0; i < candidates.size(); ++i){
-
-		Particle particle = candidates[i];
-		float eta = fabs(particle.eta());
-		float beta = particle.pAbs()/particle.e();
 		// Estimate efficiencies
 		int bin_eta = LooseEff->GetXaxis()->FindBin(eta);
 		int bin_beta = LooseEff->GetYaxis()->FindBin(beta);
@@ -170,12 +189,11 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 		float looseRandom = (std::rand()/(float)RAND_MAX);
 		float promoteRandom = (std::rand()/(float)RAND_MAX);
 
-		// Momentum cut loose selection
-		if (particle.pAbs() < 100.) continue;
-		if (particle.pT() < 70.) continue;
+		avgCandEff += effLoose;
 
 		if (looseRandom < effLoose) {
 		    looseCandidates.push_back(particle);
+		    ++nCandidate;
 		    // Momentum cut tight selection
 		    if (particle.pAbs() < 200.) continue;
 		    // Sample tight promotion of candidate
@@ -194,21 +212,25 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 	    int   bin_massToF1        = MToFFullDet->GetXaxis()->FindBin(mass1);
 	    float massToF_mean1       = MToFFullDet->GetBinContent(bin_massToF1);
 	    bin_massToF1 			  = MToFFullDetErr->GetXaxis()->FindBin(mass1);
-	    float massToF_resolution1 = MToFFullDetErr->GetBinError(bin_massToF1);
+	    float massToF_resolution1 = MToFFullDetErr->GetBinContent(bin_massToF1);
 	    int   bin_massToF2        = MToFFullDet->GetXaxis()->FindBin(mass2);
 	    float massToF_mean2       = MToFFullDet->GetBinContent(bin_massToF2);
 	    bin_massToF2		      = MToFFullDetErr->GetXaxis()->FindBin(mass2);
-	    float massToF_resolution2 = MToFFullDetErr->GetBinError(bin_massToF2);
+	    float massToF_resolution2 = MToFFullDetErr->GetBinContent(bin_massToF2);
 	    std::normal_distribution<double> gaussToF1(massToF_mean1, massToF_resolution1);
 	    std::normal_distribution<double> gaussToF2(massToF_mean2, massToF_resolution2);
 	    float massToF1   = gaussToF1(engine);
 	    float massToF2   = gaussToF2(engine);
 
-		for (int j = 0; j < nEvts_SRLoose.size(); ++j){
+	    massLooseHist->Fill(massToF1);
+	    massLooseHist->Fill(massToF2);
+
+		for (int j = 0; j < nEvts_SR2Cand.size(); ++j){
 			// Apply final mass requirements for each SR
-			if (std::min(massToF1, massToF2)  < massToFLoose_min[j]) continue;
-			++nEvts_SRLoose[j];
+			if (std::min(massToF1, massToF2)  < massToF2Cand_min[j]) continue;
+			++nEvts_SR2Cand[j];
 		}
+		if (std::min(massToF1, massToF2)  > massToF2Cand_min[0])  ++nMassWindow;
 	}
 	else if (tightCandidates.size() == 1) {
 		// Events with exactly one tight candiate and not two loose ones
@@ -216,45 +238,120 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 		// Sample the ToF mass for one full-detector candidate
 		int   bin_massToF        = MToFFullDet->GetXaxis()->FindBin(mass);
 		float massToF_mean       = MToFFullDet->GetBinContent(bin_massToF);
-		float massToF_resolution = MToFFullDet->GetBinError(bin_massToF);
+		bin_massToF        		 = MToFFullDetErr->GetXaxis()->FindBin(mass);
+		float massToF_resolution = MToFFullDetErr->GetBinContent(bin_massToF);
 		std::normal_distribution<double> gaussToF(massToF_mean, massToF_resolution);
 		float massToF = gaussToF(engine);
 
-		for (int j = 0; j < nEvts_SRTight.size(); ++j){
-			// Apply final mass requirements for each SR
-			if (massToF  < massToFTight_min[j]) continue;
-			++nEvts_SRTight[j];
-		}
-	}
+	    massTightHist->Fill(massToF);
 
-//    cout << "-------------- Event " << iEvent << "----------------" << endl;
+		for (int j = 0; j < nEvts_SR1Cand.size(); ++j){
+			// Apply final mass requirements for each SR
+			if (massToF  < massToF1Cand_min[j]) continue;
+			++nEvts_SR1Cand[j];
+		}
+		if (massToF  > massToF1Cand_min[0]) ++nMassWindow;
+	}
   // End of event loop.
   }
 
 //  pythia.stat();
 
-//  cout << "MET trigger eff = " << float(nMET)/float(iEvent) << endl;
-//  cout << "Candidate eff = " << float(nCandidate)/float(iEvent) << "  (average candidate eff = " << avgCandEff/float(recHist->GetEntries()) << ")" << endl;
-//  cout << "Mass window eff = " << float(nMassWindow)/float(iEvent) << endl;
+	  //Save histograms to file:
+	  FILE* OutputFileA = fopen((outlabel+"_massLooseHist.dat").c_str(), "w");
+	  double xbin,ybin,binContent;
+	  fprintf(OutputFileA,"# massToF,Entries\n");
+	  for (int i=1; i<=massLooseHist->GetNbinsX();i++) {
+		  xbin = massLooseHist->GetXaxis()->GetBinCenter(i);
+		  binContent = massLooseHist->GetBinContent(i);
+		  fprintf(OutputFileA,"%1.3e, %1.3e\n",xbin,binContent);
+	  }
+	  fclose(OutputFileA);
 
-  //Save histograms to file:
+	  FILE* OutputFileAA = fopen((outlabel+"_massTightHist.dat").c_str(), "w");
+	  fprintf(OutputFileA,"# massToF,Entries\n");
+	  for (int i=1; i<=massTightHist->GetNbinsX();i++) {
+		  xbin = massTightHist->GetXaxis()->GetBinCenter(i);
+		  binContent = massTightHist->GetBinContent(i);
+		  fprintf(OutputFileAA,"%1.3e, %1.3e\n",xbin,binContent);
+	  }
+	  fclose(OutputFileAA);
 
 
-  for (int i = 0; i < nEvts_SRLoose.size(); ++i){
-      fprintf(OutputFile,"(mTOF>%3.0f) total Efficiency (Loose): %1.3e\n", massToFLoose_min[i],
-      		float(nEvts_SRLoose[i])/float(iEvent));
-      fprintf(stdout,"(mTOF>%3.0f) total Efficiency (Loose): %1.3e\n", massToFLoose_min[i],
-      		float(nEvts_SRLoose[i])/float(iEvent));
-  }
-  for (int i = 0; i < nEvts_SRTight.size(); ++i){
-      fprintf(OutputFile,"(mTOF>%3.0f) total Efficiency (Tight): %1.3e\n", massToFTight_min[i],
-      		float(nEvts_SRTight[i])/float(iEvent));
-      fprintf(stdout,"(mTOF>%3.0f) total Efficiency (Tight): %1.3e\n", massToFTight_min[i],
-      		float(nEvts_SRTight[i])/float(iEvent));
-  }
+	  FILE* OutputFileB = fopen((outlabel+"_recHist.dat").c_str(), "w");
+	  fprintf(OutputFileB,"# eta,beta,Entries\n");
+	  for (int i=1; i<=recHist->GetNbinsX();i++) {
+		  for (int j=1; j<=recHist->GetNbinsY();j++) {
+			  xbin = recHist->GetXaxis()->GetBinCenter(i);
+			  ybin = recHist->GetYaxis()->GetBinCenter(j);
+			  binContent = recHist->GetBinContent(i,j);
+			  fprintf(OutputFileB,"%1.3e, %1.3e, %1.3e\n",xbin,ybin,binContent);
+		  }
+	  }
+	  fclose(OutputFileB);
 
-  //fprintf(OutputFile,"<\\total>\n");
-  fclose(OutputFile);
+	  FILE* OutputFileC = fopen((outlabel+"_pTHist.dat").c_str(), "w");
+	  fprintf(OutputFileC,"# pT,Entries\n");
+	  for (int i=1; i<=pTHist->GetNbinsX();i++) {
+		  xbin = pTHist->GetXaxis()->GetBinCenter(i);
+		  binContent = pTHist->GetBinContent(i);
+		  fprintf(OutputFileC,"%1.3e, %1.3e\n",xbin,binContent);
+	  }
+	  fclose(OutputFileC);
+
+	  FILE* OutputFileD = fopen((outlabel+"_betaHist.dat").c_str(), "w");
+	  fprintf(OutputFileD,"# beta,Entries\n");
+	  for (int i=1; i<=betaHist->GetNbinsX();i++) {
+		  xbin = betaHist->GetXaxis()->GetBinCenter(i);
+		  binContent = betaHist->GetBinContent(i);
+		  fprintf(OutputFileD,"%1.3e, %1.3e\n",xbin,binContent);
+	  }
+	  fclose(OutputFileD);
+
+	  FILE* OutputFileE = fopen((outlabel+"_metHist.dat").c_str(), "w");
+	  fprintf(OutputFileE,"# MET,Entries\n");
+	  for (int i=1; i<=metHist->GetNbinsX();i++) {
+		  xbin = metHist->GetXaxis()->GetBinCenter(i);
+		  binContent = metHist->GetBinContent(i);
+		  fprintf(OutputFileE,"%1.3e, %1.3e\n",xbin,binContent);
+	  }
+	  fclose(OutputFileE);
+
+
+
+	  fprintf(stdout,"Number of events Generated = %i\n",iEvent);
+	  fprintf(stdout,"Trigger eff = %1.3e\n",float(nTrigger)/float(iEvent));
+	  fprintf(stdout,"Decay outside eff = %1.3e\n",float(nDecay*nTrigger)/float(nHSCPs*iEvent));
+	  fprintf(stdout,"Candidate eff = %1.3e (average loose candidate eff = %1.3e) \n",float(nCandidate)/float(iEvent),
+			  avgCandEff/float(recHist->GetEntries()));
+	  fprintf(stdout,"Mass window trigger eff = %1.3e\n",float(nMassWindow)/float(iEvent));
+
+	  fprintf(OutputFile,"Number of events Generated = %i\n",iEvent);
+	  fprintf(OutputFile,"MET trigger eff = %1.3e\n",float(nTrigger)/float(iEvent));
+	  fprintf(OutputFile,"Decay outside eff = %1.3e\n",float(nDecay)/float(iEvent));
+	  fprintf(OutputFile,"Candidate eff = %1.3e (average candidate eff = %1.3e) \n",float(nCandidate)/float(iEvent),
+			  avgCandEff/float(recHist->GetEntries()));
+	  fprintf(OutputFile,"Mass window trigger eff = %1.3e\n\n",float(nMassWindow)/float(iEvent));
+
+
+	  fprintf(OutputFile,"2 Candidates:\n");
+	  fprintf(stdout,"2 Candidates:\n");
+	  for (int i = 0; i < nEvts_SR2Cand.size(); ++i){
+	      fprintf(OutputFile,"(mTOF>%3.0f) total Efficiency (2Cand): %1.3e\n", massToF2Cand_min[i],
+	      		float(nEvts_SR2Cand[i])/float(iEvent));
+	      fprintf(stdout,"(mTOF>%3.0f) total Efficiency (2Cand): %1.3e\n", massToF2Cand_min[i],
+	      		float(nEvts_SR2Cand[i])/float(iEvent));
+	  }
+
+	  fprintf(OutputFile,"1 Candidate:\n");
+	  fprintf(stdout,"1 Candidate:\n");
+	  for (int i = 0; i < nEvts_SR1Cand.size(); ++i){
+	      fprintf(OutputFile,"(mTOF>%3.0f) total Efficiency (1Cand): %1.3e\n", massToF1Cand_min[i],
+	      		float(nEvts_SR1Cand[i])/float(iEvent));
+	      fprintf(stdout,"(mTOF>%3.0f) total Efficiency (1Cand): %1.3e\n", massToF1Cand_min[i],
+	      		float(nEvts_SR1Cand[i])/float(iEvent));
+	  }
+	  fclose(OutputFile);
     
 
   // Done.
@@ -275,7 +372,7 @@ void help( const char * name )
 
 int main( int argc, const char * argv[] ) {
   float weight = 1.;
-  int nevents = 100;
+  int nevents = -1;
   double width = 0.;
   string cfgfile = "pythia8_stau.cfg";
   string outfile = "test.dat";

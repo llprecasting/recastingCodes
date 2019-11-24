@@ -1,0 +1,16 @@
+Number of events Generated = 20000
+MET trigger eff = 7.682e-01
+Decay outside eff = 1.536e+00
+Candidate eff = 7.464e-01 (average candidate eff = 5.641e-01) 
+Mass window trigger eff = 2.923e-01
+
+2 Candidates:
+(mTOF>150) total Efficiency (2Cand): 1.987e-01
+(mTOF>350) total Efficiency (2Cand): 1.602e-01
+(mTOF>575) total Efficiency (2Cand): 0.000e+00
+(mTOF>800) total Efficiency (2Cand): 0.000e+00
+1 Candidate:
+(mTOF>175) total Efficiency (1Cand): 9.365e-02
+(mTOF>375) total Efficiency (1Cand): 6.790e-02
+(mTOF>600) total Efficiency (1Cand): 0.000e+00
+(mTOF>825) total Efficiency (1Cand): 0.000e+00

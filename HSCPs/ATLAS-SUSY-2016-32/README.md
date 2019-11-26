@@ -15,37 +15,47 @@ The following pre-requisites must be installed before compiling the main code:
 
 ## Installation/Compiling ##
 
-In order to compile the recasting code, run:
+In order to compile the recasting code for the R-hadron searches, run:
 
 ```
-make main_hscp.exe pythia8path=<PATH-TO-PYTHIA8FOLDER>
+make main_Rhadron.exe pythia8path=<PATH-TO-PYTHIA8FOLDER>
 ```
 
 where PATH-TO-PYTHIA8FOLDER should point to the Pythia8 folder containing the Pythia lib and include folders.
+The recasting code for the color neutral (HSCP) searches can be compiled through:
+
+```
+make main_Rhadron.exe pythia8path=<PATH-TO-PYTHIA8FOLDER>
+```
+
 
 ## Running ##
 
 Instructions for running the main code can be obtained running:
 
 ```
-./main_hscp.exe -h
+./main_HSCP.exe -h  or ./main_Rhadron.exe -h
 ```
 
 The basic required input is a (parton level) LHE or SLHA file.
 For instance, running:
 
 ```
-./main_hscp.exe -f example.slha -n 100
+./main_HSCP.exe -f example.slha -n 100
 ```
 
 should generate 100 events and display the efficiencies for the given input file.
+Notice that for R-hadron searches the Pythia configuration file (pythia8.cfg) may have to be adapted
+in order to properly specify the hadronization properties of the new long-lived colored BSM particles.
 
 
 ## Validation ##
 
 The validation of the signal efficiencies (efficiency times acceptance) can be found in the [validation folder](validation).
-The efficiencies were computed using the SLHA files and the pythia8.cfg file stored in the folder.
+The efficiencies were computed using the SLHA files and the pythia8_xx.cfg file stored in the folder.
 The following validation plot can be generated running this [ipython notebook](validation/validationGluino.ipynb):
 
 
-![Alt text](validation/validationGluino.png?raw=true "Validation Plot")
+![Alt text](validation/gluino_eff.png?raw=true "Validation Plot for Efficiencies")
+
+![Alt text](validation/gluino_UL.png?raw=true "Validation Plot for Upper Limits")

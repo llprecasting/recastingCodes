@@ -25,7 +25,7 @@ where PATH-TO-PYTHIA8FOLDER should point to the Pythia8 folder containing the Py
 The recasting code for the color neutral (HSCP) searches can be compiled through:
 
 ```
-make main_Rhadron.exe pythia8path=<PATH-TO-PYTHIA8FOLDER>
+make main_HSCP.exe pythia8path=<PATH-TO-PYTHIA8FOLDER>
 ```
 
 

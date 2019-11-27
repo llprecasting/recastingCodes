@@ -50,8 +50,7 @@ bool decayBeforeEndHcal(Particle &particle)
 {
 	if (particle.isFinal()){return false;}
     Vec4 decayVertex = particle.vDec();
-	if (decayVertex.pT() < 3.9e3){return true;}
-	if (abs(decayVertex.pz()) < 6.1e3){return true;}
+	if (decayVertex.pT() < 3.9e3 && abs(decayVertex.pz()) < 6.1e3){return true;}
 
 	return false;
 }
@@ -61,8 +60,7 @@ bool decayInsideAtlas(Particle &particle)
 {
 	if (particle.isFinal()){return false;}
     Vec4 decayVertex = particle.vDec();
-    if (decayVertex.pT() < 12e3){return true;}
-    if (abs(decayVertex.pz()) < 23e3){return true;}
+    if (decayVertex.pT() < 12e3 && abs(decayVertex.pz()) < 23e3){return true;}
 
 	return false;
 }

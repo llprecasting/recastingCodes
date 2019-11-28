@@ -70,6 +70,7 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
   // Book histograms.
   TH2F *recHist = new TH2F("Reconstruction","", 20, 0., 2.,20,0.,1.);
   TH2F *massHist = new TH2F("mRec","", 80, -2000., 4000.,80, -2000., 4000.);
+  TH2F *vdecHist = new TH2F("vDec","", 100, 0., 5000., 100, 0., 10000.);
   TH1F *pTHist = new TH1F("pT","", 100, 0., 2000.);
   TH1F *betaHist = new TH1F("beta","", 100, 0., 1.);
   TH1F *metHist = new TH1F("MET","", 100, 0., 1000.);
@@ -150,6 +151,7 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
 		pTHist->Fill(particle.pT());
 		betaHist->Fill(particle.pAbs()/particle.e());
+		vdecHist->Fill(particle.vDec().pT(),fabs(particle.vDec().pz()));
 
 		// decayBeforeEndHcal checks for a decay vertex before the end of the tile calorimeter,
 		// so we only consider R-hadrons that decay after that (see measures above)
@@ -259,6 +261,18 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 	  }
   }
   fclose(OutputFileB);
+  FILE* OutputFileBB = fopen((outlabel+"_vdecHist.dat").c_str(), "w");
+  fprintf(OutputFileBB,"# R,|z|,Entries\n");
+  for (int i=1; i<=vdecHist->GetNbinsX();i++) {
+	  for (int j=1; j<=vdecHist->GetNbinsY();j++) {
+		  xbin = vdecHist->GetXaxis()->GetBinCenter(i);
+		  ybin = vdecHist->GetYaxis()->GetBinCenter(j);
+		  binContent = vdecHist->GetBinContent(i,j);
+		  fprintf(OutputFileBB,"%1.3e, %1.3e, %1.3e\n",xbin,ybin,binContent);
+	  }
+  }
+  fclose(OutputFileBB);
+
 
   FILE* OutputFileC = fopen((outlabel+"_pTHist.dat").c_str(), "w");
   fprintf(OutputFileC,"# pT,Entries\n");

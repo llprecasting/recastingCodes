@@ -21,12 +21,24 @@ using namespace Pythia8;
 
 
 
-int run(const string & infile, int nevents, const string & cfgfile, const string & outlabel, double width = 0.)
+int run(const string & infile, int nevents, const string & cfgfile, const string & outputfile,  const string & histofile)
 {
 
-
+  //Set output file names
   std::srand(500);
-  FILE* OutputFile = fopen((outlabel+".out").c_str(), "w");
+  string outname, histname;
+  if (outputfile == ""){
+	  size_t lastindex = infile.find_last_of(".");
+	  outname = infile.substr(0, lastindex)+".out";
+  }
+  else{outname = outputfile;}
+  if (histofile == ""){
+	  size_t lastindex = infile.find_last_of(".");
+	  histname = infile.substr(0, lastindex)+".dat";
+  }
+  else{histname = histofile;}
+
+
   // Generator. Shorthand for the event.
   Pythia pythia("",false); //Set printBanner to false
   Event& event = pythia.event;
@@ -237,69 +249,57 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
 //  pythia.stat();
 
+
+
   //Save histograms to file:
-  FILE* OutputFileA = fopen((outlabel+"_massHist.dat").c_str(), "w");
+  FILE* histoFile = fopen(histname.c_str(), "w");
   double xbin,ybin,binContent;
-  fprintf(OutputFileA,"# massdEdx,massToF,Entries\n");
+  fprintf(histoFile,"# massdEdx,massToF,Entries\n");
   for (int i=1; i<=massHist->GetNbinsX();i++) {
 	  for (int j=1; j<=massHist->GetNbinsY();j++) {
 		  xbin = massHist->GetXaxis()->GetBinCenter(i);
 		  ybin = massHist->GetYaxis()->GetBinCenter(j);
 		  binContent = massHist->GetBinContent(i,j);
-		  fprintf(OutputFileA,"%1.3e, %1.3e, %1.3e\n",xbin,ybin,binContent);
+		  fprintf(histoFile,"%1.3e, %1.3e, %1.3e\n",xbin,ybin,binContent);
 	  }
   }
-  fclose(OutputFileA);
-  FILE* OutputFileB = fopen((outlabel+"_recHist.dat").c_str(), "w");
-  fprintf(OutputFileB,"# eta,beta,Entries\n");
+  fprintf(histoFile,"\n\n# eta,beta,Entries\n");
   for (int i=1; i<=recHist->GetNbinsX();i++) {
 	  for (int j=1; j<=recHist->GetNbinsY();j++) {
 		  xbin = recHist->GetXaxis()->GetBinCenter(i);
 		  ybin = recHist->GetYaxis()->GetBinCenter(j);
 		  binContent = recHist->GetBinContent(i,j);
-		  fprintf(OutputFileB,"%1.3e, %1.3e, %1.3e\n",xbin,ybin,binContent);
+		  fprintf(histoFile,"%1.3e, %1.3e, %1.3e\n",xbin,ybin,binContent);
 	  }
   }
-  fclose(OutputFileB);
-  FILE* OutputFileBB = fopen((outlabel+"_vdecHist.dat").c_str(), "w");
-  fprintf(OutputFileBB,"# R,|z|,Entries\n");
+  fprintf(histoFile,"\n\n# R,|z|,Entries\n");
   for (int i=1; i<=vdecHist->GetNbinsX();i++) {
 	  for (int j=1; j<=vdecHist->GetNbinsY();j++) {
 		  xbin = vdecHist->GetXaxis()->GetBinCenter(i);
 		  ybin = vdecHist->GetYaxis()->GetBinCenter(j);
 		  binContent = vdecHist->GetBinContent(i,j);
-		  fprintf(OutputFileBB,"%1.3e, %1.3e, %1.3e\n",xbin,ybin,binContent);
+		  fprintf(histoFile,"%1.3e, %1.3e, %1.3e\n",xbin,ybin,binContent);
 	  }
   }
-  fclose(OutputFileBB);
-
-
-  FILE* OutputFileC = fopen((outlabel+"_pTHist.dat").c_str(), "w");
-  fprintf(OutputFileC,"# pT,Entries\n");
+  fprintf(histoFile,"\n\n# pT,Entries\n");
   for (int i=1; i<=pTHist->GetNbinsX();i++) {
 	  xbin = pTHist->GetXaxis()->GetBinCenter(i);
 	  binContent = pTHist->GetBinContent(i);
-	  fprintf(OutputFileC,"%1.3e, %1.3e\n",xbin,binContent);
+	  fprintf(histoFile,"%1.3e, %1.3e\n",xbin,binContent);
   }
-  fclose(OutputFileC);
-
-  FILE* OutputFileD = fopen((outlabel+"_betaHist.dat").c_str(), "w");
-  fprintf(OutputFileD,"# beta,Entries\n");
+  fprintf(histoFile,"\n\n# beta,Entries\n");
   for (int i=1; i<=betaHist->GetNbinsX();i++) {
 	  xbin = betaHist->GetXaxis()->GetBinCenter(i);
 	  binContent = betaHist->GetBinContent(i);
-	  fprintf(OutputFileD,"%1.3e, %1.3e\n",xbin,binContent);
+	  fprintf(histoFile,"%1.3e, %1.3e\n",xbin,binContent);
   }
-  fclose(OutputFileD);
-
-  FILE* OutputFileE = fopen((outlabel+"_metHist.dat").c_str(), "w");
-  fprintf(OutputFileE,"# MET,Entries\n");
+  fprintf(histoFile,"\n\n# MET,Entries\n");
   for (int i=1; i<=metHist->GetNbinsX();i++) {
 	  xbin = metHist->GetXaxis()->GetBinCenter(i);
 	  binContent = metHist->GetBinContent(i);
-	  fprintf(OutputFileE,"%1.3e, %1.3e\n",xbin,binContent);
+	  fprintf(histoFile,"%1.3e, %1.3e\n",xbin,binContent);
   }
-  fclose(OutputFileE);
+  fclose(histoFile);
 
 
   fprintf(stdout,"Number of events Generated = %i\n",iEvent);
@@ -309,6 +309,7 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 		  avgCandEff/float(recHist->GetEntries()));
   fprintf(stdout,"Mass window trigger eff = %1.3e\n",float(nMassWindow)/float(iEvent));
 
+  FILE* OutputFile = fopen(outname.c_str(), "w");
   fprintf(OutputFile,"Number of events Generated = %i\n",iEvent);
   fprintf(OutputFile,"MET trigger eff = %1.3e\n",float(nTrigger)/float(iEvent));
   fprintf(OutputFile,"Decay outside eff = %1.3e\n",float(nDecay)/float(iEvent));
@@ -318,13 +319,13 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
 
   for (int i = 0; i < nEvts_SR.size(); ++i){
-      fprintf(OutputFile,"(mTOF>%3.0f, mdEdx > %3.0f) total Efficiency: %1.3e\n", massToF_min[i],massdEdx_min[i],
-      		float(nEvts_SR[i])/float(iEvent));
+      fprintf(OutputFile,"(mTOF>%3.0f, mdEdx > %3.0f) total Efficiency: %1.3e  +- %1.1e\n", massToF_min[i],massdEdx_min[i],
+      		float(nEvts_SR[i])/float(iEvent),sqrt(float(nEvts_SR[i]))/float(iEvent));
 
-      fprintf(stdout,"(mTOF>%3.0f, mdEdx > %3.0f) total Efficiency: %1.3e\n", massToF_min[i],massdEdx_min[i],
-        		float(nEvts_SR[i])/float(iEvent));
+      fprintf(stdout,"(mTOF>%3.0f, mdEdx > %3.0f) total Efficiency: %1.3e  +- %1.1e\n", massToF_min[i],massdEdx_min[i],
+        		float(nEvts_SR[i])/float(iEvent),sqrt(float(nEvts_SR[i]))/float(iEvent));
   }
-  //fprintf(OutputFile,"<\\total>\n");
+
   fclose(OutputFile);
     
 
@@ -335,12 +336,12 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
 
 void help( const char * name )
 {
-	  cout << "syntax: " << name << " [-h] [-f <input file>] [-o <output file>] [-n <number of events>] [-c <pythia cfg file>]" << endl;
+	  cout << "syntax: " << name << " [-h] [-f <input file>] [-o <output file>] [-d <histogram file>] [-n <number of events>] [-c <pythia cfg file>]" << endl;
 	  cout << "        -f <input file>:  pythia input LHE or SLHA file" << endl;
-	  cout << "        -c <pythia config file>:  pythia config file [pythia8.cfg]" << endl;
-	  cout << "        -o <output file>:  output label for naming the output file and histograms [test]" << endl;
+	  cout << "        -c <pythia config file>:  pythia config file [pythia8_gluino.cfg]" << endl;
+	  cout << "        -o <output file>:  output filename for naming the output file and histograms [<input file>.out]" << endl;
 	  cout << "        -n <number of events>:  Number of events to be generated [100]. If n < 0, it will run over all events in the LHE file" << endl;
-	  cout << "        -w <width (Gev)>: Optional width to be used [0]" << endl;
+	  cout << "        -d <histogram file>:  histogram file name. If set it will save all histograms to file [<input file>.dat]" << endl;
   exit( 0 );
 };
 
@@ -349,8 +350,9 @@ int main( int argc, const char * argv[] ) {
   int nevents = -1;
   double width = 0.;
   string cfgfile = "pythia8_gluino.cfg";
-  string outlabel = "test";
+  string outfile = "";
   string infile = "";
+  string histofile = "";
   for ( int i=1; i!=argc ; ++i )
   {
     string s = argv[i];
@@ -379,7 +381,15 @@ int main( int argc, const char * argv[] ) {
     if ( s== "-o" )
     {
       if ( argc < i+2 ) help ( argv[0] );
-      outlabel = argv[i+1];
+      outfile = argv[i+1];
+      i++;
+      continue;
+    }
+
+    if ( s== "-d" )
+    {
+      if ( argc < i+2 ) help ( argv[0] );
+      histofile = argv[i+1];
       i++;
       continue;
     }
@@ -394,20 +404,12 @@ int main( int argc, const char * argv[] ) {
     }
 
 
-    if ( s== "-w" )
-    {
-      if ( argc < i+2 ) help ( argv[0] );
-      width = atof(argv[i+1]);
-      i++;
-      continue;
-    }
-
 
     cout << "Error. Argument " << argv[i] << " unknown." << endl;
     help ( argv[0] );
   };
 
-  int r = run(infile, nevents, cfgfile, outlabel, width);
+  int r = run(infile, nevents, cfgfile, outfile, histofile);
 
   return 0;
 }

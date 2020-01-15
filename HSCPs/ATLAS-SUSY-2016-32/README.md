@@ -72,7 +72,6 @@ The following validation plot can be generated running this [ipython notebook](v
   |   2 TeV     |      10 ns      |   0.060    |   0.023        |
   |   2 TeV     |      30 ns      |   0.132    |   0.116        |
   |   2 TeV     |      50 ns      |   0.146    |   0.160        |
-  | ----------- | --------------- | ---------- | -------------- |
 
 
 

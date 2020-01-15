@@ -22,7 +22,7 @@ corresponding analysis and authors:
     * [8 TeV ATLAS Displaced Vertex plus jets by GCottin](DisplacedVertices/ATLAS-SUSY-2014-02_GCottin)
   * [Heavy Stable Charged Particles](HSCPs)
     * [8 TeV CMS HSCP](HSCPs/CMS-EXO-12-026)
-    * 13 TeV CMS HSCP (CMS-PAS-EXO-16-036)
+    * [13 TeV ATLAS HSCP](HSCPs/ATLAS-SUSY-2016-32)
   * [Displaced Leptons](DisplacedLeptons)
   * [Displaced Jets](DisplacedJet)
 

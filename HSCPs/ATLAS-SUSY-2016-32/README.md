@@ -61,7 +61,7 @@ The following validation plot can be generated running this [ipython notebook](v
 ![Alt text](validation/gluino_UL.png?raw=true "Validation Plot for Upper Limits")
 
 * *The values provided by ATLAS for small lifetime values (< 50 ns) for the gluino R-hadron benchmark could not be validated.
-  Therefore we recommend to use the results with care. The comparison between the ATLAS efficiencies (Table 6) and 
+  Therefore we recommend to use the results with care*. The comparison between the ATLAS efficiencies (Table 6) and 
   the ones obtained through the recasting code for a few benchmarks is shown below:
 
   | gluino Mass | gluino lifetime | ATLAS eff. | Recasting eff. |

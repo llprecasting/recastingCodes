@@ -17,7 +17,7 @@ The repository folder structure is organized according to the type of LLP signat
 corresponding analysis and authors:
 
   * [Displaced Vertices](DisplacedVertices)  
-    * [13 TeV ATLAS Displaced Vertex plus MET by ALessa](DisplacedVertices/ATLAS-SUSY-2016-08)
+    * [13 TeV ATLAS Displaced Vertex plus MET by ALessa](DisplacedVertices/ATLAS-SUSY-2016-08_ALessa)
     * [13 TeV ATLAS Displaced Vertex plus MET by GCottin](DisplacedVertices/ATLAS-SUSY-2016-08_GCottin)
     * [8 TeV ATLAS Displaced Vertex plus jets by GCottin](DisplacedVertices/ATLAS-SUSY-2014-02_GCottin)
   * [Heavy Stable Charged Particles](HSCPs)

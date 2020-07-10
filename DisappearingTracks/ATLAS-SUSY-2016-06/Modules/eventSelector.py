@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 import ROOT
-import copy, os
+import copy, os, sys
 from Functions import filterPhaseSpace, overlapRemovalInterval, overlapRemoval, OffMissingET
 from Functions import dPhiMin, selectChargino, selectNeutralino, CDF
 import numpy as np
@@ -21,23 +21,43 @@ class EventSelector(object):
         self.kfac = kfactor
         self.lum = lum
 
-    def loadEfficiencies(self,effFile):
+        self.loadEfficiencies()
+
+    def loadEfficiencies(self):
+
+        #Efficiency map file:
+        effFile = './Modules/DisappearingTrack2016-TrackAcceptanceEfficiency.root'
+        if not os.path.isfile(effFile):
+            print('Could not find ATLAS efficiencies file: %s ' %effFile)
+            sys.exit()
 
         self.effFile = os.path.abspath(effFile)
+
+    def loadDelphesLib(self,delphesPath):
+
+        if not os.path.isdir(delphesPath):
+            print('Can not find folder %s' %delphesPath)
+            sys.exit()
+        libPath = os.path.abspath(os.path.join(delphesPath,'libDelphes.so'))
+        if not os.path.isfile(libPath):
+            print('Can not find %s' %libPath)
+            sys.exit()
+        includePath = os.path.abspath(os.path.join(delphesPath,'external'))
+        if not os.path.isdir(includePath):
+            print('Can not find %s' %includePath)
+            sys.exit()
+        if not 'ROOT_INCLUDE_PATH' in os.environ or os.environ['ROOT_INCLUDE_PATH'] != includePath:
+            print('Set the ROOT_INCLUDE_PATH enviroment variable to %s'  %(includePath))
+            print('(i.e. export ROOT_INCLUDE_PATH=%s)' %(includePath))
+            sys.exit()
+
+        ROOT.gSystem.Load(libPath.replace('libDelphes.so','libDelphes'))
 
     def loadRootFile(self,rootFile):
 
         self.rootFile = os.path.abspath(rootFile)
 
-    def selectEvents(self,nmax=-1):
-
-        froot = ROOT.TFile(self.rootFile,"READ")
-        tree = froot.Get("Delphes")
-
-        ElectroweakHistName = 'ElectroweakEfficiency'
-        ###### Read efficiency map ############
-        mapFile = ROOT.TFile(os.path.abspath(self.effFile),"READ")
-        effMap = mapFile.Get(ElectroweakHistName)
+    def resetVars(self):
 
         #Store the number of tracks for each lifetime:
         self.N_tracklets_rec = np.array([0.]*len(self.tau_array))
@@ -50,6 +70,8 @@ class EventSelector(object):
         self.totalxsec = 0
         #Track the total cross-section of the events selected:
         self.selectxsec = 0
+        #Store the current event weight
+        self.weight_xs = 0
         #Track the number of events read from file
         self.EventsRead = 0
         #Track total number of charginos:
@@ -62,6 +84,17 @@ class EventSelector(object):
         #Store chargino mass
         self.charginoMass = None
 
+    def selectEvents(self,nmax=-1):
+
+        self.resetVars()
+
+        froot = ROOT.TFile(self.rootFile,"READ")
+        tree = froot.Get("Delphes")
+
+        ElectroweakHistName = 'ElectroweakEfficiency'
+        ###### Read efficiency map ############
+        mapFile = ROOT.TFile(os.path.abspath(self.effFile),"READ")
+        effMap = mapFile.Get(ElectroweakHistName)
 
         #Total number of events:
         LoadEvents = tree.GetEntriesFast()
@@ -75,27 +108,24 @@ class EventSelector(object):
         print('Reading %i events' %nEvt)
         #Event loop:
         for ievent in range(nEvt):
+            #### Counter of event, print a message every 1000 events ####
+            if (ievent % 1000) == 0:
+                print( "Reading event", ievent)
+            # Copy next entry into memory and verify.
+            nb = tree.GetEntry( ievent )
+            if nb<=0:
+                return
             self.EventsRead += 1
-            sel = self.selectSingleEvent(ievent,tree,effMap)
-            if not sel:
+            preSel = self.preSelectEvent(tree)
+            #If failed pre-selection, continue
+            if not preSel:
                 continue
-            self.xs_PT100_rec += sel[0]
-            self.N_tracklets_rec += sel[1]
+            weights = self.computeEventWeights(tree,effMap)
+            self.xs_PT100_rec += weights[0]
+            self.N_tracklets_rec += weights[1]
 
-    def selectSingleEvent(self,ievent,tree,effMap):
+    def preSelectEvent(self,tree):
 
-        kfac = self.kfac
-        # Copy next entry into memory and verify.
-        nb = tree.GetEntry( ievent )
-        if nb<=0:
-            return
-        #### Counter of event, print a message every 1000 events ####
-        if (ievent % 1000) == 0:
-            print( "Reading event", ievent)
-
-        ############### Event Selection-Level ########################
-        weight_xs = tree.Event.At(0).Weight*kfac*1e9 # weight of each event
-        self.totalxsec += weight_xs
         ########## fill branches for Event selection #######
         OffMET	     = copy.deepcopy(tree.MissingET)
         jets50       = copy.deepcopy(tree.Jet)
@@ -139,6 +169,26 @@ class EventSelector(object):
         if( dPhiMin(jets50,OffMET,4) < 1 ):
             return False
 
+        charginos   = selectChargino(tree.Particle, 62, self.PID_chargino)
+        charginos   = filterPhaseSpace(charginos, 5, 2.5)
+        # number of charginos per event
+        nC = charginos.GetEntries()
+        if (nC > 2 or nC == 0):
+            if (nC > 2):
+                print('Can not deal with events with %i charginos' %nC)
+            return False
+
+        return True
+
+    def computeEventWeights(self,tree,effMap):
+
+        kfac = self.kfac
+
+        ############### Event Selection-Level ########################
+        weight_xs = tree.Event.At(0).Weight*kfac*1e9 # weight of each event
+        self.totalxsec += weight_xs
+        self.weight_xs = weight_xs
+
         ############## Tracklet Selection-Level ################
         #Select charginos and neutralinos from Particle branch
         charginos    = selectChargino(tree.Particle, 62, self.PID_chargino)
@@ -153,12 +203,6 @@ class EventSelector(object):
         #Count number of events after pre-selection
         self.N_event_at_Event_selection += 1
 
-        if (nC == 0): return False
-        # if ievent != 80: return False
-        if (nC > 2):
-            print('Can not deal with events with more than 2 LLPs')
-            return False
-
         #Store neutralino and chargino masses (only used in the output)
         if self.neutralinoMass is None:
             for n in neutralinos:
@@ -168,8 +212,6 @@ class EventSelector(object):
             for c in charginos:
                 self.charginoMass = c.Mass
                 break
-
-            # self.charginoMass = charginos.At(0).Mass
 
         MAX_PT = max([c.PT for c in charginos])
         if MAX_PT > 100:
@@ -234,8 +276,10 @@ class EventSelector(object):
         ## Number of charginos at E-S level
         N_tracklets_at_ES = float(self.N_charginos_at_Event_selection)
 
-        #Event weight:
-        weight_xs = self.totalxsec/self.EventsRead
+        #Event average weight:
+        # weight_xs = self.totalxsec/self.EventsRead
+        #Weight of las event:
+        weight_xs = self.weight_xs
 
         ## Loop over tau array
         for i,tau in enumerate(self.tau_array):

@@ -2,6 +2,7 @@
 
 ## Authors: ##
 [Felipe Rojas](mailto:astrofis.rojas@gmail.com)
+
 [Jose Zurita](mailto:jose.zurita@kit.edu)
 
 This folder holds the main code for recasting the 13 TeV disappearing-track signature in pp collisions with the ATLAS detector ([ATLAS-SUSY-2016-06](http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2016-06/)).
@@ -15,14 +16,22 @@ The following pre-requisites must be installed before compiling the main code:
   * [ROOT](https://root.cern/) (with Python bindings)
   * [Delphes](https://cp3.irmp.ucl.ac.be/projects/delphes) 
 
-## Installation/Compiling ##
+## Installation ##
 
+Once ROOT (compatible with Python 2) and Delphes are available, make sure to set the enviroment variable:
+
+```
+ROOT_INCLUDE_PATH=$DELPHESPATH/external
+```
+
+where $DELPHESPATH is the Delphes directory.
 
 ## Running ##
 
 For running the code, the user must provide:
  1. the .root file with Delphes processed events.  The path to this file is set by 'rootFile' inside the example.py program.  By default the "example1.root" file in the main directory is used.
- 2. the path to the Delphes libraries (by editing the line "Delphes_libraries" inside the ./modules/Macros_LLP.py file.)
+ 2. the path to the Delphes folder
+ 3. additonal (optional input), such as the lifetimes for which to compute the efficiencies
 
 After this, write in a terminal:
 

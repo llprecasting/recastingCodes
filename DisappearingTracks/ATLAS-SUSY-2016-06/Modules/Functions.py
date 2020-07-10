@@ -7,7 +7,6 @@ import numpy as np
 import random
 import math
 from ROOT import TLorentzVector
-random.seed(123)
 
 def selectChargino(objects, Status, PID=None):
     """ Select chargino from Particle branch and store the information into a new branch """

@@ -5,6 +5,7 @@
 
 [Jose Zurita](mailto:jose.zurita@kit.edu)
 
+
 This folder holds the main code for recasting the 13 TeV disappearing-track signature in pp collisions with the ATLAS detector ([ATLAS-SUSY-2016-06](http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2016-06/)).
 This recast follows the "EW-production" analysis, hence it is valid for models with EW charged multiplets.
 
@@ -49,7 +50,7 @@ The output of the program is a .dat file with 9 columns defined as:
  * EAxEE: Event Acceptance, number of events pasing the Event-Selection level over the total number of events. 
  * TAxTE: Tracklet Acceptance, number of tracklets pasing the reconstruction Level over number of tracklets pasing the Event-Selection level
  * EAxEExTAxTE: Total Acceptance x Efficiency 
- * xs100(fb): Cross section after the event selection in fb (the 100 refers to the cut on jet pT > 100 GeV)
+ * xs100(fb): Cross section after the event selection in fb (the 100 refers to the cut on "chargino" pT > 100 GeV)
  * Ntr: Expected number of tracklets based on the value of the cross section (xs100) x Luminosity
  * MCev: Number of MonteCarlo events 
 

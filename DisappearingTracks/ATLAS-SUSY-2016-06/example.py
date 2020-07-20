@@ -18,7 +18,7 @@ from eventSelector import EventSelector
 ### Define .root input file ###
 rootFile = 'example1.root'
 ### Define name of output file ###
-outputFile = 'output.dat'
+outputFile = 'example_output_default.dat'
 
 ### Define variables ##
 # User can provide different tau values in order to study other regions of the parameter space. The range of tau values used for the analysis is (0.01 - 10) nano-seconds

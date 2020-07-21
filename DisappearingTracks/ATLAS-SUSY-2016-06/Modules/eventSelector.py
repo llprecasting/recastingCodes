@@ -12,7 +12,7 @@ class EventSelector(object):
 
 
     def __init__(self,tau_array,PID_chargino=1000024,PID_neutralino=1000022,
-                    chargino_loop=100,kfactor=1.0,lum=36.1):
+                    chargino_loop=1,kfactor=1.0,lum=36.1, init_xs=1, weight='root'):
 
         self.PID_chargino = PID_chargino
         self.PID_neutralino = PID_neutralino
@@ -20,6 +20,8 @@ class EventSelector(object):
         self.tau_array = tau_array
         self.kfac = kfactor
         self.lum = lum
+        self.init_xs = init_xs
+        self.weight = weight
 
         self.loadEfficiencies()
 
@@ -59,26 +61,24 @@ class EventSelector(object):
 
     def resetVars(self):
 
-        #Store the number of tracks for each lifetime:
-        self.N_tracklets_rec = np.array([0.]*len(self.tau_array))
         #Store the event weights for each lifetime:
         self.xs_PT100_rec = np.array([0.]*len(self.tau_array))
+        #Store the numver of tracklets after reconstructuin level for each lifetime:
         self.N_tracklets_rec = np.array([0.]*len(self.tau_array))
-        #Track the number of events which passes the selection:
-        self.MCevents = 0
-        #Track the total cross-section of the events read:
-        self.totalxsec = 0
-        #Track the total cross-section of the events selected:
+        #Store the number of MC events which passes the tracklet selection:
+        self.MCevents = np.array([0.]*len(self.tau_array))
+        #Store the initial cross-section of the sample:
+        self.init_xsec = 0
+        #Store the cross-section of the events selected:
         self.selectxsec = 0
         #Store the current event weight
         self.weight_xs = 0
-        #Track the number of events read from file
+        #Store the total number of events of the sample
         self.EventsRead = 0
-        #Track total number of charginos:
+        #Store total number of charginos of the sample:
         self.N_charginos_at_Event_selection = 0
-        #Track number of events after pre-selection:
+        #Store the number of events after pre-selection:
         self.N_event_at_Event_selection = 0
-
         #Store neutralino mass
         self.neutralinoMass = None
         #Store chargino mass
@@ -87,6 +87,8 @@ class EventSelector(object):
     def selectEvents(self,nmax=-1):
 
         self.resetVars()
+
+	kfac = self.kfac
 
         froot = ROOT.TFile(self.rootFile,"READ")
         tree = froot.Get("Delphes")
@@ -116,13 +118,27 @@ class EventSelector(object):
             if nb<=0:
                 return
             self.EventsRead += 1
+
+            if(self.weight=='same'):
+                weight_xs = self.init_xs/nEvt # all events have the same weight
+            if(self.weight=='root'):
+                weight_xs = tree.Event.At(0).Weight*kfac*1e9 # events with different weights
+
+            self.init_xsec += weight_xs
+
             preSel = self.preSelectEvent(tree)
             #If failed pre-selection, continue
             if not preSel:
                 continue
-            weights = self.computeEventWeights(tree,effMap)
+            #Count number of events after pre-selection
+       	    self.N_event_at_Event_selection += 1
+            self.selectxsec += weight_xs
+
+            weights = self.computeEventWeights(tree, effMap, weight_xs)
+
             self.xs_PT100_rec += weights[0]
             self.N_tracklets_rec += weights[1]
+            self.MCevents += weights[2]
 
     def preSelectEvent(self,tree):
 
@@ -131,7 +147,7 @@ class EventSelector(object):
         jets50       = copy.deepcopy(tree.Jet)
 
         ########### Trigger on MissingET #################
-        if( tree.MissingET.At(0).MET < 110 ):
+        if( tree.MissingET.At(0).MET <= 110 ):
             return False
 
         ############## Event Reconstruction ###################
@@ -140,7 +156,6 @@ class EventSelector(object):
         jets50      = filterPhaseSpace(jets50,         50, 2.5)
         muons       = filterPhaseSpace(tree.Muon,      10, 2.7)
         electrons   = filterPhaseSpace(tree.Electron,  10,2.47)
-        #charginos   = filterPhaseSpace(charginos,       5, 2.5)
 
         ## overlap removal: candidate, neighbours, dR_min, dR_max ##
         muons     = overlapRemovalInterval(muons,     jets,   0.2, 0.4)
@@ -151,7 +166,7 @@ class EventSelector(object):
         jets      = overlapRemoval(jets,             muons,    0.2)
 
         #Offline MissingET ##
-        OffMET = OffMissingET(jets, electrons, muons, OffMET) # Offline Missing ET
+        OffMET = OffMissingET(jets, electrons, muons, OffMET)
 
         ## lepto veto ##
         if( (electrons.GetEntries() != 0 or muons.GetEntries() != 0) ):
@@ -161,7 +176,7 @@ class EventSelector(object):
         if( jets.GetEntries() == 0 ):
             return False
         if( jets.At(0) == None ):
-            return False
+	    return False
         if( jets.At(0).PT < 140 ): #leading jet
             return False
         if( OffMET.At(0).MET < 140 ):
@@ -169,25 +184,9 @@ class EventSelector(object):
         if( dPhiMin(jets50,OffMET,4) < 1 ):
             return False
 
-        charginos   = selectChargino(tree.Particle, 62, self.PID_chargino)
-        charginos   = filterPhaseSpace(charginos, 5, 2.5)
-        # number of charginos per event
-        nC = charginos.GetEntries()
-        if (nC > 2 or nC == 0):
-            if (nC > 2):
-                print('Can not deal with events with %i charginos' %nC)
-            return False
-
         return True
 
-    def computeEventWeights(self,tree,effMap):
-
-        kfac = self.kfac
-
-        ############### Event Selection-Level ########################
-        weight_xs = tree.Event.At(0).Weight*kfac*1e9 # weight of each event
-        self.totalxsec += weight_xs
-        self.weight_xs = weight_xs
+    def computeEventWeights(self,tree,effMap,weight_xs):
 
         ############## Tracklet Selection-Level ################
         #Select charginos and neutralinos from Particle branch
@@ -198,10 +197,11 @@ class EventSelector(object):
         ## number of charginos per event
         nC = charginos.GetEntries()
 
+        if(nC == 0):
+            return (0,0,0)
+
         #Count total number of charginos
         self.N_charginos_at_Event_selection += nC
-        #Count number of events after pre-selection
-        self.N_event_at_Event_selection += 1
 
         #Store neutralino and chargino masses (only used in the output)
         if self.neutralinoMass is None:
@@ -214,21 +214,22 @@ class EventSelector(object):
                 break
 
         MAX_PT = max([c.PT for c in charginos])
-        if MAX_PT > 100:
-            self.selectxsec += weight_xs
-            self.MCevents += 1
 
-        #Compute weights for all lifetimes
+        #Compute weights, num tracklets, num MC events and TAxTExTP for all lifetimes
         event_weights = [0.]*len(self.tau_array)
         ntracklets = [0.]*len(self.tau_array)
-        for i,tauns in enumerate(self.tau_array):
+        nMCevents = [0.]*len(self.tau_array)
+        for i,tauns in enumerate(self.tau_array): # loop sobre taus
             tau = tauns*1e-9 #convert to seconds
-            weight_event,weight_Track = self.trackletSection(charginos,tau,effMap)
+            weight_event, weight_Track, MC_event = self.trackletSection(charginos,tau,effMap)
             ntracklets[i] = weight_Track
+
             if MAX_PT > 100:
                 event_weights[i] = weight_xs*weight_event
+                if(weight_event != 0):
+                    nMCevents[i] += MC_event
 
-        return (event_weights,ntracklets)
+        return (event_weights,ntracklets,nMCevents)
 
     def trackletSection(self,charginos,tauns,effMap):
         ###Compute probability of selecting at least one track
@@ -236,36 +237,43 @@ class EventSelector(object):
         #First build zero efficiencies dictionary
         #(assuming there are at most 2 charginos)
         Effvalues = dict([[i,np.array([0.]*self.chargino_loop)] for i in range(2)])
-        ##sample the radial decay length
-        # and compute efficiencies for each value:
+        MCvalues = dict([[i,np.array([0.]*self.chargino_loop)] for i in range(2)])
+        ##sample the radial decay length and compute efficiencies for each value:
         for iR in range(self.chargino_loop):
             for i,c in enumerate(charginos):
                 R = CDF(tauns, c.PT, c.Mass) #decay length
                 #Efficiency:
-                Effvalues[i][iR] = effMap.GetBinContent(effMap.FindBin(c.Eta,R))
+                HMeff = effMap.GetBinContent(effMap.FindBin(c.Eta,R))
+                Effvalues[i][iR] = HMeff
+                if(HMeff != 0.0):
+                    MCvalues[i][iR] += 1
 
         #Now compute the event weight:
         #(actually list of weights for each decay length)
         weight_1 = Effvalues[0]+Effvalues[1] # weight for selecting at least 1 chargino
         weight_2 = Effvalues[0]*Effvalues[1]  # weight for selecting both charginos
 
+        #(actually list of MC events for each decay length)
+        MCevent = MCvalues[0]+MCvalues[1]
+
         ## Tracklet PT efficiency (fix for all events)
         TP = 0.57
         ## Total weight of the event
-        weight_event = weight_1*TP -weight_2*TP**2
-        #probability for an event with N charginos to have at least one reconstructed tracklet
+        weight_event = weight_1*TP - weight_2*TP**2
+        # Probability for an event with N charginos to have at least one reconstructed tracklet
         weight_Track = weight_1 - weight_2
-
-        #Now compute the weight averaged over all decay lengths:
+        # Now compute the weight averaged over all decay lengths:
         weight_event = np.average(weight_event)
         weight_Track = np.average(weight_Track)
+        # Compute the total number of MC for each decay length
+        MCevent_sum = np.sum(MCevent)
 
-        return (weight_event,weight_Track)
+        return (weight_event, weight_Track, MCevent_sum)
 
     def writeResults(self,outputFile):
 
         fAccEff = open(outputFile,'w')
-        fAccEff.write(' Char_Mass(GeV)   Neutr_Mass(GeV)   tau(ns)      EAxEE          TAxTE         EAxEExTAxTE    xs100(fb)    Ntr        MCev  \n')
+        fAccEff.write(' C_Mass(GeV)   N_Mass(GeV)    tau(ns)    Init_xs(fb)     EAxEE          TAxTE         EAxEExTAxTE      total_eff     xs100(fb)     xslim(fb)         Ntr          r       MCev \n')
 
         from_pb_to_fb = 1000
         Chargino_mass = self.charginoMass
@@ -276,10 +284,11 @@ class EventSelector(object):
         ## Number of charginos at E-S level
         N_tracklets_at_ES = float(self.N_charginos_at_Event_selection)
 
-        #Event average weight:
-        # weight_xs = self.totalxsec/self.EventsRead
-        #Weight of las event:
-        weight_xs = self.weight_xs
+        #Initial cross section of the sample:
+        init_xsec_fb = self.init_xsec*from_pb_to_fb
+        #Number of observed tracklets with PT<100 GeV in high-ETmiss region
+        # Table 4, article 1712.02118
+        Ntrack_obs = 9.0
 
         ## Loop over tau array
         for i,tau in enumerate(self.tau_array):
@@ -292,8 +301,23 @@ class EventSelector(object):
             ##Number of expected tracklets events with PT > 100 GeV
             N_Exp_Tracklets_PT100 = xs_Tracklet_PT100*self.lum
             ## Number of MC tracklets at reconstruction level
-            MCN_tracklets_rec = xs_Tracklet_PT100/(weight_xs*from_pb_to_fb)
-            fAccEff.write('  {:.3f}           {:.3f}         {:.3f}      {:.4e}      {:.4e}      {:.4e}    {:.3e}    {:.2e}    {:.2e} \n '.format(Chargino_mass, Neutralino_mass, tau, Event_AE, Tracklet_AE, EA_EE_TA_TE, xs_Tracklet_PT100, N_Exp_Tracklets_PT100, MCN_tracklets_rec))
+            N_MC_events_rec = self.MCevents[i]
+            ## Total efficiency
+            total_eff = xs_Tracklet_PT100/init_xsec_fb
 
+            if(total_eff == 0.0):
+                print('Warning: Efficiency of point Mass={:.2f}, tau={:.3f} is zero.\n More events are needed. Increase nloop variable.'.format(Chargino_mass,self.tau_array[i]))
+                ## cross section limit
+                xslim = np.nan
+            else:
+                xslim = Ntrack_obs/(total_eff*self.lum)
+
+            ## r value
+            r = N_Exp_Tracklets_PT100/Ntrack_obs
+            ## cross section of events passing the Event Selection
+            xs_select = self.selectxsec*from_pb_to_fb
+
+
+            fAccEff.write('  {: .3f}     {:.3f}         {:.3f}      {:.3f}      {:.4e}      {:.4e}      {:.4e}      {:.4e}    {:.3e}     {:.3e}       {:.2e}    {:.2e}    {:.0f} \n '.format(Chargino_mass, Neutralino_mass, tau, init_xsec_fb, Event_AE, Tracklet_AE, EA_EE_TA_TE, total_eff, xs_Tracklet_PT100, xslim, N_Exp_Tracklets_PT100, r, N_MC_events_rec))
 
         fAccEff.close()

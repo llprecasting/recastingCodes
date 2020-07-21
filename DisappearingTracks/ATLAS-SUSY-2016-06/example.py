@@ -18,7 +18,7 @@ from eventSelector import EventSelector
 ### Define .root input file ###
 rootFile = 'example1.root'
 ### Define name of output file ###
-outputFile = 'example_output.dat'
+outputFile = 'example_output_default.dat'
 
 ### Define variables ##
 # User can provide different tau values in order to study other regions of the parameter space. The range of tau values used for the analysis is (0.01 - 10) nano-seconds
@@ -31,12 +31,18 @@ PID_chargino = 1000024
 PID_neutralino = 1000022
 ### Define k-factor of sample ### (if kfactor = None, default value is 1)
 kfactor = 1.227
+### Define number of loop at reconstruction level
+nloop = 100
+### Define if all events have the same weight (weight = 'same') or select weight from root file (weight = 'root'). If weight = 'same' the used must to definr initial cross in pb section as well
+
+Weight = 'same'
+Init_xs = 0.170
 
 #Create an event selector:
-evtSelector = EventSelector(tau_array,PID_chargino,PID_neutralino,kfactor=kfactor,lum=Lum)
+evtSelector = EventSelector(tau_array, PID_chargino, PID_neutralino, chargino_loop=nloop, kfactor=kfactor, lum=Lum, init_xs=Init_xs, weight=Weight)
 
 #Set Delphes path and load required libraries:
-evtSelector.loadDelphesLib('./Delphes')
+evtSelector.loadDelphesLib('/home/felipe/Documents/Programas/MG5_aMC_v2_6_5/Delphes')
 
 #Load ROOT/Delphes events file:
 evtSelector.loadRootFile(rootFile)

@@ -15,7 +15,7 @@ The following pre-requisites must be installed before compiling the main code:
 
   * Python2
   * [ROOT](https://root.cern/) (with Python bindings)
-  * [Delphes](https://cp3.irmp.ucl.ac.be/projects/delphes) 
+  * [Delphes](https://cp3.irmp.ucl.ac.be/projects/delphes)
 
 ## Installation ##
 
@@ -47,12 +47,15 @@ The output of the program is a .dat file with 9 columns defined as:
  * Char_Mass(GeV): "Chargino" mass of the sample
  * Neut_Mass(GeV): "Neutralino" mass of the sample
  * tau(ns): List of lifetime values defined in tau_array flag inside Variable.py file.
- * EAxEE: Event Acceptance, number of events pasing the Event-Selection level over the total number of events. 
+ * EAxEE: Event Acceptance, number of events pasing the Event-Selection level over the total number of events.
  * TAxTE: Tracklet Acceptance, number of tracklets pasing the reconstruction Level over number of tracklets pasing the Event-Selection level
- * EAxEExTAxTE: Total Acceptance x Efficiency 
- * xs100(fb): Cross section after the event selection in fb (the 100 refers to the cut on "chargino" pT > 100 GeV)
+ * EAxEExTAxTE: Total Acceptance x Efficiency.
+ * total_eff: Total efficiency after the analysis, where Init_xs * total_eff = xs100.
+ * xs100(fb): Cross section after the event selection in fb (the 100 refers to the cut on "chargino" pT > 100 GeV).
+ * xslim(fb): Cross section limit is the cross section that should have the sample to be excluded (in fb).
  * Ntr: Expected number of tracklets based on the value of the cross section (xs100) x Luminosity
- * MCev: Number of MonteCarlo events 
+ * r: Fraction between the number of tracklets after the analysis over the observed number of tracklets.
+ * MCev: Number of MonteCarlo events
 
 
 ## Notes ##
@@ -61,11 +64,10 @@ The output of the program is a .dat file with 9 columns defined as:
  * For a succesful run (namely avoiding the "ImportError: No module named ROOT" message we had to set the following environmental variables:
     1. ROOT_INCLUDE_PATH=$DELPHESPATH/external (where $DELPHESPATH is the Delphes directory)
     2. PYTHONPATH=$ROOTSYS/lib:$ROOT_INCLUDE_PATH
- * The charged and neutral particle are generically called "Chargino" and "Neutralino", a MSSM inspired notation. To employ another model the CharginoPID (1000024) and NeutralinoPID (1000022) variables must be changed in ./modules/Variables.py<sup>*</sup> 
- * For a given "trial" value of the lifetime we increase the statistics by sampling its value Ntrial times from an exponential distribution. The user can adjust the Ntrial value in ./modules/Variables.py<sup>*</sup> 
+ * The charged and neutral particle are generically called "Chargino" and "Neutralino", a MSSM inspired notation. To employ another model the CharginoPID (1000024) and NeutralinoPID (1000022) variables must be changed in ./modules/Variables.py<sup>*</sup>
+ * For a given "trial" value of the lifetime we increase the statistics by sampling its value Ntrial times from an exponential distribution. The user can adjust the Ntrial value in ./modules/Variables.py<sup>*</sup>
 
 
 <sup>*</sup> *This feature has not been implemented yet.*
 
 ## Validation ##
-

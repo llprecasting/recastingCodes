@@ -1,0 +1,10 @@
+### LLP-DM analysis inputs ### 
+rootFile: example1.root  
+outputFile: example_output1.dat  
+Luminosity: 36.1 
+PIDchargino: 1000024  
+PIDneutralino: 1000022  
+kfactor: 1.277
+nloop: 1
+Weight: root
+InitXs: 0.170

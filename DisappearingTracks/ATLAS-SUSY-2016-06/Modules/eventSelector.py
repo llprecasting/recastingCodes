@@ -11,18 +11,57 @@ import numpy as np
 class EventSelector(object):
 
 
-    def __init__(self,tau_array,PID_chargino=1000024,PID_neutralino=1000022,
-                    chargino_loop=1,kfactor=1.0,lum=36.1, init_xs=1, weight='root'):
+    def __init__(self, inputFile, tau_array):
 
-        self.PID_chargino = PID_chargino
-        self.PID_neutralino = PID_neutralino
-        self.chargino_loop = chargino_loop #Controls how many times the decay length distribution is sampled (for a given proper lifetime)
+        self.inputFile = os.path.abspath(inputFile)
+	if not os.path.isfile(self.inputFile):
+            print('Could not find input_param.dat file')
+            sys.exit()
+
+	fileInput = open(self.inputFile,"r+")  
+	Inputs = dict() 
+
+	lines = fileInput.readlines()
+	for i,line in enumerate(lines):
+	    read = line.split() 
+	    read[0] = read[0][:-1]
+	    Inputs.update(dict({read[0]:read[1]})) 
+
+	self.rootFile = Inputs['rootFile']
+	self.outputFile = Inputs['outputFile']
+	self.lum = float(Inputs['Luminosity'])
+	if 'PIDneutralino' not in Inputs.keys():
+	   self.PID_neutralino = 1000022
+	else:
+ 	   self.PID_neutralino = int(Inputs['PIDneutralino'])
+	if 'PIDchargino' not in Inputs.keys():
+	   self.PID_chargino = 1000024
+	else:
+	   self.PID_chargino = int(Inputs['PIDchargino'])
         self.tau_array = tau_array
-        self.kfac = kfactor
-        self.lum = lum
-        self.init_xs = init_xs
-        self.weight = weight
 
+        if('kfactor' not in Inputs.keys()):
+           self.kfac = 1.0
+        else:
+           self.kfac = float(Inputs['kfactor'])
+
+	if('nloop' not in Inputs.keys()):
+	   self.chargino_loop = 1
+	else:
+	   self.chargino_loop = int(Inputs['nloop'])
+
+	self.weight = Inputs['Weight']
+
+	if Inputs['Weight'] == 'same':
+	   self.weight = Inputs['Weight']
+	   if('InitXs' not in Inputs.keys()):
+	       print('If you choose Weight: same, you must provide InitXs')
+	       sys.exit()
+	   else:
+	       self.init_xs = float(Inputs['InitXs'])
+	if Inputs['Weight'] == 'root':
+	   self.weight = Inputs['Weight']
+	
         self.loadEfficiencies()
 
     def loadEfficiencies(self):
@@ -55,9 +94,12 @@ class EventSelector(object):
 
         ROOT.gSystem.Load(libPath.replace('libDelphes.so','libDelphes'))
 
-    def loadRootFile(self,rootFile):
+    def loadRootFile(self):
 
-        self.rootFile = os.path.abspath(rootFile)
+        self.rootFile = os.path.abspath(self.rootFile)
+	if not os.path.isfile(self.rootFile):
+            print('Could not find root file')
+            sys.exit()
 
     def resetVars(self):
 
@@ -120,9 +162,12 @@ class EventSelector(object):
             self.EventsRead += 1
 
             if(self.weight=='same'):
-                weight_xs = self.init_xs/nEvt # all events have the same weight
+                weight_xs = (self.init_xs*kfac)/nEvt # all events have the same weight
             if(self.weight=='root'):
                 weight_xs = tree.Event.At(0).Weight*kfac*1e9 # events with different weights
+	    if(self.weight!='same' and self.weight!='root'):
+		print('Weight option is not properly defined. Options are: same or root')
+		sys.exit()
 
             self.init_xsec += weight_xs
 
@@ -270,9 +315,9 @@ class EventSelector(object):
 
         return (weight_event, weight_Track, MCevent_sum)
 
-    def writeResults(self,outputFile):
+    def writeResults(self):
 
-        fAccEff = open(outputFile,'w')
+        fAccEff = open(self.outputFile,'w')
         fAccEff.write(' C_Mass(GeV)   N_Mass(GeV)    tau(ns)    Init_xs(fb)     EAxEE          TAxTE         EAxEExTAxTE      total_eff     xs100(fb)     xslim(fb)         Ntr          r       MCev \n')
 
         from_pb_to_fb = 1000

@@ -30,9 +30,14 @@ where $DELPHESPATH is the Delphes directory.
 ## Running ##
 
 For running the code, the user must provide:
- 1. the .root file with Delphes processed events.  The path to this file is set by 'rootFile' inside the example.py program.  By default the "example1.root" file in the main directory is used.
- 2. the path to the Delphes folder
- 3. additonal (optional input), such as the lifetimes for which to compute the efficiencies
+ 1. the input parameters which must to be written inside the file input_param.dat. The minimun amount of parameters the used must to provide are:
+   * rootFile: the path to the .root file with Delphes processed events
+   * outputFile: the path to the output result of the analysis 
+   * Luminosity: the integrated luminosity in inverse femtobarns
+   * Weight: the way events are weighted. It can be either 'same' weight for all events or 'root' for take the weight from root file itself.
+   * Aditional options are availables: PIDchargino, PIDneutralino, kfactor, nloop, InitXs. 
+ 2. the path to the Delphes folder which must to be written inside example.py program.
+ 3. additonal (optional input), such as the lifetimes for which to compute the efficiencies must to be written inside the example.py program.
 
 After this, write in a terminal:
 

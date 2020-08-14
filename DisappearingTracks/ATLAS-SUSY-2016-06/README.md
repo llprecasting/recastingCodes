@@ -35,7 +35,7 @@ For running the code, the user must provide:
    * outputFile: the path to the output result of the analysis 
    * Luminosity: the integrated luminosity in inverse femtobarns
    * Weight: the way events are weighted. It can be either 'same' weight for all events or 'root' for take the weight from root file itself.
-   * Aditional options are availables: PIDchargino, PIDneutralino, kfactor, nloop, InitXs. 
+   * Aditional options are availables: user can define PID number to identify the chargino/neutraino particle for a given model with the flag: PIDchargino, PIDneutralino. NLO-QCD corrections can be added with flag: kfactor. In order to increase the tracklets statistic user can use the flag: nloop. If user wnat to use Weight = same option, it also must to provided the initial cross section of the sample with the flag: InitXs. 
  2. the path to the Delphes folder which must to be written inside example.py program.
  3. additonal (optional input), such as the lifetimes for which to compute the efficiencies must to be written inside the example.py program.
 
@@ -51,15 +51,15 @@ The output of the program is a .dat file with 9 columns defined as:
 
  * Char_Mass(GeV): "Chargino" mass of the sample
  * Neut_Mass(GeV): "Neutralino" mass of the sample
- * tau(ns): List of lifetime values defined in tau_array flag inside Variable.py file.
+ * tau(ns): List of lifetime values defined in tau_array flag inside example.py file.
  * EAxEE: Event Acceptance, number of events pasing the Event-Selection level over the total number of events.
- * TAxTE: Tracklet Acceptance, number of tracklets pasing the reconstruction Level over number of tracklets pasing the Event-Selection level
+ * TAxTE: Tracklet Acceptance, number of tracklets passing the reconstruction Level over number of tracklets passing the Event-Selection level
  * EAxEExTAxTE: Total Acceptance x Efficiency.
  * total_eff: Total efficiency after the analysis, where Init_xs * total_eff = xs100.
  * xs100(fb): Cross section after the event selection in fb (the 100 refers to the cut on "chargino" pT > 100 GeV).
- * xslim(fb): Cross section limit is the cross section that should have the sample to be excluded (in fb).
- * Ntr: Expected number of tracklets based on the value of the cross section (xs100) x Luminosity
- * r: Fraction between the number of tracklets after the analysis over the observed number of tracklets.
+ * xslim(fb): is the upper limit LO production cross section cross section of the point (in fb).
+ * Ntr: Expected number of tracklets based on the value of the cross section after event selection ( xs100 x Luminosity )
+ * r: Fraction between the cross section after the analysis over the upper limit on the model-independent visible cross-section at 95% CL in fb. from Table 4, article 1712.02118
  * MCev: Number of MonteCarlo events
 
 

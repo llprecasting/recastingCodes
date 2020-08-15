@@ -328,12 +328,10 @@ class EventSelector(object):
         Event_AE = float(self.N_event_at_Event_selection)/float(self.EventsRead)
         ## Number of charginos at E-S level
         N_tracklets_at_ES = float(self.N_charginos_at_Event_selection)
-
         #Initial cross section of the sample:
         init_xsec_fb = self.init_xsec*from_pb_to_fb
-        #Number of observed tracklets with PT<100 GeV in high-ETmiss region
-        # Table 4, article 1712.02118
-        Ntrack_obs = 9.0
+        #Upper limit on the model-independent visible cross-section at 95% CL in fb. Table 4, article 1712.02118
+	xs95lim = 0.22
 
         ## Loop over tau array
         for i,tau in enumerate(self.tau_array):
@@ -355,10 +353,10 @@ class EventSelector(object):
                 ## cross section limit
                 xslim = np.nan
             else:
-                xslim = Ntrack_obs/(total_eff*self.lum)
+                xslim = xs95lim/(total_eff)
 
             ## r value
-            r = N_Exp_Tracklets_PT100/Ntrack_obs
+            r = N_Exp_Tracklets_PT100/(xs95lim*self.lum)
             ## cross section of events passing the Event Selection
             xs_select = self.selectxsec*from_pb_to_fb
 

@@ -7,8 +7,8 @@ try:
 except ImportError:
     from configparser import ConfigParser
 
-import random
-random.seed(10) #Set the random seeed to generate reproduciable results
+#import random
+#random.seed(10) #Set the random seeed to generate reproduciable results
 
 
 start_time = time.time()

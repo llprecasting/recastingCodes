@@ -13,7 +13,7 @@ This recast follows the "EW-production" analysis, hence it is valid for models w
 
 The following pre-requisites must be installed before compiling the main code:
 
-  * Python2
+  * Python (>= v2.7)
   * [ROOT](https://root.cern/) (with Python bindings)
   * [Delphes](https://cp3.irmp.ucl.ac.be/projects/delphes)
 
@@ -72,10 +72,6 @@ The output of the program is a .dat file with 9 columns defined as:
  * For a succesful run (namely avoiding the "ImportError: No module named ROOT" message we had to set the following environmental variables:
     1. ROOT_INCLUDE_PATH=$DELPHESPATH/external (where $DELPHESPATH is the Delphes directory)
     2. PYTHONPATH=$ROOTSYS/lib:$ROOT_INCLUDE_PATH
- * The charged and neutral particle are generically called "Chargino" and "Neutralino", a MSSM inspired notation. To employ another model the CharginoPID (1000024) and NeutralinoPID (1000022) variables must be changed in ./modules/Variables.py<sup>*</sup>
- * For a given "trial" value of the lifetime we increase the statistics by sampling its value Ntrial times from an exponential distribution. The user can adjust the Ntrial value in ./modules/Variables.py<sup>*</sup>
-
-
-<sup>*</sup> *This feature has not been implemented yet.*
+ * The LLP decays in the event file are not used and the charged LLP is always assumed to decay to invisible and soft particles.
 
 ## Validation ##

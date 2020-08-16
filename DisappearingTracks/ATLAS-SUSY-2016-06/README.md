@@ -35,7 +35,7 @@ For running the code, the user must provide:
    * outputFile: the path to the output result of the analysis 
    * Luminosity: the integrated luminosity in inverse femtobarns
    * Weight: the way events are weighted. It can be either 'same' weight for all events or 'root' for take the weight from root file itself.
-   * Aditional options are availables: user can define PID number to identify the chargino/neutraino particle for a given model with the flag: PIDchargino, PIDneutralino. NLO-QCD corrections can be added with flag: kfactor. In order to increase the tracklets statistic user can use the flag: nloop. If user wnat to use Weight = same option, it also must to provided the initial cross section of the sample with the flag: InitXs. 
+   * Aditional options are available: the user can define PID number to identify the chargino/neutraino particle for a given model with the flag: PIDchargino, PIDneutralino. NLO-QCD corrections can be added with parameter kfactor. In order to increase the tracklets statistic the user can use the parameter nloop to an integer larger than 1. The parameter nloop controls how many times the decay distribution is sampled for a given MC event. If Weight = same, the user must also provided the total cross section of the events with the parameter InitXs. 
  2. the path to the Delphes folder which must to be written inside example.py program.
  3. additonal (optional input), such as the lifetimes for which to compute the efficiencies must to be written inside the example.py program.
 

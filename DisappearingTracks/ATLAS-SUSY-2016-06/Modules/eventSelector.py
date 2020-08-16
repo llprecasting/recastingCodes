@@ -11,57 +11,42 @@ import numpy as np
 class EventSelector(object):
 
 
-    def __init__(self, inputFile, tau_array):
+    def __init__(self, parser):
 
-        self.inputFile = os.path.abspath(inputFile)
-	if not os.path.isfile(self.inputFile):
-            print('Could not find input_param.dat file')
+
+        self.outputFile = parser.get('options','outputFile')
+        self.rootFile = parser.get('options','rootFile')
+        self.lum = parser.getfloat('options','Luminosity')
+        self.PID_chargino = parser.getint('options','PIDchargino')
+        self.PID_neutralino = parser.getint('options','PIDneutralino')
+        self.kfac = parser.getfloat('options','kfactor')
+        self.chargino_loop = parser.getint('options','nloop')
+        self.weight = parser.get('options','Weight')
+        tau_values = parser.get('options','tau_values')
+        try:
+            tau_array = eval(tau_values)
+        except:
+            print("Define a valid expression for the tau_values parameter. It should be a list of values (e.g. [0.01,0.03,...]) or a single value (e.g. 0.01)")
+            sys.exit()
+        if isinstance(tau_array,(int,float)):
+            self.tau_array = np.array([float(tau_array)])
+        elif isinstance(tau_array,list):
+            self.tau_array = np.array(tau_array)
+        else:
+            print('Define a valid value for the tau_values parameter. It should be a list or a float')
             sys.exit()
 
-	fileInput = open(self.inputFile,"r+")  
-	Inputs = dict() 
+        if self.weight == 'same':
+           if not parser.has_option('options','InitXs'):
+               print('If you choose Weight: same, you must provide InitXs')
+               sys.exit()
+           else:
+               self.init_xs = parser.getfloat('options','InitXs')
+        elif self.weight != 'root':
+            print('Weight option is not properly defined. Options are: same or root')
+            sys.exit()
 
-	lines = fileInput.readlines()
-	for i,line in enumerate(lines):
-	    read = line.split() 
-	    read[0] = read[0][:-1]
-	    Inputs.update(dict({read[0]:read[1]})) 
 
-	self.rootFile = Inputs['rootFile']
-	self.outputFile = Inputs['outputFile']
-	self.lum = float(Inputs['Luminosity'])
-	if 'PIDneutralino' not in Inputs.keys():
-	   self.PID_neutralino = 1000022
-	else:
- 	   self.PID_neutralino = int(Inputs['PIDneutralino'])
-	if 'PIDchargino' not in Inputs.keys():
-	   self.PID_chargino = 1000024
-	else:
-	   self.PID_chargino = int(Inputs['PIDchargino'])
-        self.tau_array = tau_array
-
-        if('kfactor' not in Inputs.keys()):
-           self.kfac = 1.0
-        else:
-           self.kfac = float(Inputs['kfactor'])
-
-	if('nloop' not in Inputs.keys()):
-	   self.chargino_loop = 1
-	else:
-	   self.chargino_loop = int(Inputs['nloop'])
-
-	self.weight = Inputs['Weight']
-
-	if Inputs['Weight'] == 'same':
-	   self.weight = Inputs['Weight']
-	   if('InitXs' not in Inputs.keys()):
-	       print('If you choose Weight: same, you must provide InitXs')
-	       sys.exit()
-	   else:
-	       self.init_xs = float(Inputs['InitXs'])
-	if Inputs['Weight'] == 'root':
-	   self.weight = Inputs['Weight']
-	
         self.loadEfficiencies()
 
     def loadEfficiencies(self):
@@ -97,9 +82,9 @@ class EventSelector(object):
     def loadRootFile(self):
 
         self.rootFile = os.path.abspath(self.rootFile)
-	if not os.path.isfile(self.rootFile):
-            print('Could not find root file')
-            sys.exit()
+        if not os.path.isfile(self.rootFile):
+                print('Could not find root file')
+                sys.exit()
 
     def resetVars(self):
 
@@ -130,7 +115,7 @@ class EventSelector(object):
 
         self.resetVars()
 
-	kfac = self.kfac
+        kfac = self.kfac
 
         froot = ROOT.TFile(self.rootFile,"READ")
         tree = froot.Get("Delphes")
@@ -165,9 +150,6 @@ class EventSelector(object):
                 weight_xs = (self.init_xs*kfac)/nEvt # all events have the same weight
             if(self.weight=='root'):
                 weight_xs = tree.Event.At(0).Weight*kfac*1e9 # events with different weights
-	    if(self.weight!='same' and self.weight!='root'):
-		print('Weight option is not properly defined. Options are: same or root')
-		sys.exit()
 
             self.init_xsec += weight_xs
 
@@ -221,7 +203,7 @@ class EventSelector(object):
         if( jets.GetEntries() == 0 ):
             return False
         if( jets.At(0) == None ):
-	    return False
+            return False
         if( jets.At(0).PT < 140 ): #leading jet
             return False
         if( OffMET.At(0).MET < 140 ):
@@ -331,7 +313,7 @@ class EventSelector(object):
         #Initial cross section of the sample:
         init_xsec_fb = self.init_xsec*from_pb_to_fb
         #Upper limit on the model-independent visible cross-section at 95% CL in fb. Table 4, article 1712.02118
-	xs95lim = 0.22
+        xs95lim = 0.22
 
         ## Loop over tau array
         for i,tau in enumerate(self.tau_array):

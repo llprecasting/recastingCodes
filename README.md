@@ -24,7 +24,7 @@ corresponding analysis and authors:
   * [Heavy Stable Charged Particles](HSCPs)
     * [8 TeV CMS HSCP](HSCPs/CMS-EXO-12-026)
     * [13 TeV ATLAS HSCP](HSCPs/ATLAS-SUSY-2016-32)
-  * [Disappearing Tracks](DisappearingTracks/ATLAS-SUSY-2016-06)
+  * [Disappearing Tracks](DisappearingTracks/ATLAS-SUSY-2016-06) :new: 
   * Displaced Jets
 
 A README file can be found inside each folder with the required dependencies

@@ -75,3 +75,5 @@ The output of the program is a .dat file with 9 columns defined as:
  * The LLP decays in the event file are not used and the charged LLP is always assumed to decay to invisible and soft particles.
 
 ## Validation ##
+
+The validation of the signal efficiencies (efficiency times acceptance) and upper limits are documented in [arXiv:2008.08581](https://arxiv.org/abs/2008.08581).

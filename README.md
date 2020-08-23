@@ -6,7 +6,7 @@ use discretion when applying it to new models.
 
 ## Adding your recasting code ##
 
-This is an open repository and if you have developed a code for recasting a LLP analysis, 
+This is an open repository and if you have developed a code for recasting a LLP analysis,
 we encourage you to include it here.
 Please contact <llp-recasting@googlegroups.com> and we will provide you with the necessary information
 for including your code.
@@ -32,9 +32,7 @@ and basic instructions on how to run the recasting codes.
 
 ## Running the Recasting Code ##
 
-A Makefile is provided inside each analysis folder which
-compiles the main executable once the code pre-requisites
-have been installed.
+Instructions on how to compile and run the main executable are provided in every recasting folder.
 For instance, the recasting of the 8 TeV CMS search
 requires [Pythia8](http://home.thep.lu.se/~torbjorn/pythia8/).
 After downloading and compiling Pythia 8, the main recasting code

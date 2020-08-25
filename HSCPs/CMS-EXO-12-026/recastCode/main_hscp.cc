@@ -55,7 +55,7 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
       histoOffline[Mi] = (TH3F*)InputFile->Get(histoName);
   };
 
-  pythia.readString("1000024:m0 = 500.");
+//  pythia.readString("1000024:m0 = 500.");
   // Initialize.
   pythia.init();
 

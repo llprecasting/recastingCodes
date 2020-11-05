@@ -16,13 +16,19 @@ class DisplacedVertex: public Particle {
 
     vector<Particle*> decayProducts;
     double DVeff;
-    int nTracks() const {return decayProducts.size();}
-    double mDV() const {
-        Vec4 pCharged;
-        for (int i=0; i < decayProducts.size(); ++ i){
-            pCharged += decayProducts[i]->p();
-        }
-        return pCharged.mCalc();
+	int nTracks() const {return decayProducts.size();}
+	double mDV() const {
+        double px = 0.0, py = 0.0, pz = 0.0, e = 0.0;
+		for (int i=0; i < decayProducts.size(); ++ i){
+			px += decayProducts[i]->px();
+            py += decayProducts[i]->py();
+            pz += decayProducts[i]->pz();
+            // e += decayProducts[i]->e();
+            //Use pion mass assumption:
+            e += sqrt(decayProducts[i]->pAbs2() + pow(0.139,2));
+		}
+		Vec4 pCharged(px,py,pz,e);
+		return pCharged.mCalc();
     }
 
  };
@@ -264,5 +270,3 @@ bool applyJetCuts(Event &event, fastjet::JetDefinition jetDef,
     return true;
 
 }
-
-

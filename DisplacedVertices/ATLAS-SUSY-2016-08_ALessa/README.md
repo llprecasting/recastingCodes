@@ -47,8 +47,13 @@ should generate 100 events and display the efficiencies for the given input file
 The validation of the signal efficiencies (efficiency times acceptance)
 for direct production of staus can be found in the [validation folder](validation).
 The output (.eff files) was generated using the SLHA files and pythia8.cfg and parameters.ini files stored in the folder.
-The following validation plot can be generated running this [ipython notebook](validation/validation.ipynb):
+For instance, the following validation plot can be generated running this [ipython notebook](validation/validation-mlsp100.ipynb):
+
+ * mgluino = 1.4 TeV, mLSP = 100 GeV:
+
+![Alt text](validation/validationPlot_mlsp100.png?raw=true "Validation Plot")
 
 
-![Alt text](validation/validationPlot.png?raw=true "Validation Plot")
+* mgluino = 1.4 TeV, mLSP = 1300 GeV:
 
+![Alt text](validation/validationPlot_dm100.png?raw=true "Validation Plot")

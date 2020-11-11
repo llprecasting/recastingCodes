@@ -1,15 +1,13 @@
-# LLP Recasting Repository
+# LLP Recasting Repository - LLP Workshop
 
-This repository holds example codes for recasting long-lived particle (LLP) searches.
+This repository holds codes for recasting long-lived particle (LLP) searches.
+
+**Not all the code versions available in this branch are final/stable. Use the master branch
+for the stable releases.**
+
 The code authors and repository maintainers are not responsible for how the code is used and the user should
 use discretion when applying it to new models.
 
-## Adding your recasting code ##
-
-This is an open repository and if you have developed a code for recasting a LLP analysis,
-we encourage you to include it here.
-Please contact <llp-recasting@googlegroups.com> and we will provide you with the necessary information
-for including your code.
 
 ## Repository Structure ##
 
@@ -24,11 +22,19 @@ corresponding analysis and authors:
   * [Heavy Stable Charged Particles](HSCPs)
     * [8 TeV CMS HSCP](HSCPs/CMS-EXO-12-026)
     * [13 TeV ATLAS HSCP](HSCPs/ATLAS-SUSY-2016-32)
-  * [Disappearing Tracks](DisappearingTracks/ATLAS-SUSY-2016-06) :new: 
-  * Displaced Jets
+  * [Disappearing Tracks](DisappearingTracks)
+    * [13 TeV ATLAS DT](DisappearingTracks/ATLAS-SUSY-2016-06)
+
 
 A README file can be found inside each folder with the required dependencies
 and basic instructions on how to run the recasting codes.
+
+## Requirements ##
+
+Most of the recasting codes present here requires a local installation of [Pythia8](http://home.thep.lu.se/Pythia/) and [Delphes](https://cp3.irmp.ucl.ac.be/projects/delphes).
+For some specific analyses [FastJet](http://fastjet.fr/) and [ROOT](https://root.cern/) are also requirements.
+It is recommended that Pythia, Delphes and FastJet are installed in the top folder.
+
 
 ## Running the Recasting Code ##
 

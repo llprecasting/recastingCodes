@@ -57,3 +57,27 @@ For instance, the following validation plot can be generated running this [ipyth
 * mgluino = 1.4 TeV, mLSP = 1300 GeV:
 
 ![Alt text](validation/validationPlot_dm100.png?raw=true "Validation Plot")
+
+### Cut-flow Comparison
+
+
+|                     | ATLAS  | Recasting  |   ATLAS | Recasting  |
+| -----------                    | ------ | ------ | - ---- | ----- |
+|  **mGluino, mLSP, tau**             | **2000,100,1ns**  | **2000,100,1ns**  |   **2000,1800,1ns** | **2000,1800,1ns**  |
+| Initial Events                 |   32   |   32   |   32   |   32  |
+| Trigger-based data reduction   |   32   |        |   27   |       |
+| Event cleaning                 |   32   |        |   27   |       |
+| Good Runs List   |   32   |   --   |   27   |   --  |
+| Primary vertex   |   32   |   --   |   27   |   --  |
+| NCB veto   |   32   |   --   |   26   |   --  |
+| MET trigger   |   31   |   --   |   24   |   --  |
+| MET filter (MET > 200 GeV for recast)   |   31   |   30.4   |   17   |   15  |
+| Offline MET (event selection eff. for recast)   |   29   |   26.8   |   7   |  9.3  |
+|  |
+| DV fiducial acceptance   |   28   |   --   |   6   |   --  |
+| DV fit quality   |   27   |   --   |   6   |   --  |
+| DV displacement   |   27   |   --   |   6   |   --  |
+| Material veto   |   22   |   --   |   5   |   --  |
+| Disabled module veto   |   22   |   --   |   5   |   --  |
+| DV track multplicity   |   15   |   --   |   3   |   --  |
+| DV mass (vertex level eff. for recast)   |   14   |   14.4   |   2   |   3.6  | 	

@@ -22,6 +22,7 @@ class EventSelector(object):
         self.kfac = parser.getfloat('options','kfactor')
         self.chargino_loop = parser.getint('options','nloop')
         self.weight = parser.get('options','Weight')
+        self.effFile = parser.get('options','effFile')
         tau_values = parser.get('options','tau_values')
         try:
             tau_array = eval(tau_values)
@@ -52,7 +53,7 @@ class EventSelector(object):
     def loadEfficiencies(self):
 
         #Efficiency map file:
-        effFile = './Modules/DisappearingTrack2016-TrackAcceptanceEfficiency.root'
+        effFile = self.effFile
         if not os.path.isfile(effFile):
             print('Could not find ATLAS efficiencies file: %s ' %effFile)
             sys.exit()
@@ -306,6 +307,7 @@ class EventSelector(object):
         Chargino_mass = self.charginoMass
         Neutralino_mass = self.neutralinoMass
 
+
         ## Event Acceptance x Efficiency
         Event_AE = float(self.N_event_at_Event_selection)/float(self.EventsRead)
         ## Number of charginos at E-S level
@@ -314,6 +316,18 @@ class EventSelector(object):
         init_xsec_fb = self.init_xsec*from_pb_to_fb
         #Upper limit on the model-independent visible cross-section at 95% CL in fb. Table 4, article 1712.02118
         xs95lim = 0.22
+
+        if self.N_event_at_Event_selection == 0:
+            print('No events passed the selection.\n')
+            fAccEff.write('No events passed the selection.\n')
+            fAccEff.close()
+            return
+        elif N_tracklets_at_ES == 0:
+            print('No charginos could be reconstructed.\n')
+            fAccEff.write('No charginos could be reconstructed.\n')
+            fAccEff.close()
+            return
+
 
         ## Loop over tau array
         for i,tau in enumerate(self.tau_array):

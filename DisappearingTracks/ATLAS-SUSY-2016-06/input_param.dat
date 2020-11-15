@@ -1,6 +1,7 @@
 ### LLP-DM analysis inputs ###
 [options]
 DelphesPath: ./Delphes
+effFile: ./Modules/DisappearingTrack2016-TrackAcceptanceEfficiency.root
 rootFile: example1.root
 outputFile: example_output1.dat
 Luminosity: 36.1

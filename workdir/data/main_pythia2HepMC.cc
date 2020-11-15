@@ -60,7 +60,6 @@ int run(const string & infile, int nevents, const string & cfgfile, const string
   }
 
 
-
 // trying to write hepmc
 // Interface for conversion from Pythia8::Event to HepMC event.
   HepMC::Pythia8ToHepMC ToHepMC;

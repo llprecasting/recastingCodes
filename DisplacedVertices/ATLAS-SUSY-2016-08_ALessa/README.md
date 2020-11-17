@@ -58,6 +58,12 @@ For instance, the following validation plot can be generated running this [ipyth
 
 ![Alt text](validation/validationPlot_dm100.png?raw=true "Validation Plot")
 
+* mgluino = 1.4 TeV, tau = 1 ns:
+
+![Alt text](validation/validationPlot_mgluino1400_tau1ns.png?raw=true "Validation Plot")
+
+
+
 ### Cut-flow Comparison
 
 

@@ -32,3 +32,8 @@ main_atlas_susy_2016_08_cutFlow.exe: $(DVPATH)/recastCode/main_atlas_susy_2016_0
 	echo $(XMLDOC) > xml.doc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(DVPATH)/recastCode/main_atlas_susy_2016_08_cutFlow.cc -lpythia8 -ldl -DGZIPSUPPORT -lz -lfastjet -lHepMC
 
+
+main_atlas_susy_2016_08_getRDVeff.exe: $(DVPATH)/recastCode/main_atlas_susy_2016_08_getRDVeff.cc $(DVPATH)/recastCode/helperFunctions.h $(DVPATH)/recastCode/dataReader.h
+	echo $(XMLDOC) > xml.doc
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(DVPATH)/recastCode/main_atlas_susy_2016_08_getRDVeff.cc -lpythia8 -ldl -DGZIPSUPPORT -lz -lfastjet -lHepMC
+

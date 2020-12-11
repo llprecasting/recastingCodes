@@ -21,7 +21,7 @@ set ExecutionPath {
   Calorimeter
   EFlowMerger
   EFlowFilter
-  
+
   PhotonEfficiency
   PhotonIsolation
 
@@ -388,7 +388,7 @@ module PdgCodeFilter ElectronFilter {
 module PdgCodeFilter ChargedHadronFilter {
   set InputArray HCal/eflowTracks
   set OutputArray chargedHadrons
-  
+
   add PdgCode {11}
   add PdgCode {-11}
   add PdgCode {13}
@@ -428,7 +428,7 @@ module Merger EFlowMerger {
 module PdgCodeFilter EFlowFilter {
   set InputArray EFlowMerger/eflow
   set OutputArray eflow
-  
+
   add PdgCode {11}
   add PdgCode {-11}
   add PdgCode {13}
@@ -742,7 +742,7 @@ module TreeWriter TreeWriter {
 # add Branch InputArray BranchName BranchClass
   add Branch Delphes/allParticles Particle GenParticle
 
-#  add Branch TrackMerger/tracks Track Track
+  add Branch TrackMerger/tracks Track Track
 #  add Branch Calorimeter/towers Tower Tower
 
 #  add Branch HCal/eflowTracks EFlowTrack Track
@@ -759,4 +759,3 @@ module TreeWriter TreeWriter {
   add Branch MissingET/momentum MissingET MissingET
 #  add Branch ScalarHT/energy ScalarHT ScalarHT
 }
-

@@ -1,0 +1,11 @@
+---
+analyses:
+ - DT_CMS
+ 
+settings:
+  nevents: 150000
+  cores: 1
+  Include Pileup: false
+  Efficiency Filename: HEPMC_noPU.eff
+  Cutflow Filename: HEPMC_noPU_cf.eff
+  Histogram Filename: HEPMC_noPU.yoda

@@ -1,0 +1,14 @@
+---
+analyses:
+ - DT_CMS
+ 
+settings:
+  nevents: 150000
+  debug: true
+  cores: 15
+  Efficiency Filename: MLM.eff
+  Cutflow Filename: MLM_cf.eff
+  Histogram Filename: MLM.yoda
+  Include Pileup: true
+  LHE file: Split/split
+  Config file: MLM.cfg

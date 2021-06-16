@@ -1,0 +1,13 @@
+---
+analyses:
+ - DT_CMS
+ - HSCP_ATLAS
+ 
+settings:
+  nevents: 1000
+  cores: 1
+  Include Pileup: false
+  Efficiency Filename: LO.eff
+  Cutflow Filename: LO_cf.eff
+  Histogram Filename: LO.yoda
+  Config file: LO.cfg

@@ -1,0 +1,14 @@
+---
+analyses:
+ - DT_CMS
+ 
+settings:
+  nevents: 150000
+  debug: true
+  cores: 15
+  Include Pileup: true
+  Efficiency Filename: CKKWL.eff
+  Cutflow Filename: CKKWL_cf.eff
+  Histogram Filename: CKKWL.yoda
+  LHE file: Split/split
+  Config file: CKKWL.cfg

@@ -1,0 +1,25 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t24
+#: name: Mass Limit vs. Lifetime, Chargino, Expected
+#: description: (a) Lower limits on the chargino mass as a function of lifetime, and (b) the contours around the excluded mass-lifetime region for stau pair production.
+#: data_file: fig19a_limits_chargino_exp.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: CLs
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+#: keyword reactions: p p --> CHARGINO CHARGINO | p p --> CHARGINO NEUTRALINO
+Lifetime [ns],Expected Limit [GeV],"exp,1-sigma +","exp,1-sigma -"
+1.0,639,36,-62
+2.0,871,29,-72
+2.8,965,27,-79
+4.0,1055,57,-85
+5.0,1090,47,-91
+7.0,1137,30,-78
+10.0,1162,21,-61
+15.0,1184,21,-52
+21.0,1190,36,-54
+30.0,1190,31,-48
+39.0,1191,44,-51
+51.0,1190,37,-53
+66.0,1188,48,-45
+87.0,1183,56,-49
+stable,1180,48,-50
+

@@ -1,0 +1,28 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t20
+#: name: Mass Limit vs. Lifetime, R-hadron, Expected
+#: description: Lower limits on the gluino mass, from gluino $R$-hadron pair production, as a function of gluino lifetime for two neutralino mass assumptions of (a) $m(\tilde{\chi}_{1}^{0}) = 100 \text{GeV}$ and (b) $\Delta m(\tilde{g}, \tilde{\chi}_{1}^{0}) = 30 \text{GeV}$. The upper $1 \sigma_\text{exp}$ expected bound is very close to the expected limit for some lifetime values due to the expected background getting very close to 0 events.
+#: data_file: fig18a_limits_rhadron_100_exp.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: CLs
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+#: keyword reactions: p p --> GLUINO GLUINO
+Lifetime [ns],Expected Limit [GeV],"exp,1-sigma +","exp,1-sigma -"
+0.5,1393.0,23,-153
+0.7,1557.0,60,-69
+1.0,1755.0,32,-74
+1.5,1915.0,34,-64
+2.1,2042.0,18,-66
+3.0,2143.0,9,-62
+5.0,2265.0,13,-76
+7.0,2306.0,5,-71
+10.0,2330.0,11,-63
+15.0,2348.0,3,-65
+21.0,2355.0,3,-70
+30.0,2344.0,5,-69
+39.0,2331.0,3,-63
+51.0,2318.0,5,-65
+66.0,2304.0,4,-68
+87.0,2290.0,7,-71
+111.0,2267.0,4,-66
+stable,2171.0,8,-69
+

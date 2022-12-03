@@ -1,0 +1,139 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t107
+#: name: Efficiency, SR-Inclusive_Low, Chargino
+#: description: Efficiency of SR-Inclusive_Low for the chargino pair-production model for various masses and lifetimes. The efficiency is defined as the ratio of events satisfying the signal region selection to those satisfying the acceptance criteria. The mass window is not applied for the presented numbers.
+#: data_file: tabaux16_effLow_chargino.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: Acc/Eff
+#: keyword phrases: Supersymmetry | SUSY
+#: Model,Chargino
+#: Lifetime,0.2 ns
+Mass [GeV],Efficiency (Inclusive_Low)
+90.0,0.0
+200.0,0.006
+250.0,--
+300.0,0.006
+350.0,--
+400.0,0.0
+500.0,0.019
+600.0,0.0
+700.0,0.01
+800.0,0.0
+900.0,0.0
+1000.0,0.0
+1100.0,--
+1200.0,--
+1300.0,--
+1400.0,--
+1500.0,--
+1600.0,--
+
+#: Model,Chargino
+#: Lifetime,1 ns
+Mass [GeV],Efficiency (Inclusive_Low)
+90.0,0.001
+200.0,0.011
+250.0,--
+300.0,0.016
+350.0,--
+400.0,0.025
+500.0,0.033
+600.0,0.039
+700.0,0.039
+800.0,0.05
+900.0,0.051
+1000.0,0.055
+1100.0,--
+1200.0,--
+1300.0,--
+1400.0,--
+1500.0,--
+1600.0,--
+
+#: Model,Chargino
+#: Lifetime,4 ns
+Mass [GeV],Efficiency (Inclusive_Low)
+90.0,0.045
+200.0,0.066
+250.0,--
+300.0,0.063
+350.0,--
+400.0,0.034
+500.0,0.035
+600.0,0.044
+700.0,0.053
+800.0,0.057
+900.0,0.057
+1000.0,0.063
+1100.0,0.063
+1200.0,0.066
+1300.0,0.063
+1400.0,0.062
+1500.0,0.061
+1600.0,0.06
+
+#: Model,Chargino
+#: Lifetime,10 ns
+Mass [GeV],Efficiency (Inclusive_Low)
+90.0,0.001
+200.0,0.014
+250.0,--
+300.0,0.03
+350.0,--
+400.0,0.035
+500.0,0.041
+600.0,0.047
+700.0,0.033
+800.0,0.053
+900.0,0.057
+1000.0,0.057
+1100.0,0.058
+1200.0,0.058
+1300.0,0.061
+1400.0,0.058
+1500.0,0.058
+1600.0,0.055
+
+#: Model,Chargino
+#: Lifetime,30 ns
+Mass [GeV],Efficiency (Inclusive_Low)
+90.0,0.002
+200.0,0.014
+250.0,0.019
+300.0,0.024
+350.0,0.033
+400.0,0.036
+500.0,0.043
+600.0,0.02
+700.0,0.05
+800.0,0.002
+900.0,0.058
+1000.0,0.058
+1100.0,0.059
+1200.0,0.061
+1300.0,0.059
+1400.0,0.06
+1500.0,0.058
+1600.0,0.057
+
+#: Model,Chargino
+#: Lifetime,Stable
+Mass [GeV],Efficiency (Inclusive_Low)
+90.0,0.001
+200.0,0.003
+250.0,0.007
+300.0,0.002
+350.0,0.01
+400.0,0.013
+500.0,0.017
+600.0,0.021
+700.0,0.006
+800.0,0.027
+900.0,0.026
+1000.0,0.029
+1100.0,0.03
+1200.0,0.03
+1300.0,0.03
+1400.0,0.029
+1500.0,0.03
+1600.0,0.028
+

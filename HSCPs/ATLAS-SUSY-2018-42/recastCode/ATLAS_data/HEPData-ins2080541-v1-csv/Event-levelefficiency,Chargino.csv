@@ -1,0 +1,139 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t99
+#: name: Event-level efficiency, Chargino
+#: description: Event-level efficiency for the chargino pair-production model for various masses and lifetimes. The efficiency is defined as the fraction of events satisfying the selection of trigger, event and jet cleaning, ETmiss and primary vertex requirements per events satisfying the acceptance criteria.
+#: data_file: tabaux8_effEvent_chargino.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: Acc/Eff
+#: keyword phrases: Supersymmetry | SUSY
+#: Model,Chargino
+#: Lifetime,0.2 ns
+Mass [GeV],Event-level Efficiency
+90.0,0.423
+200.0,0.423
+250.0,--
+300.0,0.402
+350.0,--
+400.0,0.437
+500.0,0.406
+600.0,0.313
+700.0,0.46
+800.0,0.474
+900.0,0.436
+1000.0,0.334
+1100.0,--
+1200.0,--
+1300.0,--
+1400.0,--
+1500.0,--
+1600.0,--
+
+#: Model,Chargino
+#: Lifetime,1 ns
+Mass [GeV],Event-level Efficiency
+90.0,0.264
+200.0,0.328
+250.0,--
+300.0,0.351
+350.0,--
+400.0,0.366
+500.0,0.385
+600.0,0.391
+700.0,0.392
+800.0,0.392
+900.0,0.384
+1000.0,0.403
+1100.0,--
+1200.0,--
+1300.0,--
+1400.0,--
+1500.0,--
+1600.0,--
+
+#: Model,Chargino
+#: Lifetime,4 ns
+Mass [GeV],Event-level Efficiency
+90.0,0.37
+200.0,0.395
+250.0,--
+300.0,0.391
+350.0,--
+400.0,0.335
+500.0,0.341
+600.0,0.372
+700.0,0.381
+800.0,0.379
+900.0,0.383
+1000.0,0.393
+1100.0,0.388
+1200.0,0.395
+1300.0,0.391
+1400.0,0.396
+1500.0,0.39
+1600.0,0.396
+
+#: Model,Chargino
+#: Lifetime,10 ns
+Mass [GeV],Event-level Efficiency
+90.0,0.142
+200.0,0.248
+250.0,--
+300.0,0.31
+350.0,--
+400.0,0.336
+500.0,0.358
+600.0,0.367
+700.0,0.33
+800.0,0.384
+900.0,0.387
+1000.0,0.39
+1100.0,0.389
+1200.0,0.389
+1300.0,0.395
+1400.0,0.394
+1500.0,0.397
+1600.0,0.395
+
+#: Model,Chargino
+#: Lifetime,30 ns
+Mass [GeV],Event-level Efficiency
+90.0,0.119
+200.0,0.22
+250.0,0.252
+300.0,0.283
+350.0,0.311
+400.0,0.327
+500.0,0.355
+600.0,0.16
+700.0,0.392
+800.0,0.168
+900.0,0.408
+1000.0,0.404
+1100.0,0.408
+1200.0,0.41
+1300.0,0.407
+1400.0,0.408
+1500.0,0.406
+1600.0,0.405
+
+#: Model,Chargino
+#: Lifetime,Stable
+Mass [GeV],Event-level Efficiency
+90.0,0.036
+200.0,0.062
+250.0,0.073
+300.0,0.047
+350.0,0.099
+400.0,0.111
+500.0,0.134
+600.0,0.156
+700.0,0.097
+800.0,0.185
+900.0,0.191
+1000.0,0.197
+1100.0,0.202
+1200.0,0.202
+1300.0,0.208
+1400.0,0.205
+1500.0,0.212
+1600.0,0.209
+

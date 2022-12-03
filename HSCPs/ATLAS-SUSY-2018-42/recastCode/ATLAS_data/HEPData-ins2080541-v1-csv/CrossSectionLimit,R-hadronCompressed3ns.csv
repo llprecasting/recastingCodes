@@ -1,0 +1,32 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t74
+#: name: Cross Section Limit, R-hadron Compressed 3ns
+#: description: The expected upper limits on cross-section for gluinos with $\Delta m(\tilde{g}, \tilde{\chi}_{1}^{0}) = 30 \text{GeV}$, with lifetime (a) 1 ns, (b) 3 ns, (c) 10 ns, and (d) 30 ns.
+#: data_file: figaux27b_XSExclusion_dEdx_Multibin_Internal_rhadron_dm30_3.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: CLs
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+#: keyword reactions: p p --> GLUINO GLUINO
+R-hadron Mass [TeV],Expected limit [pb],"exp,1-sigma +","exp,1-sigma -"
+1.4,0.00141,0.000514,-0.000177
+1.6,0.00142,0.000544,-0.000276
+1.8,0.00136,0.00049,-0.000194
+2.0,0.0017,0.000569,-0.000118
+2.2,0.00154,0.00051,-0.000111
+2.4,0.0017,0.000511,-7.53e-05
+
+R-hadron Mass [TeV],Observed limit [pb]
+1.4,0.00311
+1.6,0.00321
+1.8,0.00256
+2.0,0.00246
+2.2,0.00222
+2.4,0.00238
+
+R-hadron Mass [TeV],Signal Cross Section [pb]
+1.4,0.0284
+1.6,0.00887
+1.8,0.00293
+2.0,0.00101
+2.2,0.000356
+2.4,0.000128
+

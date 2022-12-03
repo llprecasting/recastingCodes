@@ -1,0 +1,35 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t70
+#: name: Cross Section Limit, R-hadron 10ns
+#: description: The expected upper limits on cross-section for gluinos with $m(\tilde{\chi}_{1}^{0}) = 100 \text{GeV}$, with lifetime with lifetime (a) 1 ns, (b) 3 ns, (c) 10 ns, (d) 30 ns, and (e) stable.
+#: data_file: figaux26d_XSExclusion_dEdx_Multibin_Internal_rhadron_100_10.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: CLs
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+#: keyword reactions: p p --> GLUINO GLUINO
+R-hadron Mass [TeV],Expected limit [pb],"exp,1-sigma +","exp,1-sigma -"
+1.6,0.000192,8.07e-05,-1.66e-05
+1.8,0.000187,6.36e-05,-8.3e-06
+2.2,0.000172,6.01e-05,-4.43e-06
+2.4,0.000164,5.81e-05,-3.61e-06
+2.6,0.000176,5.2e-05,-4.13e-06
+2.8,0.000182,5.01e-05,-2.27e-06
+3.0,0.000183,4.77e-05,-3.26e-06
+
+R-hadron Mass [TeV],Observed limit [pb]
+1.6,0.000433
+1.8,0.000353
+2.2,0.000248
+2.4,0.000245
+2.6,0.000253
+2.8,0.000181
+3.0,0.000183
+
+R-hadron Mass [TeV],Signal Cross Section [pb]
+1.6,0.00887
+1.8,0.00293
+2.2,0.000356
+2.4,0.000128
+2.6,4.62e-05
+2.8,1.68e-05
+3.0,6.12e-06
+

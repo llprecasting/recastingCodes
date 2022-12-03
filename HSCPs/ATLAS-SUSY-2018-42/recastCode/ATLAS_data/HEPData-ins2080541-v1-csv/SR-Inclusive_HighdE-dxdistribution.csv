@@ -1,0 +1,118 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t13
+#: name: SR-Inclusive_High dE/dx distribution
+#: description: The observed dE/dx distribution in the SR-Inclusive_High signal-region bin. The band on the expected background indicates the total uncertainty of the estimation. Several representative signal models are overlaid. Events outside the shown range are accumulated in the rightmost bin indicated as 'Overflow'. Downward triangle markers at the bottom of the panels indicate that no events are observed in the corresponding mass bin, while upward triangle markers in the lower panels indicate that the observed data is beyond the range.
+#: data_file: fig16f_dEdx_Nominal_Stable_IncHigh.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: N
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+#: keyword reactions: p p --> GLUINO GLUINO | p p --> CHARGINO NEUTRALINO | p p --> CHARGINO CHARGINO | p p --> SLEPTON SLEPTON
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,SR-Inclusive_High
+dEdx [${\rm MeV~g^{-1}~cm^{2}}$],dEdx [${\rm MeV~g^{-1}~cm^{2}}$] LOW,dEdx [${\rm MeV~g^{-1}~cm^{2}}$] HIGH,Background [Entries / 0.12 ${\rm MeV~g^{-1}~cm^{2}}$],"sys,background +","sys,background -"
+1.8599999999999999,1.8,1.92,0.0,1e-06,-1e-06
+1.98,1.92,2.04,0.0,1e-06,-1e-06
+2.1,2.04,2.16,0.0,1e-06,-1e-06
+2.2199999999999998,2.16,2.28,0.0,1e-06,-1e-06
+2.34,2.28,2.4,0.0,1e-06,-1e-06
+2.46,2.4,2.52,6.67,0.803,-0.803
+2.58,2.52,2.64,3.73,0.513,-0.513
+2.7,2.64,2.76,3.27,0.437,-0.437
+2.82,2.76,2.88,2.14,0.346,-0.346
+2.94,2.88,3.0,1.16,0.286,-0.286
+3.06,3.0,3.12,0.923,0.198,-0.198
+3.18,3.12,3.24,0.691,0.22,-0.22
+3.3,3.24,3.36,0.393,0.134,-0.134
+3.42,3.36,3.48,0.309,0.108,-0.108
+3.54,3.48,3.6,0.126,0.0972,-0.0972
+3.66,3.6,3.72,0.0346,0.137,-0.137
+3.7800000000000002,3.72,3.84,0.11,0.0547,-0.0547
+3.9,3.84,3.96,0.134,0.148,-0.148
+
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,SR-Inclusive_High
+dEdx [${\rm MeV~g^{-1}~cm^{2}}$],dEdx [${\rm MeV~g^{-1}~cm^{2}}$] LOW,dEdx [${\rm MeV~g^{-1}~cm^{2}}$] HIGH,Data [Entries / 0.12 ${\rm MeV~g^{-1}~cm^{2}}$],stat +,stat -
+1.8599999999999999,1.8,1.92,0.0,0,0
+1.98,1.92,2.04,0.0,0,0
+2.1,2.04,2.16,0.0,0,0
+2.2199999999999998,2.16,2.28,0.0,0,0
+2.34,2.28,2.4,0.0,0,0
+2.46,2.4,2.52,9.0,3.0,-3.0
+2.58,2.52,2.64,6.0,2.45,-2.45
+2.7,2.64,2.76,3.0,1.73,-1.73
+2.82,2.76,2.88,1.0,1.0,-1.0
+2.94,2.88,3.0,1.0,1.0,-1.0
+3.06,3.0,3.12,1.0,1.0,-1.0
+3.18,3.12,3.24,2.0,1.41,-1.41
+3.3,3.24,3.36,2.0,1.41,-1.41
+3.42,3.36,3.48,0.0,0,0
+3.54,3.48,3.6,1.0,1.0,-1.0
+3.66,3.6,3.72,0.0,0,0
+3.7800000000000002,3.72,3.84,1.0,1.0,-1.0
+3.9,3.84,3.96,0.0,0,0
+
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,SR-Inclusive_High
+dEdx [${\rm MeV~g^{-1}~cm^{2}}$],dEdx [${\rm MeV~g^{-1}~cm^{2}}$] LOW,dEdx [${\rm MeV~g^{-1}~cm^{2}}$] HIGH,"$m(\tilde{g}) = 2.2 ~\text{TeV}, m(\tilde{\chi}_{1}^{0}) = 100 ~\text{GeV}, \tau(\tilde{g}) = 10 ~\text{ns}$ [Entries / 0.12 ${\rm MeV~g^{-1}~cm^{2}}$]"
+1.8599999999999999,1.8,1.92,0.0
+1.98,1.92,2.04,0.0
+2.1,2.04,2.16,0.0
+2.2199999999999998,2.16,2.28,0.0
+2.34,2.28,2.4,0.0
+2.46,2.4,2.52,0.365
+2.58,2.52,2.64,0.361
+2.7,2.64,2.76,0.336
+2.82,2.76,2.88,0.32
+2.94,2.88,3.0,0.251
+3.06,3.0,3.12,0.3
+3.18,3.12,3.24,0.33
+3.3,3.24,3.36,0.307
+3.42,3.36,3.48,0.268
+3.54,3.48,3.6,0.256
+3.66,3.6,3.72,0.212
+3.7800000000000002,3.72,3.84,0.251
+3.9,3.84,3.96,6.1
+
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,SR-Inclusive_High
+dEdx [${\rm MeV~g^{-1}~cm^{2}}$],dEdx [${\rm MeV~g^{-1}~cm^{2}}$] LOW,dEdx [${\rm MeV~g^{-1}~cm^{2}}$] HIGH,"$m(\tilde{\chi}_{1}^{\pm}) = 1.3 ~\text{TeV}, \tau(\tilde{\chi}_{1}^{\pm}) = 10 ~\text{ns}$ [Entries / 0.12 ${\rm MeV~g^{-1}~cm^{2}}$]"
+1.8599999999999999,1.8,1.92,0.0
+1.98,1.92,2.04,0.0
+2.1,2.04,2.16,0.0
+2.2199999999999998,2.16,2.28,0.0
+2.34,2.28,2.4,0.0
+2.46,2.4,2.52,0.118
+2.58,2.52,2.64,0.111
+2.7,2.64,2.76,0.0994
+2.82,2.76,2.88,0.0932
+2.94,2.88,3.0,0.0897
+3.06,3.0,3.12,0.0877
+3.18,3.12,3.24,0.0743
+3.3,3.24,3.36,0.0689
+3.42,3.36,3.48,0.0711
+3.54,3.48,3.6,0.0637
+3.66,3.6,3.72,0.058
+3.7800000000000002,3.72,3.84,0.0451
+3.9,3.84,3.96,0.987
+
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,SR-Inclusive_High
+dEdx [${\rm MeV~g^{-1}~cm^{2}}$],dEdx [${\rm MeV~g^{-1}~cm^{2}}$] LOW,dEdx [${\rm MeV~g^{-1}~cm^{2}}$] HIGH,"$m(\tilde{\tau}) =  400 ~\text{GeV}, \tau(\tilde{\tau}) = 10 ~\text{ns}$ [Entries / 0.12 ${\rm MeV~g^{-1}~cm^{2}}$]"
+1.8599999999999999,1.8,1.92,0.0
+1.98,1.92,2.04,0.0
+2.1,2.04,2.16,0.0
+2.2199999999999998,2.16,2.28,0.0
+2.34,2.28,2.4,0.0
+2.46,2.4,2.52,0.93
+2.58,2.52,2.64,0.593
+2.7,2.64,2.76,0.583
+2.82,2.76,2.88,0.417
+2.94,2.88,3.0,0.366
+3.06,3.0,3.12,0.321
+3.18,3.12,3.24,0.332
+3.3,3.24,3.36,0.212
+3.42,3.36,3.48,0.198
+3.54,3.48,3.6,0.149
+3.66,3.6,3.72,0.214
+3.7800000000000002,3.72,3.84,0.176
+3.9,3.84,3.96,1.8
+

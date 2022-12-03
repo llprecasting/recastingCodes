@@ -1,0 +1,49 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t112
+#: name: Cut Flow, Stau
+#: description: Passing events in event selection steps for the stau pair-production model for various masses and lifetimes.
+#: data_file: tabaux21_cutflow_stau.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: N
+#: keyword phrases: Supersymmetry | SUSY
+#: Model,Stau $m(\tilde{\tau})$ = 400 GeV
+#: Lifetime,10 ns
+Selection,Events
+Total,258.0
+Event and jet Cleaning,256.0
+Trigger,129.0
+Primary vertex,129.0
+$E_{T}^{miss}>170$ GeV,87.0
+Track in PV,84.9
+$p_{T} > 50$ GeV,83.7
+Track quality requirements,80.4
+Track isolation,79.4
+$p_{T} > 120$ GeV,78.9
+Track momentum uncertainty,78.3
+$|\eta|<1.8$,73.3
+"$m_{T}({track},{p}_{{T}}^{{ miss}}) > 130$ GeV",60.6
+Electron veto,60.0
+Hadron/tau veto,58.8
+"$dE/dx\in[1.8,2.4] {MeV~cm^{2}/g}$",6.79
+$dE/dx>2.4 {MeV~cm^{2}/g}$,6.18
+
+#: Model,Stau $m(\tilde{\tau})$ = 400 GeV
+#: Lifetime,10 ns
+Selection,Efficiency
+Total,1.0
+Event and jet Cleaning,0.991
+Trigger,0.499
+Primary vertex,0.499
+$E_{T}^{miss}>170$ GeV,0.337
+Track in PV,0.328
+$p_{T} > 50$ GeV,0.324
+Track quality requirements,0.311
+Track isolation,0.307
+$p_{T} > 120$ GeV,0.305
+Track momentum uncertainty,0.303
+$|\eta|<1.8$,0.284
+"$m_{T}({track},{p}_{{T}}^{{ miss}}) > 130$ GeV",0.234
+Electron veto,0.232
+Hadron/tau veto,0.228
+"$dE/dx\in[1.8,2.4] {MeV~cm^{2}/g}$",0.026
+$dE/dx>2.4 {MeV~cm^{2}/g}$,0.024
+

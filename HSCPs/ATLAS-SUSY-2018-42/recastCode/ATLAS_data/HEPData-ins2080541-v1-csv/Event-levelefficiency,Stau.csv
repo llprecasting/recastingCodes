@@ -1,0 +1,109 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t100
+#: name: Event-level efficiency, Stau
+#: description: Event-level efficiency for the stau pair-production model for various masses and lifetimes. The efficiency is defined as the fraction of events satisfying the selection of trigger, event and jet cleaning, ETmiss and primary vertex requirements per events satisfying the acceptance criteria.
+#: data_file: tabaux9_effEvent_stau.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: Acc/Eff
+#: keyword phrases: Supersymmetry | SUSY
+#: Model,Stau
+#: Lifetime,0.3 ns
+Mass [GeV],Event-level Efficiency
+100.0,0.0
+200.0,0.001
+300.0,0.001
+400.0,0.003
+450.0,--
+500.0,0.005
+550.0,--
+600.0,0.006
+650.0,--
+700.0,0.008
+800.0,0.004
+900.0,0.015
+1000.0,0.018
+
+#: Model,Stau
+#: Lifetime,1 ns
+Mass [GeV],Event-level Efficiency
+100.0,--
+200.0,--
+300.0,--
+400.0,--
+450.0,0.018
+500.0,--
+550.0,0.027
+600.0,0.03
+650.0,0.033
+700.0,0.043
+800.0,0.047
+900.0,0.06
+1000.0,0.073
+
+#: Model,Stau
+#: Lifetime,3 ns
+Mass [GeV],Event-level Efficiency
+100.0,0.0
+200.0,0.003
+300.0,0.013
+400.0,0.025
+450.0,--
+500.0,0.043
+550.0,--
+600.0,0.06
+650.0,--
+700.0,0.082
+800.0,0.094
+900.0,0.117
+1000.0,0.138
+
+#: Model,Stau
+#: Lifetime,10 ns
+Mass [GeV],Event-level Efficiency
+100.0,0.0
+200.0,0.002
+300.0,0.012
+400.0,0.028
+450.0,0.04
+500.0,0.047
+550.0,0.059
+600.0,0.066
+650.0,0.08
+700.0,0.086
+800.0,0.111
+900.0,0.134
+1000.0,0.155
+
+#: Model,Stau
+#: Lifetime,30 ns
+Mass [GeV],Event-level Efficiency
+100.0,0.0
+200.0,0.001
+300.0,0.007
+400.0,0.019
+450.0,--
+500.0,0.033
+550.0,--
+600.0,0.045
+650.0,--
+700.0,0.063
+800.0,0.08
+900.0,0.093
+1000.0,0.113
+
+#: Model,Stau
+#: Lifetime,Stable
+Mass [GeV],Event-level Efficiency
+100.0,0.0
+200.0,0.0
+300.0,0.001
+400.0,0.004
+450.0,0.006
+500.0,0.008
+550.0,0.012
+600.0,0.014
+650.0,0.017
+700.0,0.021
+800.0,0.027
+900.0,0.033
+1000.0,0.042
+

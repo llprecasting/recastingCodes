@@ -1,0 +1,37 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t29
+#: name: VR-LowPt-Mu-IBL0_Low VAR distribution
+#: description: Comparison of the observed and expected VAR distributionsin VR-LowPt-Mu-IBL0_Low. The band on the expected background estimation indicates the total uncertainty of the estimation. Downward triangle markers at the bottom of the panels indicate there is no events observed in the corresponding bin, while upward triangle markers at the bottom panel indicate the observed data is beyond the range.
+#: data_file: figaux4b_mass_Validation_Stable_IsMu_OF0Low.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: N
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,SR-Mu-IBL0_Low
+mass [GeV],mass [GeV] LOW,mass [GeV] HIGH,Background [Entries / 30 GeV],"sys,background +","sys,background -"
+25.0,0.0,50.0,0.0889,0.213,-0.213
+65.0,50.0,80.0,87.1,8.79,-8.79
+90.0,80.0,100.0,107.0,10.7,-10.7
+110.0,100.0,120.0,84.0,5.68,-5.68
+140.0,120.0,160.0,35.7,2.96,-2.96
+180.0,160.0,200.0,12.6,1.22,-1.22
+220.0,200.0,240.0,5.86,0.461,-0.461
+260.0,240.0,280.0,2.55,0.383,-0.383
+300.0,280.0,320.0,1.07,0.237,-0.237
+340.0,320.0,360.0,0.49,0.38,-0.38
+380.0,360.0,400.0,0.173,0.177,-0.177
+
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,SR-Mu-IBL0_Low
+mass [GeV],mass [GeV] LOW,mass [GeV] HIGH,Data [Entries / 30 GeV],stat +,stat -
+25.0,0.0,50.0,0.0,0,0
+65.0,50.0,80.0,90.0,9.49,-9.49
+90.0,80.0,100.0,104.0,12.5,-12.5
+110.0,100.0,120.0,90.0,11.6,-11.6
+140.0,120.0,160.0,37.5,5.3,-5.3
+180.0,160.0,200.0,12.0,3.0,-3.0
+220.0,200.0,240.0,4.5,1.84,-1.84
+260.0,240.0,280.0,3.0,1.5,-1.5
+300.0,280.0,320.0,3.0,1.5,-1.5
+340.0,320.0,360.0,0.75,0.75,-0.75
+380.0,360.0,400.0,0.0,0,0
+

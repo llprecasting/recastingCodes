@@ -1,0 +1,26 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t90
+#: name: Event Selection Efficiency distribution
+#: description: Trigger and event selection efficiencies. The band on the marker indicates a typical size of fluctuation by the LLP mass and lifetime observed by the samples used in efficiency derivation, but it does not indicate the full envelope of model dependence.
+#: data_file: figaux33b_selEffCurve.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: Acc/Eff
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+Truth Level ETmiss (Total) [GeV],Truth Level ETmiss (Total) [GeV] LOW,Truth Level ETmiss (Total) [GeV] HIGH,Efficiency,error +,error -
+10.0,0,20,0.016,0.013,-0.013
+30.0,20,40,0.013,0.02,-0.02
+50.0,40,60,0.004,0.005,-0.005
+70.0,60,80,0.005,0.009,-0.009
+90.0,80,100,0.009,0.015,-0.015
+110.0,100,120,0.015,0.021,-0.021
+130.0,120,140,0.035,0.025,-0.025
+150.0,140,160,0.122,0.03,-0.03
+170.0,160,180,0.413,0.022,-0.022
+190.0,180,200,0.774,0.027,-0.027
+225.0,200,250,0.961,0.013,-0.013
+275.0,250,300,0.996,0.006,-0.006
+350.0,300,400,1.0,0.001,-0.001
+450.0,400,500,1.0,0.001,-0.001
+600.0,500,700,1.0,0.001,-0.001
+850.0,700,1000,1.0,0.001,-0.001
+1050.0,1000,1100,1.0,0.001,-0.001
+

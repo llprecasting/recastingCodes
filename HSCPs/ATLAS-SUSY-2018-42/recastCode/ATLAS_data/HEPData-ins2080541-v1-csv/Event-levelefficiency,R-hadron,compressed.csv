@@ -1,0 +1,92 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t98
+#: name: Event-level efficiency, R-hadron, compressed
+#: description: Event-level efficiency for the R-hadron pair-production model with DeltaM(gluino, N1) = 30 GeV for various masses and lifetimes. The efficiency is defined as the fraction of events satisfying the selection of trigger, event and jet cleaning, ETmiss and primary vertex requirements per events satisfying the acceptance criteria.
+#: data_file: tabaux7_effEvent_rhadron_compressed.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: Acc/Eff
+#: keyword phrases: Supersymmetry | SUSY
+#: Model,R-hadron / $\Delta m(\tilde{g},\tilde{\chi}_{1}^{0})$ = 30 GeV
+#: Lifetime,0.3 ns
+Mass [GeV],Event-level Efficiency
+400.0,0.289
+500.0,0.163
+600.0,0.289
+700.0,0.313
+800.0,0.237
+1000.0,0.263
+1200.0,0.294
+1400.0,0.43
+1600.0,0.259
+1800.0,0.354
+2000.0,--
+2200.0,--
+2400.0,--
+
+#: Model,R-hadron / $\Delta m(\tilde{g},\tilde{\chi}_{1}^{0})$ = 30 GeV
+#: Lifetime,1 ns
+Mass [GeV],Event-level Efficiency
+400.0,0.189
+500.0,0.229
+600.0,0.263
+700.0,0.297
+800.0,0.295
+1000.0,0.326
+1200.0,0.313
+1400.0,0.312
+1600.0,0.333
+1800.0,0.326
+2000.0,0.277
+2200.0,--
+2400.0,--
+
+#: Model,R-hadron / $\Delta m(\tilde{g},\tilde{\chi}_{1}^{0})$ = 30 GeV
+#: Lifetime,3 ns
+Mass [GeV],Event-level Efficiency
+400.0,0.163
+500.0,0.201
+600.0,0.224
+700.0,0.253
+800.0,0.269
+1000.0,0.297
+1200.0,0.308
+1400.0,0.307
+1600.0,0.296
+1800.0,0.292
+2000.0,0.273
+2200.0,0.271
+2400.0,0.255
+
+#: Model,R-hadron / $\Delta m(\tilde{g},\tilde{\chi}_{1}^{0})$ = 30 GeV
+#: Lifetime,10 ns
+Mass [GeV],Event-level Efficiency
+400.0,0.156
+500.0,0.194
+600.0,0.22
+700.0,0.243
+800.0,0.261
+1000.0,0.279
+1200.0,0.287
+1400.0,0.295
+1600.0,0.287
+1800.0,0.276
+2000.0,0.28
+2200.0,0.262
+2400.0,0.247
+
+#: Model,R-hadron / $\Delta m(\tilde{g},\tilde{\chi}_{1}^{0})$ = 30 GeV
+#: Lifetime,30 ns
+Mass [GeV],Event-level Efficiency
+400.0,0.168
+500.0,0.205
+600.0,0.221
+700.0,0.249
+800.0,0.262
+1000.0,0.284
+1200.0,0.294
+1400.0,0.293
+1600.0,0.287
+1800.0,0.28
+2000.0,0.268
+2200.0,0.259
+2400.0,0.242
+

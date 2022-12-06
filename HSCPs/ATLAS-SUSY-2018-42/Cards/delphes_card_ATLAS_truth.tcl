@@ -5,6 +5,7 @@
 set ExecutionPath {
  ParticlePropagator
 
+
   TrackMerger
 
   ECal
@@ -14,16 +15,12 @@ set ExecutionPath {
   EFlowMerger
   EFlowFilter
   
-  PhotonEfficiency
-  PhotonIsolation
 
   ElectronFilter
-  ElectronEfficiency
   ElectronIsolation
 
   ChargedHadronFilter
 
-  MuonEfficiency
   MuonIsolation
 
   MissingET
@@ -35,6 +32,7 @@ set ExecutionPath {
 
 
   UniqueObjectFinder
+
 
   TreeWriter
 }
@@ -59,6 +57,7 @@ module ParticlePropagator ParticlePropagator {
   # magnetic field
   set Bz 2.0
 }
+
 
 
 ##############
@@ -157,18 +156,30 @@ module SimpleCalorimeter ECal {
   add EnergyFraction {1000025} {0.0}
   add EnergyFraction {1000035} {0.0}
   add EnergyFraction {1000045} {0.0}
+  # energy fraction for charged LLPs (charginos, sleptons)
+  add EnergyFraction {1000024} {0.0}  
+  add EnergyFraction {1000037} {0.0}    
+  add EnergyFraction {1000011} {0.0}
+  add EnergyFraction {2000011} {0.0}          
+  add EnergyFraction {1000013} {0.0}      
+  add EnergyFraction {2000013} {0.0}      
+  add EnergyFraction {1000015} {0.0}      
+  add EnergyFraction {2000015} {0.0}      
+  # energy fraction for charged Rhadrons (Pythia codes)
+  add EnergyFraction {1009213} {0.0}
+  add EnergyFraction {1092214} {0.0}      
+  add EnergyFraction {1000612} {0.0}
+  add EnergyFraction {1006211} {0.0}      
+  
+  
   # energy fractions for K0short and Lambda
   add EnergyFraction {310} {0.3}
   add EnergyFraction {3122} {0.3}
 
   # set ResolutionFormula {resolution formula as a function of eta and energy}
 
-  # set ECalResolutionFormula {resolution formula as a function of eta and energy}
-  # http://arxiv.org/pdf/physics/0608012v1 jinst8_08_s08003
-  # http://villaolmo.mib.infn.it/ICATPP9th_2005/Calorimetry/Schram.p.pdf
-  # http://www.physics.utoronto.ca/~krieger/procs/ComoProceedings.pdf
-  set ResolutionFormula {                      (abs(eta) <= 3.2) * sqrt(energy^2*0.0017^2 + energy*0.101^2) +
-                             (abs(eta) > 3.2 && abs(eta) <= 4.9) * sqrt(energy^2*0.0350^2 + energy*0.285^2)}
+  # set a very tiny ECalResolutionFormula 
+  set ResolutionFormula { energy*0.00001}
 
 
 }
@@ -234,16 +245,20 @@ module SimpleCalorimeter HCal {
   add EnergyFraction {1000025} {0.0}
   add EnergyFraction {1000035} {0.0}
   add EnergyFraction {1000045} {0.0}
-  # remove gluinos, charginos and sleptons (in case of LLPs)
-  add EnergyFraction {1000021} {0.0}
-  add EnergyFraction {1000024} {0.0}
-  add EnergyFraction {1000037} {0.0}
+  # energy fraction for charged LLPs (charginos, sleptons)
+  add EnergyFraction {1000024} {0.0}  
+  add EnergyFraction {1000037} {0.0}    
   add EnergyFraction {1000011} {0.0}
-  add EnergyFraction {2000011} {0.0}  
-  add EnergyFraction {1000013} {0.0}
-  add EnergyFraction {2000013} {0.0}
-  add EnergyFraction {1000015} {0.0}
-  add EnergyFraction {2000015} {0.0}
+  add EnergyFraction {2000011} {0.0}          
+  add EnergyFraction {1000013} {0.0}      
+  add EnergyFraction {2000013} {0.0}      
+  add EnergyFraction {1000015} {0.0}      
+  add EnergyFraction {2000015} {0.0}      
+  # energy fraction for charged Rhadrons (Pythia codes)
+  add EnergyFraction {1009213} {0.0}
+  add EnergyFraction {1092214} {0.0}      
+  add EnergyFraction {1000612} {0.0}
+  add EnergyFraction {1006211} {0.0}    
   
   # energy fractions for K0short and Lambda
   add EnergyFraction {310} {0.7}
@@ -251,8 +266,8 @@ module SimpleCalorimeter HCal {
 
   # http://arxiv.org/pdf/hep-ex/0004009v1
   # http://villaolmo.mib.infn.it/ICATPP9th_2005/Calorimetry/Schram.p.pdf
-  # set HCalResolutionFormula {resolution formula as a function of eta and energy}
-  set ResolutionFormula { 0.0 }
+  # set a tiny HCalResolutionFormula
+  set ResolutionFormula { energy*0.00001 }
 }
 
 
@@ -321,58 +336,14 @@ module PdgCodeFilter EFlowFilter {
   add PdgCode {-13}
 }
 
-###################
-# Photon efficiency
-###################
 
-module Efficiency PhotonEfficiency {
-  set InputArray ECal/eflowPhotons
-  set OutputArray photons
-
-  # set EfficiencyFormula {efficiency formula as a function of eta and pt}
-
-  # efficiency formula for photons
-  set EfficiencyFormula {  1.0 }
-}
-
-##################
-# Photon isolation
-##################
-
-module Isolation PhotonIsolation {
-  set CandidateInputArray PhotonEfficiency/photons
-  set IsolationInputArray EFlowFilter/eflow
-
-  set OutputArray photons
-
-  set DeltaRMax 0.5
-
-  set PTMin 0.5
-
-  set PTRatioMax 0.12
-}
-
-
-#####################
-# Electron efficiency
-#####################
-
-module Efficiency ElectronEfficiency {
-  set InputArray ElectronFilter/electrons
-  set OutputArray electrons
-
-  # set EfficiencyFormula {efficiency formula as a function of eta and pt}
-
-  # efficiency formula for electrons
-  set EfficiencyFormula { 1.0 }
-}
 
 ####################
 # Electron isolation
 ####################
 
 module Isolation ElectronIsolation {
-  set CandidateInputArray ElectronEfficiency/electrons
+  set CandidateInputArray ElectronFilter/electrons
   set IsolationInputArray EFlowFilter/eflow
 
   set OutputArray electrons
@@ -384,26 +355,13 @@ module Isolation ElectronIsolation {
   set PTRatioMax 0.12
 }
 
-#################
-# Muon efficiency
-#################
-
-module Efficiency MuonEfficiency {
-  set InputArray ParticlePropagator/muons
-  set OutputArray muons
-
-  # set EfficiencyFormula {efficiency as a function of eta and pt}
-
-  # efficiency formula for muons
-  set EfficiencyFormula {  1.0 }
-}
 
 ################
 # Muon isolation
 ################
 
 module Isolation MuonIsolation {
-  set CandidateInputArray MuonEfficiency/muons
+  set CandidateInputArray ParticlePropagator/muons
   set IsolationInputArray EFlowFilter/eflow
 
   set OutputArray muons
@@ -422,7 +380,7 @@ module Isolation MuonIsolation {
 module Merger MissingET {
 # add InputArray InputArray
   add InputArray Calorimeter/towers
-  add InputArray MuonEfficiency/muons
+  add InputArray ParticlePropagator/muons
   set MomentumOutputArray momentum    
 }
 
@@ -471,11 +429,13 @@ module Merger GenMissingET {
   set MomentumOutputArray momentum
 }
 
+#####################################################
+# Find uniquely identified photons/electrons/tau/jets
+#####################################################
 
 module UniqueObjectFinder UniqueObjectFinder {
 # earlier arrays take precedence over later ones
 # add InputArray InputArray OutputArray
-  add InputArray PhotonIsolation/photons photons
   add InputArray ElectronIsolation/electrons electrons
   add InputArray MuonIsolation/muons muons
 }
@@ -499,7 +459,6 @@ module TreeWriter TreeWriter {
   add Branch GenMissingET/momentum GenMissingET MissingET
 
   add Branch UniqueObjectFinder/electrons Electron Electron
-  add Branch UniqueObjectFinder/photons Photon Photon
   add Branch UniqueObjectFinder/muons Muon Muon
   add Branch MissingET/momentum MissingET MissingET
   add Branch MissingETCalo/momentum MissingETCalo MissingET

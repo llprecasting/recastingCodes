@@ -3,9 +3,10 @@
 #######################################
 
 set ExecutionPath {
- ParticlePropagator
+  
+  ParticlePropagator
 
-
+  ChargedHadrons
   TrackMerger
 
   ECal
@@ -59,6 +60,47 @@ module ParticlePropagator ParticlePropagator {
 }
 
 
+######################
+# ChargedHadrons
+######################
+
+module PdgCodeFilter ChargedHadrons {
+  set InputArray ParticlePropagator/chargedHadrons
+  set OutputArray chargedHadrons
+  
+  add PdgCode {11}
+  add PdgCode {-11}
+  add PdgCode {13}
+  add PdgCode {-13}
+  # charged LLPs (charginos, sleptons)
+  add PdgCode {1000024}
+  add PdgCode {1000037}
+  add PdgCode {1000011}
+  add PdgCode {2000011}
+  add PdgCode {1000013}
+  add PdgCode {2000013}
+  add PdgCode {1000015}
+  add PdgCode {2000015}
+  add PdgCode {-1000024}
+  add PdgCode {-1000037}
+  add PdgCode {-1000011}
+  add PdgCode {-2000011}
+  add PdgCode {-1000013}
+  add PdgCode {-2000013}
+  add PdgCode {-1000015}
+  add PdgCode {-2000015}
+  
+  # charged Rhadrons (Pythia codes)
+  add PdgCode {1009213}
+  add PdgCode {1092214}
+  add PdgCode {1000612}
+  add PdgCode {1006211}
+  add PdgCode {-1009213}
+  add PdgCode {-1092214}
+  add PdgCode {-1000612}
+  add PdgCode {-1006211}  
+}
+
 
 ##############
 # Track merger
@@ -66,7 +108,7 @@ module ParticlePropagator ParticlePropagator {
 
 module Merger TrackMerger {
 # add InputArray InputArray
-  add InputArray ParticlePropagator/chargedHadrons
+  add InputArray ChargedHadrons/chargedHadrons
   add InputArray ParticlePropagator/electrons
   add InputArray ParticlePropagator/muons
   set OutputArray tracks

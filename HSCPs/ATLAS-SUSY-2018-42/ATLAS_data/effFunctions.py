@@ -54,22 +54,60 @@ def getSelectionEff(met):
 
 inputFile = os.path.join(atlasDir,'./HEPData-ins2080541-v1-csv/TrackSelectionEfficiencydistribution.csv')
 gridPtsHigh = np.genfromtxt(inputFile,names=True,skip_header=34,delimiter=',')
+# Central value
 trackEffHigh_F = interp1d(gridPtsHigh['beta__gamma'],gridPtsHigh['Efficiency'],
                       fill_value=0.0,bounds_error=False)
-gridPtsLow = np.genfromtxt(inputFile,names=True,skip_header=8,skip_footer=32-8,delimiter=',')
-trackEffLow_F = interp1d(gridPtsLow['beta__gamma'],gridPtsLow['Efficiency'],
+# Upper value                    
+trackEffHigh_Fp = interp1d(gridPtsHigh['beta__gamma'],gridPtsHigh['error_'],
+                      fill_value=0.0,bounds_error=False)
+# Lower value                      
+trackEffHigh_Fm = interp1d(gridPtsHigh['beta__gamma'],gridPtsHigh['error__1'],
                       fill_value=0.0,bounds_error=False)
 
 
-def getTrackEff(gbeta,sr):
+gridPtsLow = np.genfromtxt(inputFile,names=True,skip_header=8,skip_footer=32-8,delimiter=',')
+# Central value
+trackEffLow_F = interp1d(gridPtsLow['beta__gamma'],gridPtsLow['Efficiency'],
+                      fill_value=0.0,bounds_error=False)
+# Upper value
+trackEffLow_Fp = interp1d(gridPtsLow['beta__gamma'],gridPtsLow['error_'],
+                      fill_value=0.0,bounds_error=False)
+# Lower value
+trackEffLow_Fm = interp1d(gridPtsLow['beta__gamma'],gridPtsLow['error__1'],
+                      fill_value=0.0,bounds_error=False)
+
+def getTrackEff(gbeta,sr,use='central'):
     
+    eff = 0.0
     if sr.lower() == 'high':
-        eff = trackEffHigh_F(gbeta)
+        if use == 'central':
+            eff = trackEffHigh_F(gbeta)
+        elif use == 'lower':
+            eff = trackEffHigh_F(gbeta)+trackEffHigh_Fm(gbeta)
+        elif use == 'higher':
+            eff = trackEffHigh_F(gbeta)+trackEffHigh_Fp(gbeta)
+        elif use == 'smear':
+            mu = trackEffHigh_F(gbeta)
+            sigma = (trackEffHigh_Fp(gbeta)-trackEffHigh_Fm(gbeta))/2.0
+            eff = np.random.normal(mu,sigma,1)[0]
+        else:
+            raise ValueError()
     elif sr.lower() == 'low':
-        eff = trackEffLow_F(gbeta)
+        if use == 'central':
+            eff = trackEffLow_F(gbeta)
+        elif use == 'lower':
+            eff = trackEffLow_F(gbeta)+trackEffLow_Fm(gbeta)
+        elif use == 'higher':
+            eff = trackEffLow_F(gbeta)+trackEffLow_Fp(gbeta)
+        elif use == 'smear':
+            mu = trackEffLow_F(gbeta)
+            sigma = (trackEffLow_Fp(gbeta)-trackEffLow_Fm(gbeta))/2.0
+            eff = np.random.normal(mu,sigma,1)[0]
+        else:
+            raise ValueError()
     else:
-        return None
-    
+        raise ValueError()
+
     return float(eff)
 
 

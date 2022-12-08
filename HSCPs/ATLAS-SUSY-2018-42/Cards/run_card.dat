@@ -18,12 +18,12 @@
 #*********************************************************************
 # Tag name for the run (one word)                                    *
 #*********************************************************************
-  prompt     = run_tag ! name of the run 
+  stable1300     = run_tag ! name of the run 
 #*********************************************************************
 # Number of events and rnd seed                                      *
 # Warning: Do not generate more than 1M events in a single run       *
 #*********************************************************************
-  50000 = nevents ! Number of unweighted events requested 
+  20000 = nevents ! Number of unweighted events requested 
   0   = iseed   ! rnd seed (0=assigned automatically=default))
 #*********************************************************************
 # Collider type and energy                                           *
@@ -44,14 +44,16 @@
 #          eva=Effective W/Z/A Approx.       [21yy.zzzzz]            *
 #          none=No PDF, same as lhapdf with lppx=0                   *
 #*********************************************************************
-     nn23lo1    = pdlabel     ! PDF set 
+     nn23lo1    = pdlabel1     ! PDF type for beam #1
+     nn23lo1    = pdlabel2     ! PDF type for beam #2
      230000    = lhaid     ! if pdlabel=lhapdf, this is the lhapdf number
 # To see heavy ion options: type "update ion_pdf"
 #*********************************************************************
 # Renormalization and factorization scales                           *
 #*********************************************************************
  False = fixed_ren_scale  ! if .true. use fixed ren scale
-     False = fixed_fac_scale  ! if .true. use fixed fac scale
+ False = fixed_fac_scale1  ! if .true. use fixed fac scale for beam 1
+ False = fixed_fac_scale2  ! if .true. use fixed fac scale for beam 2
  91.188  = scale            ! fixed ren scale
  91.188  = dsqrt_q2fact1    ! fixed fact scale for pdf1
  91.188  = dsqrt_q2fact2    ! fixed fact scale for pdf2

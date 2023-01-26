@@ -32,7 +32,10 @@ set ExecutionPath {
   MissingETCalo
 
   HSCPFilter
+  DMFilter
+  DMMissingET
   
+
   NeutrinoFilter
   GenMissingET
 
@@ -531,7 +534,23 @@ module PdgCodeFilter NeutrinoFilter {
 
 }
 
+#####################
+# Dark Matter Filter
+#####################
 
+module PdgCodeFilter DMFilter {
+
+  set InputArray Delphes/allParticles
+  set OutputArray dmParticles
+  set Invert true
+  set RequireStatus true
+  set Status 1
+
+  set PTMin 0.0
+
+  add PdgCode {1000022}    
+  add PdgCode {-1000022}
+}
 
 #########################
 # Gen Missing ET merger
@@ -542,6 +561,18 @@ module Merger GenMissingET {
   add InputArray NeutrinoFilter/filteredParticles
   set MomentumOutputArray momentum
 }
+
+
+###############################
+# Dark Matter Missing ET merger
+###############################
+
+module Merger DMMissingET {
+  add InputArray DMFilter/dmParticles
+  set MomentumOutputArray momentum
+}
+
+
 
 #####################################################
 # Find uniquely identified photons/electrons/tau/jets
@@ -563,6 +594,8 @@ module TreeWriter TreeWriter {
 # add Branch InputArray BranchName BranchClass
   add Branch Delphes/allParticles Particle GenParticle
   add Branch HSCPFilter/hscpParticles hscpParticles GenParticle  
+  add Branch DMFilter/dmParticles dmParticles GenParticle
+  add Branch DMMissingET/momentum DMMissingET MissingET  
 
   add Branch TrackMerger/tracks Track Track
   add Branch Calorimeter/towers Tower Tower

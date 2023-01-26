@@ -35,8 +35,6 @@ read answer
 if echo "$answer" | grep -iq "^y" ;then
 	mkdir MG5;
 	echo "[installer] getting MadGraph5"; wget $URL 2>/dev/null || curl -O $URL; tar -zxf $madgraph -C MG5 --strip-components 1;
-	echo "Replacing MG5/Template/NLO/SubProcesses/cuts.f by Cards/CMS-SUS-20-004/cuts.f";
-	cp ./Cards/CMS-SUS-20-004/cuts.f ./MG5/Template/NLO/SubProcesses/cuts.f
 	cd $homeDIR
         rm $madgraph;
 fi

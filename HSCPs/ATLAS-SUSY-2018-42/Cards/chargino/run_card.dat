@@ -44,8 +44,8 @@
 #          eva=Effective W/Z/A Approx.       [21yy.zzzzz]            *
 #          none=No PDF, same as lhapdf with lppx=0                   *
 #*********************************************************************
-     nn23lo1    = pdlabel     ! PDF set 
-     230000    = lhaid     ! if pdlabel=lhapdf, this is the lhapdf number
+     lhapdf    = pdlabel     ! PDF set 
+     246800    = lhaid     ! if pdlabel=lhapdf, this is the lhapdf number
 # To see heavy ion options: type "update ion_pdf"
 #*********************************************************************
 # Renormalization and factorization scales                           *
@@ -63,7 +63,7 @@
 # Type and output format
 #*********************************************************************
   False     = gridpack  !True = setting up the grid pack
-  -1.0 = time_of_flight ! threshold (in mm) below which the invariant livetime is not written (-1 means not written)
+  1.0 = time_of_flight ! threshold (in mm) below which the invariant livetime is not written (-1 means not written)
   average =  event_norm       ! average/sum. Normalization of the weight in the LHEF
 # To see MLM/CKKW  merging options: type "update MLM" or "update CKKW"
 

@@ -44,4 +44,4 @@ import model MSSM_SLHA2
 define x1 = x1+ x1-
 generate p p > x1 n1
 add process p p > x1 x1
-output ../../pp2C1X1
+output ../../pp2C1X1_0j

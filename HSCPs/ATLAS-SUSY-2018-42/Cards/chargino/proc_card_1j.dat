@@ -42,6 +42,6 @@ define vl = ve vm vt
 define vl~ = ve~ vm~ vt~
 import model MSSM_SLHA2
 define x1 = x1+ x1-
-generate p p > x1 n1
-add process p p > x1 x1
-output ../../pp2C1X1
+generate p p > x1 n1 j
+add process p p > x1 x1 j
+output ../../pp2C1X1_1j

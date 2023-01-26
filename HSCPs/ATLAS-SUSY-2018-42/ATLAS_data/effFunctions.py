@@ -75,7 +75,7 @@ trackEffLow_Fp = interp1d(gridPtsLow['beta__gamma'],gridPtsLow['error_'],
 # Lower value
 trackEffLow_Fm = interp1d(gridPtsLow['beta__gamma'],gridPtsLow['error__1'],
                       fill_value=0.0,bounds_error=False)
-
+@np.vectorize
 def getTrackEff(gbeta,sr,use='central'):
     
     eff = 0.0
@@ -155,7 +155,7 @@ def getTargetMass(trueMass,trueWidth=0.0):
             
     return targetMass
 
-
+@np.vectorize
 def getMassSelEff(targetMass,sr):            
 
     if sr.lower() == 'high':

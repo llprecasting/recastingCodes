@@ -18,12 +18,12 @@
 #*********************************************************************
 # Tag name for the run (one word)                                    *
 #*********************************************************************
-  stable1300     = run_tag ! name of the run 
+  c1x1_10ns_13000GeV_0j     = run_tag ! name of the run 
 #*********************************************************************
 # Number of events and rnd seed                                      *
 # Warning: Do not generate more than 1M events in a single run       *
 #*********************************************************************
-  20000 = nevents ! Number of unweighted events requested 
+  25000 = nevents ! Number of unweighted events requested 
   0   = iseed   ! rnd seed (0=assigned automatically=default))
 #*********************************************************************
 # Collider type and energy                                           *
@@ -44,9 +44,8 @@
 #          eva=Effective W/Z/A Approx.       [21yy.zzzzz]            *
 #          none=No PDF, same as lhapdf with lppx=0                   *
 #*********************************************************************
-     nn23lo1    = pdlabel1     ! PDF type for beam #1
-     nn23lo1    = pdlabel2     ! PDF type for beam #2
-     230000    = lhaid     ! if pdlabel=lhapdf, this is the lhapdf number
+     lhapdf    = pdlabel     ! PDF type for beam
+     246800    = lhaid     ! if pdlabel=lhapdf, this is the lhapdf number
 # To see heavy ion options: type "update ion_pdf"
 #*********************************************************************
 # Renormalization and factorization scales                           *
@@ -65,9 +64,27 @@
 # Type and output format
 #*********************************************************************
   False     = gridpack  !True = setting up the grid pack
-  1 = time_of_flight ! threshold (in mm) below which the invariant lifetime is not written (-1 means not written)
+  1.0 = time_of_flight ! threshold (in mm) below which the invariant livetime is not written (-1 means not written)
   average =  event_norm       ! average/sum. Normalization of the weight in the LHEF
-# To see MLM/CKKW  merging options: type "update MLM" or "update CKKW"
+#*********************************************************************
+# Matching parameter (MLM only)
+#*********************************************************************
+ 1 = ickkw            ! 0 no matching, 1 MLM
+ 1.0 = alpsfact         ! scale factor for QCD emission vx
+ False = chcluster        ! cluster only according to channel diag
+ 5 = asrwgtflavor     ! highest quark flavor for a_s reweight
+ True  = auto_ptj_mjj  ! Automatic setting of ptj and mjj if xqcut >0
+                                   ! (turn off for VBF and single top processes)
+ 100.0   = xqcut   ! minimum kt jet measure between partons
+
+#***********************************************************************
+# Turn on either the ktdurham or ptlund cut to activate                *
+# CKKW(L) merging with Pythia8 [arXiv:1410.3012, arXiv:1109.4829]      *
+#***********************************************************************
+ -1.0  =  ktdurham
+ 0.4   =  dparameter
+ -1.0  =  ptlund
+ 1, 2, 3, 4, 5, 6, 21, 82  =  pdgs_for_merging_cut ! PDGs for two cuts above
 
 #*********************************************************************
 #
@@ -85,7 +102,7 @@
 #  'cp3.irmp.ucl.ac.be/projects/madgraph/wiki/LOEventGenerationBias' *
 #*********************************************************************
  None = bias_module  ! Bias type of bias, [None, ptj_bias, -custom_folder-]
- {} = bias_parameters ! Specifies the parameters of the module.
+ {'ptj_bias_target_ptj': 100.0, 'ptj_bias_enhancement_power': 1.0} = bias_parameters ! Specifies the parameters of the module.
 #
 #*******************************                                                 
 # Parton level cuts definition *
@@ -97,11 +114,18 @@
 # BW cutoff (M+/-bwcutoff*Gamma) ! Define on/off-shell for "$" and decay  
 #*********************************************************************
   15.0  = bwcutoff      ! (M+/-bwcutoff*Gamma)
+ #*********************************************************************
+ # Apply pt/E/eta/dr/mij/kt_durham cuts on decay products or not
+ # (note that etmiss/ptll/ptheavy/ht/sorted cuts always apply)
+ #*********************************************************************
+   False  = cut_decays    ! Cut decay products 
 #*********************************************************************
 # Standard Cuts                                                      *
 #*********************************************************************
 # Minimum and maximum pt's (for max, -1 means no cut)                *
 #*********************************************************************
+ 25.0  = ptj       ! minimum pt for the jets 
+ -1.0  = ptjmax    ! maximum pt for the jets
  {} = pt_min_pdg ! pt cut for other particles (use pdg code). Applied on particle and anti-particle
  {}	= pt_max_pdg ! pt cut for other particles (syntax e.g. {6: 100, 25: 50}) 
 #
@@ -110,6 +134,7 @@
 #*********************************************************************
 # Maximum and minimum absolute rapidity (for max, -1 means no cut)   *
 #*********************************************************************
+ 5.0 = etaj    ! max rap for the jets 
  {} = eta_min_pdg ! rap cut for other particles (use pdg code). Applied on particle and anti-particle
  {} = eta_max_pdg ! rap cut for other particles (syntax e.g. {6: 2.5, 23: 5})
 #*********************************************************************
@@ -129,7 +154,7 @@
 # maximal pdg code for quark to be considered as a light jet         *
 # (otherwise b cuts are applied)                                     *
 #*********************************************************************
- 4 = maxjetflavor    ! Maximum jet pdg code
+ 5 = maxjetflavor    ! Maximum jet pdg code
 #*********************************************************************
 #
 #*********************************************************************

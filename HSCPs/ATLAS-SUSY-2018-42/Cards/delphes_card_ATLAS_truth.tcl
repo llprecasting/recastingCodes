@@ -2,6 +2,8 @@
 # Order of execution of various modules
 #######################################
 
+#set MaxEvents 1000
+
 set ExecutionPath {
   
   ParticlePropagator
@@ -24,10 +26,13 @@ set ExecutionPath {
 
   MuonIsolation
 
+
   MissingET
   
   MissingETCalo
 
+  HSCPFilter
+  
   NeutrinoFilter
   GenMissingET
 
@@ -437,6 +442,73 @@ module Merger MissingETCalo {
 }
 
 
+
+#####################
+# HSCP Filter
+#####################
+
+module PdgCodeFilter HSCPFilter {
+
+  set InputArray Delphes/allParticles
+  set OutputArray hscpParticles
+  set Invert true
+  set PTMin 0.0
+
+  # PIDs for charged LLPs (charginos, sleptons)
+  add PdgCode {1000024}  
+  add PdgCode {1000037}    
+  add PdgCode {1000011}
+  add PdgCode {2000011}          
+  add PdgCode {1000013}      
+  add PdgCode {2000013}      
+  add PdgCode {1000015}      
+  add PdgCode {2000015}
+  add PdgCode {-1000024}  
+  add PdgCode {-1000037}    
+  add PdgCode {-1000011}
+  add PdgCode {-2000011}          
+  add PdgCode {-1000013}      
+  add PdgCode {-2000013}      
+  add PdgCode {-1000015}      
+  add PdgCode {-2000015}
+  
+  # PIDs for charged R-hadrons
+  add PdgCode {1009213}
+  add PdgCode {1009323}  
+  add PdgCode {1091114}    
+  add PdgCode {1092214}      
+  add PdgCode {1093114}        
+  add PdgCode {1093224}        
+  add PdgCode {1093314}          
+  add PdgCode {1093334}          
+  add PdgCode {1000612}
+  add PdgCode {1000632}  
+  add PdgCode {1000652}    
+  add PdgCode {1006211}      
+  add PdgCode {1006213}        
+  add PdgCode {1006321}
+  add PdgCode {1006323}   
+  add PdgCode {-1009213}
+  add PdgCode {-1009323}  
+  add PdgCode {-1091114}    
+  add PdgCode {-1092214}      
+  add PdgCode {-1093114}        
+  add PdgCode {-1093224}        
+  add PdgCode {-1093314}          
+  add PdgCode {-1093334}          
+  add PdgCode {-1000612}
+  add PdgCode {-1000632}  
+  add PdgCode {-1000652}    
+  add PdgCode {-1006211}      
+  add PdgCode {-1006213}        
+  add PdgCode {-1006321}
+  add PdgCode {-1006323}                   
+                  
+
+}
+
+
+
 #####################
 # Neutrino Filter
 #####################
@@ -490,6 +562,7 @@ module UniqueObjectFinder UniqueObjectFinder {
 module TreeWriter TreeWriter {
 # add Branch InputArray BranchName BranchClass
   add Branch Delphes/allParticles Particle GenParticle
+  add Branch HSCPFilter/hscpParticles hscpParticles GenParticle  
 
   add Branch TrackMerger/tracks Track Track
   add Branch Calorimeter/towers Tower Tower

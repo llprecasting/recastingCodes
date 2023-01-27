@@ -89,6 +89,9 @@ if echo "$answer" | grep -iq "^y" ;then
   latest=`git ls-remote --sort="version:refname" --tags $repo  | grep -v -e "pre" | grep -v -e "\{\}" | cut -d/ -f3- | tail -n1`
   echo "[installer] Cloning Delphes version $latest";
   git clone --branch $latest https://github.com/delphes/delphes.git Delphes
+  echo "[installer] Adding HSCP module to Delphes";
+  cp delphesHSCP/Makefile Delphes/;
+  cp delphesHSCP/HSCPFilter.cc delphesHSCP/HSCPFilter.h delphesHSCP/ModulesLinkDef.h Delphes/modules/;
   cd Delphes;
   export PYTHIA8=$homeDIR/pythia8;
   echo "[installer] installing Delphes";

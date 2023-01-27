@@ -597,7 +597,7 @@ module TreeWriter TreeWriter {
   add Branch DMFilter/dmParticles dmParticles GenParticle
   add Branch DMMissingET/momentum DMMissingET MissingET  
 
-#  add Branch TrackMerger/tracks Track Track
+  add Branch TrackMerger/tracks Track Track
 #  add Branch Calorimeter/towers Tower Tower
 
 #  add Branch HCal/eflowTracks EFlowTrack Track

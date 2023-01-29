@@ -130,5 +130,6 @@ fi
 
 echo "\n[installer] For running Delphes the following env variables should be set:\n\n export LD_LIBRARY_PATH=$homeDIR/MG5/HEPTools/pythia8/lib"
 echo "\nand for reading Delphes produced ROOT files:\n\n export ROOT_INCLUDE_PATH=$homeDIR/DelphesHSCP/external\n"
+echo "\n\n or run source setenv.sh\n\n"
 
 cd $homeDIR

@@ -1,8 +1,8 @@
 #!/bin/sh
 
 currentDIR="$( pwd )"
-delphesDIR=$currentDIR/Delphes
-pythiaDIR=$currentDIR/pythia8
+delphesDIR=$currentDIR/DelphesHSCP
+pythiaDIR=$currentDIR/MG5/HEPTools/pythia8
 
 
 Help()

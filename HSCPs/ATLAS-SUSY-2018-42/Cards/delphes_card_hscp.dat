@@ -32,6 +32,7 @@ set ExecutionPath {
   MissingETCalo
 
   HSCPFilter
+  HSCPIsolation
   DMFilter
   DMMissingET
   
@@ -460,8 +461,28 @@ module HSCPFilter HSCPFilter {
   
   add Charge 1
   add Charge -1  
-    
+   
+}
 
+
+################
+# HSCP isolation
+################
+
+module Isolation HSCPIsolation {
+  set CandidateInputArray HSCPFilter/hscpParticles
+  set IsolationInputArray TrackMerger/tracks
+
+  set OutputArray isoHSCPs
+
+  set DeltaRMax 0.3
+
+  set PTMin 1.0
+
+  set PTRatioMax 1000.0
+  
+  set UsePTSum false
+    
 }
 
 
@@ -546,13 +567,13 @@ module UniqueObjectFinder UniqueObjectFinder {
 
 module TreeWriter TreeWriter {
 # add Branch InputArray BranchName BranchClass
-#  add Branch Delphes/allParticles Particle GenParticle
-  add Branch HSCPFilter/hscpParticles hscpParticles GenParticle 
+  add Branch Delphes/allParticles Particle GenParticle
+  add Branch HSCPIsolation/isoHSCPs isoHSCPs GenParticle 
   add Branch HSCPFilter/daughters hscpDaughters GenParticle  
   add Branch DMFilter/dmParticles dmParticles GenParticle
   add Branch DMMissingET/momentum DMMissingET MissingET  
 
-#  add Branch TrackMerger/tracks Track Track
+  add Branch TrackMerger/tracks Track Track
 #  add Branch Calorimeter/towers Tower Tower
 
 #  add Branch HCal/eflowTracks EFlowTrack Track

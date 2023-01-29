@@ -51,7 +51,7 @@ if echo "$answer" | grep -iq "^y" ;then
         echo "[installer] installing Pythia8 under MadGraph5";
 	echo "install pythia8\nexit\n" > mad_install.txt;
 	./mg5_aMC -f mad_install.txt;
-	rm mad_install.txt;	
+	rm mad_install.txt;
 	cd $homeDIR;
 	sed  "s|homeDIR|$homeDIR|g" mg5_configuration.txt > ./MG5/input/mg5_configuration.txt;
         rm $madgraph;

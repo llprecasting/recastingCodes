@@ -35,6 +35,7 @@ read answer
 if echo "$answer" | grep -iq "^y" ;then
 	mkdir MG5;
 	echo "[installer] getting MadGraph5"; wget $URL 2>/dev/null || curl -O $URL; tar -zxf $madgraph -C MG5 --strip-components 1;
+	sed  "s|homeDIR|$homeDIR|g" mg5_configuration.txt > ./MG5/input/mg5_configuration.txt;	
 	cd ./MG5/bin;
 	echo "[installer] installing HepMC under MadGraph5"
 	echo "install hepmc\nexit\n" > mad_install.txt

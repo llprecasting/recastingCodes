@@ -62,21 +62,13 @@ def applyHSCPSelection(hscpList,pT=50.,eta=2.4,r=500.):
     
     return selHSCPs
 
-def applyIsolation(hscpList,tracks):
+def applyIsolation(hscpList,pTmax=5.0):
 
     isoHSCPs = []
     # Apply isolation requirement for HSCP tracks
     for hscp in hscpList:
-        sumPT = 0.0
-        for itrk in range(tracks.GetEntries()):
-            track = tracks.At(itrk)
-            if abs(track.PID) > 10000:
-                continue
-            deltaR = np.sqrt((track.Phi-hscp.Phi)**2 +(track.Eta-hscp.Eta)**2)
-            if deltaR > 0.3:
-                continue
-            sumPT += track.PT
-        if sumPT > 5.0: continue
+        sumPT = hscp.SumPtCharged
+        if sumPT > pTmax: continue
         isoHSCPs.append(hscp)
     return isoHSCPs
 
@@ -292,9 +284,10 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
             htargetMass = [(hscp,getTargetMass(hscp.Mass)) for hscp in hscps]
             htargetMass = [x for x in htargetMass[:] if x[1] is not None]
             hscps = [x[0] for x in htargetMass]
-            gbetas = [h.gbeta for h in hscps]
             targetMass = [x[1] for x in htargetMass]
             # targetMass = [h.Mass for h in hscps]
+
+            gbetas = [h.gbeta for h in hscps]
             trackEffHigh = getTrackEff(gbetas,sr='High')
             trackEffLow =  getTrackEff(gbetas,sr='Low')
             wMassHigh = getMassSelEff(targetMass,sr='High')
@@ -320,12 +313,15 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
     modelDict['Total xsec (pb)'] = totalweightPB
     print('\nCross-section (pb) = %1.3e\n' %totalweightPB)
 
-    # Normalize cutFlow by FullSample:
+    # Add normalized cutflow entry
     for key,val in cutFlow.items():
         if key == 'Total':
             continue
-        cutFlow[key] = val/cutFlow['Total']
-    cutFlow['Total'] = 1.0
+        valRound = float('%1.3e' %val)
+        valNorm = float('%1.3e' %(val/cutFlow['Total']))
+        cutFlow[key] = [(valRound,valNorm)]*2
+    cutFlow['Total'] = [(float('%1.3e' %cutFlow['Total']),1.0)]*2
+
         
     # Create a dictionary for storing data
     # The final data will have two entries (rows): one
@@ -376,7 +372,7 @@ if __name__ == "__main__":
             help='path to output file storing the DataFrame with the recasting data.'
                  + 'If not defined, will use the name of the first input file', 
             default = None)
-    ap.add_argument('-pt', '--pTcut', required=False,default=150.0,type=float,
+    ap.add_argument('-pt', '--pTcut', required=False,default=60.0,type=float,
             help='Gen level cut on gaugino pT for computing partial cross-sections.')
     ap.add_argument('-n', '--normalize', required=False,action='store_true',
             help='If set, the input files will be considered to refer to multiple samples of the same process and their weights will be normalized.')

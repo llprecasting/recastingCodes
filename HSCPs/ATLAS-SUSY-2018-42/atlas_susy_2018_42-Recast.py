@@ -8,7 +8,8 @@ import pyslha
 import time
 import progressbar as P
 from ATLAS_data.effFunctions import (getMuonRecoEff,getTriggerEff,getTrackEff,
-                                     getSelectionEff,getTargetMass,getMassSelEff)
+                                     getSelectionEff,getTargetMass,getMassSelEff,
+                                     massLong,massShort)
 
 delphesDir = os.path.abspath("./DelphesHSCP")
 os.environ['ROOT_INCLUDE_PATH'] = os.path.join(delphesDir,"external")
@@ -168,7 +169,20 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
     modelDict = getModelDict(inputFiles)
     if not modelDict:
         modelDict = {}
+
+    # Select mass windows accoding to lifetime
+    # (use long lifetime by default)
+    if 'width' not in modelDict or (6.582e-25/modelDict['width']) < 1e-9:
+        massWindows = massShort
+        lifetimeRegime = 'Short Lifetime'
+    else:
+        massWindows = massLong
+        lifetimeRegime = 'Long Lifetime'
+
+    massWindows = massWindows[['Mass_window_Low','Mass_window_High','Target_Mass_GeV']]
+
     modelDict['Total MC Events'] = 0
+
     nevtsDict = {}
     # Get total number of events:
     for inputFile in inputFiles:
@@ -181,7 +195,7 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
 
 
     lumi = 139.0
-    yields = {'Low' : [], 'High' : []}
+    yields = {}
     targetMasses = []
     totalweightPB = 0.0
     # Keep track of yields for each dataset
@@ -280,30 +294,36 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
             if not hscps: continue
             cutFlow['mT(track,pTmiss) > 130 GeV'] += ns
 
-            # Select hscps which fall into one of the mass windows:
-            htargetMass = [(hscp,getTargetMass(hscp.Mass)) for hscp in hscps]
-            htargetMass = [x for x in htargetMass[:] if x[1] is not None]
-            hscps = [x[0] for x in htargetMass]
-            targetMass = [x[1] for x in htargetMass]
-            # targetMass = [h.Mass for h in hscps]
-
             gbetas = [h.gbeta for h in hscps]
             trackEffHigh = getTrackEff(gbetas,sr='High')
             trackEffLow =  getTrackEff(gbetas,sr='Low')
-            wMassHigh = getMassSelEff(targetMass,sr='High')
-            wMassLow = getMassSelEff(targetMass,sr='Low')
-            yieldHigh = ns*(1-np.prod(1.0-trackEffHigh*wMassHigh))            
-            yieldLow = ns*(1-np.prod(1.0-trackEffLow*wMassLow))
-
             cutFlow['(SR-High - no mass Window)'] += ns*(1-np.prod(1.0-trackEffHigh))
             cutFlow['(SR-Low - no mass Window)'] += ns*(1-np.prod(1.0-trackEffLow))
 
-            
-            # Use maximum mass to select final mass window
-            targetMass = max(targetMass)
-            yields['Low'].append(yieldLow)
-            yields['High'].append(yieldHigh)
-            targetMasses.append(targetMass)
+            # Assume hscp masses can be approximated
+            # by the closest target mass for computing the
+            # mass window efficiency:
+            masses = [getTargetMass(hscp.Mass) for hscp in hscps]
+            if all(m is None for m in masses):
+                continue
+            # masses = [hscp.Mass for hscp in hscps] # Use target mass or real HSCP mass?
+            # Not sure if we can use the same mass window efficiencies if the masses
+            # are different!
+            wmassSRHigh = getMassSelEff(masses,sr='High')
+            wmassSRLow = getMassSelEff(masses,sr='Low')
+               
+            yieldHigh = ns*(1-np.prod(1.0-trackEffHigh*wmassSRHigh))            
+            yieldLow = ns*(1-np.prod(1.0-trackEffLow*wmassSRLow))
+        
+            # In case there are distinct masses, use the largest one (correct?)
+            # (if there are no good masses, store in 0.)
+            mTarget = max([m for m in masses if m])
+            if not mTarget in yields:
+                yields[mTarget] = {'SR-Inclusive_Low': [], 'SR-Inclusive_High' : []}
+                
+            # Store event for a given target window
+            yields[mTarget]['SR-Inclusive_Low'].append(yieldLow)
+            yields[mTarget]['SR-Inclusive_High'].append(yieldHigh)
             
         f.Close()
     progressbar.finish()
@@ -313,48 +333,53 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
     modelDict['Total xsec (pb)'] = totalweightPB
     print('\nCross-section (pb) = %1.3e\n' %totalweightPB)
 
-    # Add normalized cutflow entry
+    # Compute normalized cutflow
     for key,val in cutFlow.items():
         if key == 'Total':
             continue
         valRound = float('%1.3e' %val)
         valNorm = float('%1.3e' %(val/cutFlow['Total']))
-        cutFlow[key] = [(valRound,valNorm)]*2
-    cutFlow['Total'] = [(float('%1.3e' %cutFlow['Total']),1.0)]*2
+        cutFlow[key] = (valRound,valNorm)
+    cutFlow['Total'] = (float('%1.3e' %cutFlow['Total']),1.0)
 
-        
+    
     # Create a dictionary for storing data
-    # The final data will have two entries (rows): one
-    # for SR = Low and another one for SR = high
-    ## Common values:
-    dataDict = {'Luminosity (1/fb)' : lumi}
+    dataDict = {'Luminosity (1/fb)' : lumi, 'Regime' : lifetimeRegime}
+    # Signal regions
+    if not yields:
+        dataDict['SR'] = ['SR-Inclusive_Low', 'SR-Inclusive_High']
+        dataDict['Target Mass [GeV]'] = [0.0,0.0]
+        dataDict['$N_s$'] = [0.0,0.0]
+        dataDict['$\sigma_{Ns}$'] = [0.0,0.0]
+    else:
+        dataDict['SR'] = []
+        dataDict['Target Mass [GeV]'] = []
+        dataDict['$N_s$'] = []
+        dataDict['$\sigma_{Ns}$'] = []
+
+        # Total signal regions = mass targets * (Low, High)
+        for targetMass in yields.keys():
+            for sr in yields[targetMass]:
+                ns = np.array(yields[targetMass][sr])
+                nsTot = sum(ns)
+                nsError = np.sqrt(sum(ns**2))
+                if not nsTot:
+                    continue # Skip empty bins
+                dataDict['SR'].append(sr)
+                dataDict['Target Mass [GeV]'].append(targetMass)
+                dataDict['$N_s$'].append(nsTot)
+                dataDict['$\sigma_{Ns}$'].append(nsError)    
+
+    # Expand cutflow and modelDict to match number of rows in dataDict:
+    for key,val in cutFlow.items():
+        cutFlow[key] = [val]*len(dataDict['SR'])
+    for key,val in modelDict.items():
+        modelDict[key] = [val]*len(dataDict['SR'])
+
+    # Create a dictionary for storing data
     dataDict.update(modelDict)
     dataDict.update(cutFlow)
-
-    dataDict['SR'] = ['Low','High']
-
-    # Pre-defined mass windows:
-    massWindows = [100.0, 200.0, 300.0, 400.0, 450.0, 550.0, 600.0, 700.0, 800.0, 900.0, 1000.0, 1100.0, 1200.0, 1300.0, 1400.0, 1500.0, 1600.0, 1800.0, 2000.0, 2200.0, 2400.0, 2600.0, 2800.0, 3000.0]
-
-    # Mass windows for each SR:
-    for ibin,b in enumerate(massWindows[:-1]):
-        label = 'massWindow_%i_%i'%(b,massWindows[ibin+1])
-        dataDict[label] = []
-        dataDict[label+'_ErrorPlus'] = []
-        dataDict[label+'_ErrorMinus'] = []        
-    
-
-    for sr in dataDict['SR']:
-        ns = np.array(yields[sr])
-        binc,binEdges = np.histogram(targetMasses,bins=massWindows, 
-                                      weights=ns)
-        binc2,_ = np.histogram(targetMasses,bins=massWindows, 
-                                weights=ns**2)
-        for ibin,b in enumerate(binc):
-            label = 'massWindow_%i_%i'%(binEdges[ibin],binEdges[ibin+1])
-            dataDict[label].append(b)
-            dataDict[label+'_ErrorPlus'].append(np.sqrt(binc2[ibin]))
-            dataDict[label+'_ErrorMinus'].append(np.sqrt(binc2[ibin]))
+   
 
     return dataDict
 

@@ -133,30 +133,33 @@ for c in massShortLT.dtype.names:
 massShort['Mass_window_Low'] = [eval(x.strip().replace(" ",","))[0] for x in massShortLT['Mass_window_GeV']]
 massShort['Mass_window_High'] = [eval(x.strip().replace(" ",","))[1] for x in massShortLT['Mass_window_GeV']]
 
-def getTargetMass(trueMass,trueWidth=0.0):
+def getTargetMass(trueMass,trueWidth=None):
     """
-    Returns the target mass (which falls within a given mass window)
-    as a function of the true LLP mass and its decay regime (long-lived or short-lived).
-    According to the ATLAS guide, we should assume the long-lived regime (default)
+    Returns the target mass closest to the true LLP mass according
+    to the pre-defined masses for each decay regime (long-lived or short-lived).
+    According to the ATLAS guide, we should assume the long-lived regime (default).
     """
     
     # The long regime is intended for particles with tau > 1 ns
     # while the short regime windows are intended for particles with tau <= 1 ns.
-    if trueWidth == 0.0 or (6.582e-25/trueWidth) > 1e-9:
+    if trueWidth is None or (6.582e-25/trueWidth) > 1e-9:
         massWindow = massLong
     else:
         massWindow = massShort
-    
-    targetMass = None
-    for pt in massWindow:
-        if pt['Mass_window_Low'] <= trueMass < pt['Mass_window_High']:
-            targetMass = pt['Target_Mass_GeV']
-            
+    targetMasses = massWindow['Target_Mass_GeV']
+    if trueMass < min(targetMasses) or trueMass > max(targetMasses):
+        return None
+
+    itargetMass = np.argmin(np.abs(targetMasses-trueMass))
+    targetMass = targetMasses[itargetMass]
             
     return targetMass
 
 @np.vectorize
-def getMassSelEff(targetMass,sr):            
+def getMassSelEff(targetMass,sr): 
+
+    if not targetMass:
+        return 0.0           
 
     if sr.lower() == 'high':
         wMass = max(0.,0.74 - 0.052*(targetMass/1000.))

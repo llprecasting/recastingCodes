@@ -11,8 +11,6 @@ def computeULs(inputFile,outputFile):
     # ### Load ATLAS data
     atlasFile = './ATLAS_data/modelIndependentLimits.pcl'
     atlasDF = pd.read_pickle(atlasFile)
-    # Restrict data to long-regime (as suggested by the ATLAS recasting note)
-    atlasDF = atlasDF[atlasDF['Regime'] == 'Long Lifetime']
 
     # ### Load Recast Data
     recastDF = pd.read_pickle(inputFile)

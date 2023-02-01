@@ -172,7 +172,7 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
 
     # Select mass windows accoding to lifetime
     # (use long lifetime by default)
-    if 'width' not in modelDict or (6.582e-25/modelDict['width']) < 1e-9:
+    if 'width' not in modelDict or (modelDict['width'] > 0 and (6.582e-25/modelDict['width']) < 1e-9):
         massWindows = massShort
         lifetimeRegime = 'Short Lifetime'
     else:

@@ -326,7 +326,6 @@ def main(parfile,verbose):
 
         parserDict = newParser.toDict(raw=False)
         logger.debug('submitting with pars:\n %s \n' %parserDict)
-        continue
         p = pool.apply_async(generateEvents, args=(parserDict,), callback=moveFolders)                       
         children.append(p)
 

@@ -305,25 +305,36 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
             # mass window efficiency:
             masses = [getTargetMass(hscp.Mass) for hscp in hscps]
             if all(m is None for m in masses):
-                continue
+                continue            
             # masses = [hscp.Mass for hscp in hscps] # Use target mass or real HSCP mass?
-            # Not sure if we can use the same mass window efficiencies if the masses
-            # are different!
-            wmassSRHigh = getMassSelEff(masses,sr='High')
-            wmassSRLow = getMassSelEff(masses,sr='Low')
-               
-            yieldHigh = ns*(1-np.prod(1.0-trackEffHigh*wmassSRHigh))            
-            yieldLow = ns*(1-np.prod(1.0-trackEffLow*wmassSRLow))
-        
-            # In case there are distinct masses, use the largest one (correct?)
-            # (if there are no good masses, store in 0.)
-            mTarget = max([m for m in masses if m])
-            if not mTarget in yields:
-                yields[mTarget] = {'SR-Inclusive_Low': [], 'SR-Inclusive_High' : []}
+
+            # Loop over masses 
+            # (if HSCP have different masses, each one can contribute to distinct
+            # mass windows/target masses)
+            for mTarget in set(masses):
+                if not mTarget: continue
+                # For the HSCP masses not matching the target mass, set them to None
+                # so they will have zero mass selection efficiencies and will not be
+                # counted to the target mass SR
+                selectedMasses = [h.Mass if masses[ih] == mTarget else None 
+                                    for ih,h in enumerate(hscps)]
+                # Get mass window selection efficiency (zero if mass = None)
+                wmassSRHigh = getMassSelEff(selectedMasses,sr='High')
+                wmassSRLow = getMassSelEff(selectedMasses,sr='Low')
                 
-            # Store event for a given target window
-            yields[mTarget]['SR-Inclusive_Low'].append(yieldLow)
-            yields[mTarget]['SR-Inclusive_High'].append(yieldHigh)
+                # Get total yield for respective target mass and 
+                # the High and Low SRs:
+                yieldHigh = ns*(1-np.prod(1.0-trackEffHigh*wmassSRHigh))            
+                yieldLow = ns*(1-np.prod(1.0-trackEffLow*wmassSRLow))
+            
+                # In case there are distinct masses, use the largest one (correct?)
+                # (if there are no good masses, store in 0.)
+                if not mTarget in yields:
+                    yields[mTarget] = {'SR-Inclusive_Low': [], 'SR-Inclusive_High' : []}
+                    
+                # Store event for a given target window
+                yields[mTarget]['SR-Inclusive_Low'].append(yieldLow)
+                yields[mTarget]['SR-Inclusive_High'].append(yieldHigh)
             
         f.Close()
     progressbar.finish()

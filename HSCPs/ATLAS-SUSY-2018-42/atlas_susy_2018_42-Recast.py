@@ -114,6 +114,26 @@ def removeFromMET(particles,METobj):
     
     return [metx,mety]
 
+def addToMET(particles,METobj):
+    """
+    Add the contribution from the particles in the list
+    to the total MET.
+    """
+
+    metx = METobj.MET*np.cos(METobj.Phi)
+    mety = METobj.MET*np.sin(METobj.Phi)
+
+    if particles:
+        # Remove particles from MET:            
+        pxTot = sum([p.Px for p in particles])
+        pyTot = sum([p.Py for p in particles])        
+        metx = (metx+pxTot)
+        mety = (mety+pyTot)
+    
+    return [metx,mety]
+
+
+
 def applyMTCut(hscps,METvector):
     """
     Remove tracks which have mT < 130 GeV
@@ -196,7 +216,6 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
 
     lumi = 139.0
     yields = {}
-    targetMasses = []
     totalweightPB = 0.0
     # Keep track of yields for each dataset
     cutFlow = { "Total" : 0.0,
@@ -234,9 +253,29 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
             progressbar.update(ntotal)
             tree.GetEntry(ievt)        
 
-            metCalo = tree.MissingETCalo.At(0).MET
+            metCalo = tree.MissingETCalo.At(0)
             hscpCandidates = getHSCPCandidates(tree.isoHSCPs,tree.hscpDaughters)
             dmParticles = [tree.dmParticles.At(idm) for idm in range(tree.dmParticles.GetEntries())]
+            dmPDGs = set([dm.PID for dm in dmParticles])
+
+            # Get visible HSCP daughters produced outside the calorimenter
+            dispDaughters = []
+            for ip in range(tree.hscpDaughters.GetEntries()):
+                d = tree.hscpDaughters.At(ip)
+                r_decay = np.sqrt(d.X**2 + d.Y**2)
+                z_decay = np.abs(d.Z)
+                if r_decay < 3.9e3: #Produced within the calorimenter
+                    continue
+                if z_decay < 6.0e3: #Produced within the calorimenter
+                    continue
+                if d.PID in dmPDGs: # DM particle (ignore)
+                    continue
+                dispDaughters.append(d)
+            # Add the displaced daughters to the MET computed
+            # using the calorimeter
+            metCalo = addToMET(dispDaughters,metCalo)
+            metCalo = np.sqrt(metCalo[0]**2 + metCalo[1]**2)
+
 
             try:
                 weightPB = tree.Weight.At(1).Weight

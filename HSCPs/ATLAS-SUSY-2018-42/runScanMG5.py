@@ -289,6 +289,7 @@ def main(parfile,verbose):
         ncpus = int(parser.get("options","ncpu"))
     if ncpus  < 0:
         ncpus =  multiprocessing.cpu_count()
+    ncpus = min(ncpus,len(parserList))
     pool = multiprocessing.Pool(processes=ncpus)
     if ncpus > 1:
         logger.info('Running in parallel with %i processes' %ncpus)

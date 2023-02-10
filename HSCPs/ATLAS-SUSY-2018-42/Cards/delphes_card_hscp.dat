@@ -60,9 +60,9 @@ module ParticlePropagator ParticlePropagator {
   set MuonOutputArray muons
 
   # radius of the magnetic field coverage, in m
-  set Radius 1.15
+  set Radius 3.9
   # half-length of the magnetic field coverage, in m
-  set HalfLength 3.51
+  set HalfLength 6.0
 
   # magnetic field
   set Bz 2.0
@@ -197,12 +197,13 @@ module SimpleCalorimeter ECal {
   add EnergyFraction {11} {1.0}
   add EnergyFraction {22} {1.0}
   add EnergyFraction {111} {1.0}
-  # energy fractions for muon, neutrinos and neutralinos
+  # energy fractions for muon, neutrinos, neutralinos and gravitinos
   add EnergyFraction {12} {0.0}
   add EnergyFraction {13} {0.0}
   add EnergyFraction {14} {0.0}
   add EnergyFraction {16} {0.0}
   add EnergyFraction {1000022} {0.0}
+  add EnergyFraction {1000039} {0.0}  
   add EnergyFraction {1000023} {0.0}
   add EnergyFraction {1000025} {0.0}
   add EnergyFraction {1000035} {0.0}
@@ -286,12 +287,13 @@ module SimpleCalorimeter HCal {
   add EnergyFraction {11} {0.0}
   add EnergyFraction {22} {0.0}
   add EnergyFraction {111} {0.0}
-  # energy fractions for muon, neutrinos and neutralinos
+  # energy fractions for muon, neutrinos, neutralinos and gravitinos
   add EnergyFraction {12} {0.0}
   add EnergyFraction {13} {0.0}
   add EnergyFraction {14} {0.0}
   add EnergyFraction {16} {0.0}
   add EnergyFraction {1000022} {0.0}
+  add EnergyFraction {1000039} {0.0}  
   add EnergyFraction {1000023} {0.0}
   add EnergyFraction {1000025} {0.0}
   add EnergyFraction {1000035} {0.0}
@@ -505,7 +507,10 @@ module PdgCodeFilter NeutrinoFilter {
   add PdgCode {-14}
   add PdgCode {-16}
   add PdgCode {1000022}  
-  add PdgCode {-1000022}    
+  add PdgCode {-1000022}   
+  add PdgCode {1000039}    
+  add PdgCode {-1000039}
+   
 
 }
 
@@ -525,6 +530,9 @@ module PdgCodeFilter DMFilter {
 
   add PdgCode {1000022}    
   add PdgCode {-1000022}
+  add PdgCode {1000039}    
+  add PdgCode {-1000039}
+  
 }
 
 #########################
@@ -567,14 +575,15 @@ module UniqueObjectFinder UniqueObjectFinder {
 
 module TreeWriter TreeWriter {
 # add Branch InputArray BranchName BranchClass
-#  add Branch Delphes/allParticles Particle GenParticle
+  add Branch Delphes/allParticles Particle GenParticle
+  add Branch Delphes/partons Parton GenParticle  
   add Branch HSCPIsolation/isoHSCPs isoHSCPs GenParticle 
   add Branch HSCPFilter/daughters hscpDaughters GenParticle  
   add Branch DMFilter/dmParticles dmParticles GenParticle
   add Branch DMMissingET/momentum DMMissingET MissingET  
 
 #  add Branch TrackMerger/tracks Track Track
-#  add Branch Calorimeter/towers Tower Tower
+  add Branch Calorimeter/towers Tower Tower
 
 #  add Branch HCal/eflowTracks EFlowTrack Track
 #  add Branch ECal/eflowPhotons EFlowPhoton Tower

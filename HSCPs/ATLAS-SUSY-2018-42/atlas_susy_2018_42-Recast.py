@@ -114,25 +114,6 @@ def removeFromMET(particles,METobj):
     
     return [metx,mety]
 
-def addToMET(particles,METobj):
-    """
-    Add the contribution from the particles in the list
-    to the total MET.
-    """
-
-    metx = METobj.MET*np.cos(METobj.Phi)
-    mety = METobj.MET*np.sin(METobj.Phi)
-
-    if particles:
-        # Remove particles from MET:            
-        pxTot = sum([p.Px for p in particles])
-        pyTot = sum([p.Py for p in particles])        
-        metx = (metx+pxTot)
-        mety = (mety+pyTot)
-    
-    return [metx,mety]
-
-
 
 def applyMTCut(hscps,METvector):
     """
@@ -150,7 +131,14 @@ def applyMTCut(hscps,METvector):
     
     return selHSCPs
 
-def getModelDict(inputFiles):
+def getModelDict(inputFiles,model):
+
+    if model == 'wino':
+        LLP = 1000024
+        LSP = 1000022
+    elif model == 'stau':
+        LLP = 1000015
+        LSP = 1000039
 
     modelInfoDict = {}
     f = inputFiles[0]
@@ -163,9 +151,9 @@ def getModelDict(inputFiles):
             slhaData = ff.read().split('<slha>')[1].split('</slha>')[0]
             slhaData = pyslha.readSLHA(slhaData)
     parsDict = {}
-    parsDict['mLLP'] = slhaData.blocks['MASS'][1000024]
-    parsDict['mLSP'] = slhaData.blocks['MASS'][1000022]
-    parsDict['width'] = slhaData.decays[1000024].totalwidth
+    parsDict['mLLP'] = slhaData.blocks['MASS'][LLP]
+    parsDict['mLSP'] = slhaData.blocks['MASS'][LSP]
+    parsDict['width'] = slhaData.decays[LLP].totalwidth
     if parsDict['width']:
         parsDict['tau_ns'] = (6.582e-25/parsDict['width'])*1e9
     else:
@@ -179,14 +167,14 @@ def getModelDict(inputFiles):
     return modelInfoDict
 
 # ### Define dictionary to store data
-def getRecastData(inputFiles,pTcut=60.,normalize=False):
+def getRecastData(inputFiles,pTcut=60.,normalize=False,model='wino'):
 
     if len(inputFiles) > 1:
         print('Combining files:')
         for f in inputFiles:
             print(f)
 
-    modelDict = getModelDict(inputFiles)
+    modelDict = getModelDict(inputFiles,model)
     if not modelDict:
         modelDict = {}
 
@@ -220,12 +208,12 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
     # Keep track of yields for each dataset
     cutFlow = { "Total" : 0.0,
                 "Trigger" : 0.0,
-                "ETmiss > 170 GeV" : 0.0,
-                "pT > 50 GeV" : 0.0,
+                "$E_{T}^{miss}>170$ GeV" : 0.0,
+                "$p_{T} > 50$ GeV" : 0.0,
                 "Track isolation" : 0.0,
-                "pT > 120 GeV" : 0.0,
-                "eta < 1.8" : 0.0,
-                "mT(track,pTmiss) > 130 GeV" : 0.0,
+                "$p_{T} > 120$ GeV" : 0.0,
+                "$|\eta|<1.8$" : 0.0,
+                "$m_{T}({track},{p}_{{T}}^{{ miss}}) > 130$ GeV" : 0.0,
                 "(Acceptance)" : 0.0,
                 "(SR-Low - no mass Window)" : 0.0,
                 "(SR-High - no mass Window)" : 0.0          
@@ -253,29 +241,9 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
             progressbar.update(ntotal)
             tree.GetEntry(ievt)        
 
-            metCalo = tree.MissingETCalo.At(0)
+            metCalo = tree.MissingETCalo.At(0).MET
             hscpCandidates = getHSCPCandidates(tree.isoHSCPs,tree.hscpDaughters)
             dmParticles = [tree.dmParticles.At(idm) for idm in range(tree.dmParticles.GetEntries())]
-            dmPDGs = set([dm.PID for dm in dmParticles])
-
-            # Get visible HSCP daughters produced outside the calorimenter
-            dispDaughters = []
-            for ip in range(tree.hscpDaughters.GetEntries()):
-                d = tree.hscpDaughters.At(ip)
-                r_decay = np.sqrt(d.X**2 + d.Y**2)
-                z_decay = np.abs(d.Z)
-                if r_decay < 3.9e3: #Produced within the calorimenter
-                    continue
-                if z_decay < 6.0e3: #Produced within the calorimenter
-                    continue
-                if d.PID in dmPDGs: # DM particle (ignore)
-                    continue
-                dispDaughters.append(d)
-            # Add the displaced daughters to the MET computed
-            # using the calorimeter
-            metCalo = addToMET(dispDaughters,metCalo)
-            metCalo = np.sqrt(metCalo[0]**2 + metCalo[1]**2)
-
 
             try:
                 weightPB = tree.Weight.At(1).Weight
@@ -313,25 +281,25 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False):
             eventEff = getSelectionEff(newMET)
             ns = ns*eventEff
             if not ns: continue
-            cutFlow["ETmiss > 170 GeV"] += ns
+            cutFlow["$E_{T}^{miss}>170$ GeV"] += ns
 
             # Apply selection to HSCP candidates (following ATLAS snippet)
             hscps = applyHSCPSelection(hscps,pT=50.,eta=3.0,r=500.0)
             if not hscps: continue
-            cutFlow['pT > 50 GeV'] += ns        
+            cutFlow['$p_{T} > 50$ GeV'] += ns        
             # hscps = applyIsolation(hscps,tree.Track) # Already included in trackEff
             if not hscps: continue
             cutFlow['Track isolation'] += ns     
             hscps = applyHSCPSelection(hscps,pT=120.)
             if not hscps: continue
-            cutFlow['pT > 120 GeV'] += ns  
+            cutFlow['$p_{T} > 120$ GeV'] += ns  
             if not hscps: continue
             hscps = applyHSCPSelection(hscps,pT=120.,eta=1.8)
             if not hscps: continue
-            cutFlow['eta < 1.8'] += ns
+            cutFlow['$|\eta|<1.8$'] += ns
             # hscps = applyMTCut(hscps,newMETv) # Already included in trackEff
             if not hscps: continue
-            cutFlow['mT(track,pTmiss) > 130 GeV'] += ns
+            cutFlow['$m_{T}({track},{p}_{{T}}^{{ miss}}) > 130$ GeV'] += ns
 
             gbetas = [h.gbeta for h in hscps]
             trackEffHigh = getTrackEff(gbetas,sr='High')
@@ -451,6 +419,9 @@ if __name__ == "__main__":
             help='Gen level cut on gaugino pT for computing partial cross-sections.')
     ap.add_argument('-n', '--normalize', required=False,action='store_true',
             help='If set, the input files will be considered to refer to multiple samples of the same process and their weights will be normalized.')
+    ap.add_argument('-m', '--model', required=False,type=str,default='wino',
+            help='Defines which model should be considered for extracting model parameters (stau,wino,rhadron).')
+
     ap.add_argument('-v', '--verbose', default='info',
             help='verbose level (debug, info, warning or error). Default is info')
 
@@ -479,7 +450,7 @@ if __name__ == "__main__":
     if os.path.splitext(outputFile)[1] != '.pcl':
         outputFile = os.path.splitext(outputFile)[0] + '.pcl'
 
-    modelDict = getRecastData(inputFiles,args.pTcut,args.normalize)
+    modelDict = getRecastData(inputFiles,args.pTcut,args.normalize,args.model)
 
     # #### Create pandas DataFrame
     df = pd.DataFrame.from_dict(modelDict)

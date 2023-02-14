@@ -59,9 +59,9 @@ module ParticlePropagator ParticlePropagator {
   set MuonOutputArray muons
 
   # radius of the magnetic field coverage, in m
-  set Radius 1.15
+  set Radius 3.9
   # half-length of the magnetic field coverage, in m
-  set HalfLength 3.51
+  set HalfLength 6.0
 
   # magnetic field
   set Bz 2.0

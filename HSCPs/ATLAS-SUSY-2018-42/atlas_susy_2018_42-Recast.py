@@ -416,7 +416,7 @@ if __name__ == "__main__":
                  + 'If not defined, will use the name of the first input file', 
             default = None)
     ap.add_argument('-pt', '--pTcut', required=False,default=60.0,type=float,
-            help='Gen level cut on gaugino pT for computing partial cross-sections.')
+            help='Gen level cut on gaugino pT for computing partial cross-sections [default = 60].')
     ap.add_argument('-n', '--normalize', required=False,action='store_true',
             help='If set, the input files will be considered to refer to multiple samples of the same process and their weights will be normalized.')
     ap.add_argument('-m', '--model', required=False,type=str,default='wino',

@@ -139,6 +139,9 @@ def getModelDict(inputFiles,model):
     elif model == 'stau':
         LLP = 1000015
         LSP = 1000039
+    elif model == 'gluino':
+        LLP = 1000021
+        LSP = 1000022
 
     modelInfoDict = {}
     f = inputFiles[0]
@@ -420,7 +423,7 @@ if __name__ == "__main__":
     ap.add_argument('-n', '--normalize', required=False,action='store_true',
             help='If set, the input files will be considered to refer to multiple samples of the same process and their weights will be normalized.')
     ap.add_argument('-m', '--model', required=False,type=str,default='wino',
-            help='Defines which model should be considered for extracting model parameters (stau,wino,rhadron).')
+            help='Defines which model should be considered for extracting model parameters (stau,wino,gluino).')
 
     ap.add_argument('-v', '--verbose', default='info',
             help='verbose level (debug, info, warning or error). Default is info')

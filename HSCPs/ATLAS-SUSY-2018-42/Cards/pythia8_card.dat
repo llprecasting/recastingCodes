@@ -90,6 +90,7 @@ RHadrons:allow = on
 RHadrons:allowDecay = on
 RHadrons:probGluinoball = 0.1
 
+
 ParticleDecays:limitTau = on
 ParticleDecays:tauMax = 15000  ! All particles with (lab) lifetime smaller than 15m are decayed
 

@@ -4,7 +4,7 @@
 [Andre Lessa](mailto:andre.lessa@ufabc.edu.br)
 
 This repository holds the main code for recasting the 13 TeV ATLAS heavy stable charged particle
-search ([ATLAS-SUSY-2018-41](http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-41/))
+search ([ATLAS-SUSY-2018-42](http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-42/))
 based on the recasting details and code provided [here](https://doi.org/10.17182/hepdata.127994.v1/r1) .
 
 ## Pre-Requisites ##

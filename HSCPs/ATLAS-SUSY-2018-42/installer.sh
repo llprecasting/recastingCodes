@@ -58,61 +58,12 @@ if echo "$answer" | grep -iq "^y" ;then
         rm $madgraph;
 fi
 
-#Get HepMC tarball
-#hepmc="hepmc2.06.11.tgz"
-#echo -n "Install HepMC2 (y/n)? "
-#read answer
-#if echo "$answer" | grep -iq "^y" ;then
-#	mkdir hepMC_tmp
-#	URL=http://hepmc.web.cern.ch/hepmc/releases/$hepmc
-#	echo "[installer] getting HepMC"; wget $URL 2>/dev/null || curl -O $URL; tar -zxf $hepmc -C hepMC_tmp;
-#	mkdir HepMC-2.06.11; mkdir HepMC-2.06.11/build; mkdir HepMC2;
-#	echo "Installing HepMC in ./HepMC";
-#	cd HepMC-2.06.11/build;
-#	../../hepMC_tmp/HepMC-2.06.11/configure --prefix=$homeDIR/HepMC2 --with-momentum=GEV --with-length=MM;
-#	make;
-#	make check;
-#	make install;
-#
-#	#Clean up
-#	cd $homeDIR;
-#	rm -rf hepMC_tmp; rm $hepmc; rm -rf HepMC-2.06.11;
-#fi
-
-#Get pythia tarball
-#pythia="pythia8308.tgz"
-#URL=https://pythia.org/download/pythia83/$pythia
-#echo -n "Install Pythia (y/n)? "
-#read answer
-#if echo "$answer" | grep -iq "^y" ;then
-#	if hash gzip 2>/dev/null; then
-#		mkdir pythia8;
-#		echo "[installer] getting Pythia"; wget $URL 2>/dev/null || curl -O $URL; tar -zxf $pythia -C pythia8 --strip-components 1;
-#		echo "Installing Pythia in pythia8";
-#		cd pythia8;
-#		./configure --with-hepmc2=$homeDIR/HepMC2 --with-root=$ROOTSYS --prefix=$homeDIR/pythia8 --with-gzip
-#		make -j4; make install;
-#		cd $homeDIR
-#		rm $pythia;
-#	else
-#		echo "[installer] gzip is required. Try to install it with sudo apt-get install gzip";
-#	fi
-#fi
-
 
 echo -n "Install Delphes (y/n)? "
 repo=https://github.com/delphes/delphes
 URL=http://cp3.irmp.ucl.ac.be/downloads/$delphes
 read answer
 if echo "$answer" | grep -iq "^y" ;then
-#  latest=`git ls-remote --sort="version:refname" --tags $repo  | grep -v -e "pre" | grep -v -e "\{\}" | cut -d/ -f3- | tail -n1`
-#  echo "[installer] Cloning Delphes version $latest";
-#  git clone --branch $latest https://github.com/delphes/delphes.git Delphes
-#  echo "[installer] Adding HSCP module to Delphes";
-#  cp delphesHSCP/Makefile Delphes/;
-#  cp delphesHSCP/HSCPFilter.cc delphesHSCP/HSCPFilter.h delphesHSCP/ModulesLinkDef.h Delphes/modules/;
-#  cd Delphes;
-#  echo "[installer] installing Delphes";
 
 # Check if pythia8 has been installed under MadGraph5
   pythiaDir=$homeDIR/MG5/HEPTools/pythia8 

@@ -578,7 +578,8 @@ module TreeWriter TreeWriter {
 #  add Branch Delphes/allParticles Particle GenParticle
 #  add Branch Delphes/partons Parton GenParticle  
   add Branch HSCPIsolation/isoHSCPs isoHSCPs GenParticle 
-  add Branch HSCPFilter/daughters hscpDaughters GenParticle  
+  add Branch HSCPFilter/daughters hscpDaughters GenParticle
+  add Branch HSCPFilter/hscpParticles hscps GenParticle
   add Branch DMFilter/dmParticles dmParticles GenParticle
   add Branch DMMissingET/momentum DMMissingET MissingET  
 

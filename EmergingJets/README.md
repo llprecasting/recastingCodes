@@ -16,6 +16,8 @@ The following pre-requisites must be installed before compiling the main code:
 
 ## Installation ##
 
+
+Run make
 describe installation
 
 

@@ -12,20 +12,19 @@ This folder holds the main code for recasting the 13 TeV emerging jet signature 
 
 The following pre-requisites must be installed before compiling the main code:
 
-  * ....
+  * Pythia8
 
 ## Installation ##
 
-
-Run make
-describe installation
+To compile de code, run:
+make maindEJ
 
 
 ## Running ##
 
-For running the code, the user must provide:
+For running the code, the user must provide a pythia card with the configuration parameters, for example, to reproduce CMS analysis:
 
-xxxxx
+./maindEJ cardEJcms.cmnd 
 
 
 ## Output ##

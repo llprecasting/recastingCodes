@@ -337,18 +337,20 @@ def parsing_LHE(MG_events):
     MASS = []
     for event in MG_events:
         for particle in event:
-            px.append(particle.px)
-            py.append(particle.py)
-            pz.append(particle.pz)
             pdg.append(particle.pdg)
-            E.append(particle.E)
-            MASS.append(particle.mass)
+            if particle.pdg == 35:
+                px.append(particle.px)
+                py.append(particle.py)
+                pz.append(particle.pz)
+                E.append(particle.E)
+                MASS.append(particle.mass)
 
     px = np.array(px)/c # GeV/c = kg m s⁻¹
     py = np.array(py)/c
     pz = np.array(pz)/c
 
     return px, py, pz, pdg, E, MASS
+
 
 #########################################################################################
 # Recovering the data from LLP1 (PDG ID, px,py,pz,E,mass).
@@ -361,23 +363,23 @@ def recover_MG_DH1(px, py, pz, E, MASS, pdg):
         MG_pdg_DH1_1.append(pdg[i]) #List with the PDG ID of the particle produced by the decay of the LLP1
 
     MG_E_DH1 = []
-    for i in range(3,len(px),9):
+    for i in range(0,len(px),2):
         MG_E_DH1.append(E[i]) #List with the energy of the LLP1
 
     MG_px_DH1 = []
-    for i in range(3,len(px),9):
+    for i in range(0,len(px),2):
         MG_px_DH1.append(px[i]) #List with x momenta from LLP1
 
     MG_py_DH1 = []
-    for i in range(3,len(px),9):
+    for i in range(0,len(px),2):
         MG_py_DH1.append(py[i]) #List with y momenta from LLP1
 
     MG_pz_DH1 = []
-    for i in range(3,len(px),9):
+    for i in range(0,len(px),2):
         MG_pz_DH1.append(pz[i]) #List with z momenta from LLP1
 
     MG_mass_DH1 = []
-    for i in range(3,len(px),9):
+    for i in range(0,len(px),2):
         MG_mass_DH1.append(MASS[i]) #List with the mass from LLP1
 
     MG_px_DH1 = np.array(MG_px_DH1)
@@ -415,23 +417,23 @@ def recover_MG_DH2(px, py, pz, E, MASS, pdg):
         MG_pdg_DH2_1.append(pdg[i]) #List with the PDG ID of the particle produced by the decay of the LLP2
 
     MG_E_DH2 = []
-    for i in range(4,len(px),9):
+    for i in range(1,len(px),2):
         MG_E_DH2.append(E[i]) #List with the energy of the LLP2
 
     MG_px_DH2 = []
-    for i in range(4,len(px),9):
+    for i in range(1,len(px),2):
         MG_px_DH2.append(px[i]) #List with x momenta from LLP2
 
     MG_py_DH2 = []
-    for i in range(4,len(px),9):
+    for i in range(1,len(px),2):
         MG_py_DH2.append(py[i]) #List with y momenta from LLP2
 
     MG_pz_DH2 = []
-    for i in range(4,len(px),9):
+    for i in range(1,len(px),2):
         MG_pz_DH2.append(pz[i]) #List with z momenta from LLP2
 
     MG_mass_DH2 = []
-    for i in range(4,len(px),9):
+    for i in range(1,len(px),2):
         MG_mass_DH2.append(MASS[i]) #List with the mass from LLP2
 
     MG_px_DH2 = np.array(MG_px_DH2)

@@ -1,6 +1,9 @@
-// Pythia8 code to test CMS analysis for emerging jets EJs (1810.10069), giving pythia_card with details of model.
+// Pythia8 code to test CMS analysis for emerging jets EJs (arxiv:1810.10069), providing a pythia configuration card with details of the model.
 // To reproduce CMS results, use cardEJcms.cmnd
-// This implemets all selection sets in Table 3, aplying cuts at track- and event-level. 
+// Here we apply the cuts of all seven selection sets in Table 3, at track- and event-level.
+// We use two parametrizatrions for the tracking efficiencies (as function of vertex position R) eff(R):
+//  1) eff(R)= Θ(R-102mm)  2) reported value of iteration 5 from fig.12 of [1]
+// [1] arxiv:11405.6569  
 
 #include <Pythia8/Pythia.h> 
 #include <math.h>
@@ -157,20 +160,20 @@ double resolIPpt (double const xp, double const eta){
   return yp;
 }
 
+
 int main(int argc, char* argv[]) {
 
   Pythia pythia;
   Event& event = pythia.event;
 
   if (argc != 2) {
-    cout << "Give input card. Usage ./main1002.x inputcard" << endl;
+    cout << "Give input card." << endl;
     return 0;
   }
 
   //pythia.readFile("cardEJcms.cmnd");
   pythia.readFile(argv[1]);
 
-  
   SlowJet slowJet( -1, 0.4, 20., 2.0, 2, 1); //power, R, ptjetmin, etamax, which particles, mass
 
   pythia.init();
@@ -180,11 +183,7 @@ int main(int argc, char* argv[]) {
   int nEvent   = pythia.mode("Main:numberOfEvents");
   //int nEvent = 1000;
   int nAbort = 30;
-  
-  //ofstream myfile1;
-  //myfile1.open("effisR_test.dat", std::ios_base::app);
-  //ofstream myfile2;
-  //myfile2.open("effisIt_test.dat", std::ios_base::app);
+
 
   ///cuts on variables for EJs tagging (table2) //EMJ-G(1-6) [cz0,cdn,cip,calf] 
 	vector<vector<double>> EJg{{25.0,4.,0.5,0.25},{40.0,4,1.0,0.25},{40.0,20,2.5,0.25},{25.0,4,1.0,0.25},{25.0,20.0,0.5,0.25},{25.0,10.0,0.5,0.25}}; 
@@ -340,7 +339,7 @@ int main(int argc, char* argv[]) {
         if (dR < 0.4) sqinj[j]=true;
       }
       
-      //### loop oves jet constituents
+      //### loop over jet constituents
       jpart = slowJet.constituents(j);
       for (int t=0; t< int(jpart.size()); t++){
         int seed = iEvent+j+t;  
@@ -350,12 +349,10 @@ int main(int argc, char* argv[]) {
         double teta = abs(event[jpart[t]].eta());
         tpass=false;
         double eftrk, ipa, z0a;
-        /// selecting tracks (with two approaches)
-        if (event[jpart[t]].isCharged() && event[jpart[t]].isFinal() && event[jpart[t]].pT()>1.0 && abs(event[jpart[t]].eta())<2.5){ // && rprod<600
-          if (rprod<600){
-            eftrk = readEff(rpcm); //as rpcm in cm
-            tpass = randBool(eftrk,seed);
-          }
+        /// select tracks following two approaches (for tracking) as function of transverse distance rprod
+        if (event[jpart[t]].isCharged() && event[jpart[t]].isFinal() && event[jpart[t]].pT()>1.0 && rprod<600){
+          eftrk = readEff(rpcm); //as rpcm in cm
+          tpass = randBool(eftrk,seed);
           double z0i=d0z(&event[jpart[t]]);
           double ipi=d0t(&event[jpart[t]]);
           double sigd0 = resolIPpt(tpt, teta) *0.001; //as sigma_d0 in [mum]
@@ -368,6 +365,7 @@ int main(int argc, char* argv[]) {
             z0a = z0i;             
           }
           double DNa = sqrt(pow((z0a/0.1),2) + pow((ipa/sigd0),2));
+          ///1) considering rprod<102mm (i.e. with hit in pixel tracker)
           if (rprod< 102.0){
             ipj.push_back(ipa);
             for (int u=0; u<6; u++){
@@ -378,6 +376,7 @@ int main(int argc, char* argv[]) {
             ptall += event[jpart[t]].pT();
             jntr1[j]++;
           }
+          ///2) considering tracking efficiency using Iteration5 in [1]  
           if (tpass){
             ipj2.push_back(ipa);
             for (int u=0; u<6; u++){
@@ -452,6 +451,7 @@ int main(int argc, char* argv[]) {
     if (ptjja > 900.) ptTrg=true;
     if (ptjja2 > 900.) ptTrg2=true;
 
+
     /// #sort jets according ptjet
     vector<int> V(jsize);
     std::iota(V.begin(),V.end(),0); 
@@ -508,49 +508,30 @@ int main(int argc, char* argv[]) {
   }///end event loop
 
   cout.precision(4);
-  cout << "total efficiency EJs, sn7 (r<102mm)" << Evtot[6]/nEvs <<  endl;
-  cout << "total efficiency EJs, sn7 (it5)" << Evtot2[6]/nEvs2 <<  endl;
-  cout << "m_dp: "<<mN<<" ct_dp: "<< int(ctN) << endl;
-
-
-  //myfile1 << mS<<" "<<mN <<" "<< ctN<<" "<< nEvs <<" "<< Evtot[0] <<" "<< Evtot[1] <<" "<< Evtot[2] <<" "<< Evtot[3] \
-    <<" "<< Evtot[4] <<" "<< Evtot[5] <<" "<< Evtot[6] << endl;
-  //myfile2 << mS<<" "<<mN <<" "<< ctN<<" "<< nEvs2 <<" "<< Evtot2[0] <<" "<< Evtot2[1] <<" "<< Evtot2[2] <<" "<< Evtot2[3] \
-    <<" "<< Evtot2[4] <<" "<< Evtot2[5] <<" "<< Evtot2[6] << endl;
-
-  /////########### Get final yield and ratio if excluded
+  cout << "###################"<<endl;
+  /////########### Get total number of signal events and ratio if excluded
+  /// Considering the tracking effinciency 1) R_track<102mm   
   vector<double> stm{36.7,14.6,15.6,15.1,35.3,20.7,5.61};
-
-  double max = *max_element(Evtot.begin(), Evtot.end());
-  int maxid = max_element(Evtot.begin(),Evtot.end()) - Evtot.begin();
-  double effi1 = max / nEvs;
-  double max2 = *max_element(Evtot2.begin(), Evtot2.end());
-  int maxid2 = max_element(Evtot2.begin(),Evtot2.end()) - Evtot2.begin();
-  double effi2 = max2 / nEvs2;
-
+  vector<double> eff1, eff2;
   double xs = 1000;
   double lumi = 16.1; //fb-1
-  double ny1 = xs * lumi * effi1;
-  double ny2 = xs * lumi * effi2;
-  
-  double exlcms = stm[maxid];
-  double exlcms2 = stm[maxid2];
-  double rat1 = ny1/exlcms;
-  double rat2 = ny2/exlcms2;
-
-  //cout <<"r: "<<endl;
-  cout <<"SetNumber:"<< maxid+1 <<" ; signal acceptance: " << effi1<< endl;
-  cout <<"CMS, L=16.1fb-1, 95CL excluded: "<< exlcms<< endl;
-  cout <<"xsec=1pb, signal events: "<< ny1<<" ; r="<< rat1 << endl;  
-
-  //cout <<"It5: "<<endl; 
-  //cout <<"SetNumber:"<< maxid2+1 <<" ; signal acceptance: " << effi2<< endl;
-  //cout <<"CMS, L=16.1fb-1, 95CL excluded: "<< exlcms2<< endl;
-  //cout <<"xsec=1pb, signal events: "<< ny2<<" ; r="<< rat2 << endl;  
+  cout << "CMS EJ search with L=16.1fb-1" << endl;
+  cout << "For m_dpion=" << mN << "GeV, ctau_dpion="<< int(ctN) <<"mm" << endl; 
+  cout << "If xsec=1pb, ratio of our predicted number of events and the CMS excluded ones at 95%""CL (r):" << endl;
+  for (int s=0; s<7; s++){
+    eff1.push_back(Evtot[s]/nEvs);
+    double ny1 = xs * lumi * eff1[s];
+    double rat1 = ny1/stm[s];
+    cout << "SetN "<<s+1 <<": SignalAcceptance:"<< eff1[s] <<", r = "<< rat1 << endl;
+  }
+  /// Considering the tracking effinciency parametrization 2) Iteration5
+  /*for (int s=0; s<7; s++){
+    eff2.push_back(Evtot2[s]/nEvs2);
+    double ny2 = xs * lumi * eff2[s];
+    double rat2 = ny2/stm[s];
+    cout << "SetN "<<s+1 <<": SignalAcceptance:"<< eff2[s] <<", r = "<< rat2 << endl;
+  }*/
 
   pythia.stat();
-
-	//myfile1.close();
-  //myfile2.close();
   return 0;
 }

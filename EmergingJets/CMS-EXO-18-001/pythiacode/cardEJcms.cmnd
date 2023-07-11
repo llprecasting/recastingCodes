@@ -14,17 +14,16 @@
         Next:numberShowProcess = 0                      ! print process record n times
         Next:numberShowEvent = 0                        ! print event record n times
 
-        ! For debugging purposes only
         PartonLevel:ISR = on
         PartonLevel:FSR = on
         PartonLevel:MPI = on
         HadronLevel:all = on
         
         ParticleDecays:xyMax = 30000
-	ParticleDecays:zMax = 30000
-	ParticleDecays:limitCylinder = on
-	ParticleDecays:limitTau0 = off
-	ParticleDecays:tau0Max = 30000
+		ParticleDecays:zMax = 30000
+		ParticleDecays:limitCylinder = on
+		ParticleDecays:limitTau0 = off
+		ParticleDecays:tau0Max = 30000
 
         ! HiddenValley Settings
         HiddenValley:gg2DvDvbar = on
@@ -35,20 +34,20 @@
         HiddenValley:fragment = on
         HiddenValley:FSR = on
         HiddenValley:alphaOrder = 1                      ! use running coupling
-        HiddenValley:Lambda = 10                       ! dark confinement scale
-        HiddenValley:pTminFSR = 11.0                      ! pT cut off on dark shower (IR regulator)
+        HiddenValley:Lambda = 10                         ! dark confinement scale
+        HiddenValley:pTminFSR = 11.0                     ! pT cut off on dark shower (IR regulator)
         HiddenValley:spinFv=0                            ! spin of bifundamentals, which are not used, but set for consistency
         HiddenValley:altHadronSpecies = off
         #HiddenValley:probVector=0.318
       
         ! dark sector meson mass spectrum
-	4900001:m0 = 1000.0
-	4900001:mWidth = 10
-	4900002:m0 = 50000
-	4900003:m0 = 50000
-	4900004:m0 = 50000
-	4900005:m0 = 50000
-	4900006:m0 = 50000
+		4900001:m0 = 1000.0
+		4900001:mWidth = 10
+		4900002:m0 = 50000
+		4900003:m0 = 50000
+		4900004:m0 = 50000
+		4900005:m0 = 50000
+		4900006:m0 = 50000
         4900101:m0 = 10.0                                ! Dark Quark Mass, pythia 8 crashes if this is < 0.4 GeV
         4900111:m0 = 5.0
         4900211:m0 = 5.0                                ! Setting pi'0  Mass
@@ -56,12 +55,12 @@
         4900213:m0 = 20.0                                ! Setting omega'0 Mass
         
         ! dark meson decay chains
-        4900111:tau0 = 25.0
-	4900211:tau0 = 25.0
-	4900111:0:all = 1 1.000 91 1 -1
-	4900211:oneChannel = 1 1.000 91 1 -1
-        4900113:0:all = 1 0.999 91 4900111 4900111
-	4900113:addchannel = 1 0.001 91 1 -1
-	4900213:oneChannel = 1 0.999 91 4900211 4900211
-	4900213:addchannel = 1 0.001 91 1 -1
+        4900111:tau0 = 25.0                              ! proper lifetime in mm
+		4900211:tau0 = 25.0
+		4900111:0:all = 1 1.000 91 1 -1                  ! pi -> d dbar  
+		4900211:oneChannel = 1 1.000 91 1 -1
+        4900113:0:all = 1 0.999 91 4900111 4900111        ! rho -> pi pi
+		4900113:addchannel = 1 0.001 91 1 -1
+		4900213:oneChannel = 1 0.999 91 4900211 4900211
+		4900213:addchannel = 1 0.001 91 1 -1
 

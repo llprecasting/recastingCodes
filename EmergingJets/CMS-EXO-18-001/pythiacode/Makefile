@@ -4,7 +4,6 @@
 
 
 homeDIR = $(shell pwd)
-pythia8path = $(homeDIR)/../pythia8 ## Set the path to your local pythia folder
 
 CXX      := g++
 

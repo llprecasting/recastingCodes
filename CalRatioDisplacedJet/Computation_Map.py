@@ -15,6 +15,7 @@ import math
 import uproot
 import yaml
 from yaml.loader import SafeLoader
+
 random.seed(123)
 hep.style.use("ATLAS") # Define a style for the plots
 
@@ -58,7 +59,7 @@ for fichier_selection, MG_fichier_selection,mass_phi,mass_s in zip(Fichier_selec
     MG_Lxy_tot_DH2, MG_Lz_tot_DH2 = cmfp.decaylenght_MG_DH2(MG_px_DH2, MG_py_DH2, MG_pz_DH2, E_DH2, MG_gamma_DH2, tauN) # Computing the decay lenght for DH2
 
     #HEP data
-    data_HEP = cmfp.elem_list(Fichier_HEP[count], Branche_HEP[count]) # Recover public data from ATLAS to compare the results
+    data_HEP = cmfp.elem_list(File_HEP[count], Branch_HEP[count]) # Recover public data from ATLAS to compare the results
 
 ############################################################################################################################################################################
 ############################################################################################################################################################################
@@ -69,9 +70,12 @@ for fichier_selection, MG_fichier_selection,mass_phi,mass_s in zip(Fichier_selec
     if mass_phi >= 400: # Condition if the sample is 'High-ET' or ' Low-ET'
         MG_eff_highETX = cmfp.eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN) # Compute the efficiency from MG
         eff_highETX = cmfp.eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, abs(pdg_tot_DH1), pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, abs(pdg_tot_DH2), tauN) # Compute the efficiency from Pythia
-        cmfp.plt_eff_high(MG_eff_highETX, eff_highETX, tauN, data_HEP, mass_H, mass_DH ) # Ploting and saving a comparison of all the results of efficiencies
+        cmfp.plt_eff_high(MG_eff_highETX, eff_highETX, tauN, data_HEP, mass_phi, mass_s ) # Ploting and saving a comparison of all the results of efficiencies
+        cmfp.plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, data_HEP)# Ploting and saving a comparison of the limits obtained with the map and by ATLAS.
+
     else:
         MG_eff_lowETX = cmfp.eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN)
         eff_lowETX = cmfp.eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, abs(pdg_tot_DH1), pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, abs(pdg_tot_DH2), tauN)
-        cmfp.plt_eff_low(MG_eff_lowETX, eff_lowETX, tauN, data_HEP, mass_H, mass_DH )
+        cmfp.plt_eff_low(MG_eff_lowETX, eff_lowETX, tauN, data_HEP, mass_phi, mass_s )
+        cmfp.plt_cross_low(eff_lowETX, tauN, mass_phi, mass_s, data_HEP)
     count+=1

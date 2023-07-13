@@ -595,10 +595,10 @@ def eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_D
 # Computing HEP data
 #########################################################################################
 
-def elem_list(fichier_HEP, Branche_HEP):
+def elem_list(HEP, Branch_HEP):
 
-    file_HEP = uproot.open(fichier_HEP) # changer ça pour qu'il prenne le nom d'un truc autre
-    data_HEP = file_HEP[Branche_HEP] # changer ça pour qu'il prenne le nom d'un truc autre###
+    file_HEP = uproot.open(HEP) # name of the HEP file
+    data_HEP = file_HEP[Branch_HEP] # name of the HEP file
 
     return data_HEP
 
@@ -637,7 +637,7 @@ def plt_eff_high(MG_eff_highETX, eff_highETX,tauN, data_HEP,  mass_phi , mass_s)
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)
     plt.ylabel('Efficiency', fontsize=20 )
     plt.legend(fontsize = 11, loc=1)
-    plt.savefig(f"/mnt/files/Bureau/Stage_LLP/New_Plot/Pythia_plots/Efficiency_PYTHIA_comparison_mH{mass_phi}.png")
+    plt.savefig(f"./Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
     plt.close()
 
 
@@ -676,5 +676,64 @@ def plt_eff_low(MG_eff_lowETX, eff_lowETX,tauN, data_HEP,  mass_phi , mass_s):
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)
     plt.ylabel('Efficiency', fontsize=20 )
     plt.legend( fontsize = 10, loc=1)
-    plt.savefig(f"/mnt/files/Bureau/Stage_LLP/New_Plot/Pythia_plots/Efficiency_PYTHIA_comparison_mH{mass_phi}.png")
+    plt.savefig(f"./Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
     plt.close()
+
+#########################################################################################
+# Plot limits obtained with the map, to those obtain by ATLAS (High-ET).
+#########################################################################################
+
+def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, data_HEP):
+
+    fig, ax = plt.subplots()
+
+    Nsobs = 0.5630 * 26 # nbr of observed events = 26
+
+    Crr_Sec_obs = (Nsobs)/((np.array(eff_highETX)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
+    Crr_Sec_obs_HEP = (Nsobs)/((np.array(data_HEP.values(axis='both')[1])) * 139e3 )
+
+    plt.plot(tauN, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)
+    plt.plot(tauN, Crr_Sec_obs_HEP, 'b', label ='Observed', linewidth = 2)
+
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel(r'c$\tau$ [m]')
+    plt.ylabel(r'95% CL limit on $\sigma \times B$ [pb]')
+
+    # place a text box in upper left in axes coords
+    props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+    ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+
+    plt.legend( fontsize = 10, loc=3)
+    plt.savefig(f"./Cross_section_mH{mass_phi}_mS{mass_s}.png")
+    plt.close()
+
+#########################################################################################
+# Plot limits obtained with the map, to those obtain by ATLAS (Low-ET).
+#########################################################################################
+
+def plt_cross_Low(eff_lowETX , tauN, mass_phi, mass_s, data_HEP):
+
+    fig, ax = plt.subplots()
+
+    Nsobs = 0.5630 * 26 # nbr of observed events = 26
+
+    Crr_Sec_obs = (Nsobs)/((np.array(eff_lowETX)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
+    Crr_Sec_obs_HEP = (Nsobs)/((np.array(data_HEP.values(axis='both')[1])) * 139e3 )
+
+    plt.plot(tauN, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)
+    plt.plot(tauN, Crr_Sec_obs_HEP, 'b', label ='Observed', linewidth = 2)
+
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel(r'c$\tau$ [m]')
+    plt.ylabel(r'95% CL limit on $\sigma \times B$ [pb]')
+
+    # place a text box in upper left in axes coords
+    props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+    ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+
+    plt.legend( fontsize = 10, loc=3)
+    plt.savefig(f"./Cross_section_mH{mass_phi}_mS{mass_s}.png")
+    plt.close()
+

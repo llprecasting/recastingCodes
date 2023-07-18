@@ -3,6 +3,7 @@ import os
 
 masses_phi = [1000,600,400,200,125,60]
 masses_S = [275,150,100,50,55,5]
+nevent = [10000,10000,10000,50000,50000]
 
 
 for i in range(len(masses_phi)):
@@ -14,6 +15,7 @@ for i in range(len(masses_phi)):
         f.write(f"output Script_mH{masses_phi[i]}_mS{masses_S[i]} \n")
         f.write(f"launch Script_mH{masses_phi[i]}_mS{masses_S[i]} \n")
         f.write(f"1 \n") #Add Pythia
+        f.write(f"set nevents = {nevent[i]} \n" ) #set the number of events
         f.write(f"set pdlabel = lhapdf \n" ) # Set the Parton Distribution Function.
         f.write(f"set lhaid = 315000 \n" )
         f.write(f"set mhsinput {masses_S[i]} \n") # Set a mass for the LLP.
@@ -59,6 +61,7 @@ for i in range(len(masses_phi)):
         f.write(f"output Script_mH{masses_phi[i]}_mS{masses_S[i]} \n")
         f.write(f"launch Script_mH{masses_phi[i]}_mS{masses_S[i]} \n")
         f.write(f"1 \n")
+        f.write(f"set nevents = {nevent[i]} \n" )
         f.write(f"set pdlabel = lhapdf \n" )
         f.write(f"set lhaid = 315000 \n" )
         f.write(f"set mhsinput {masses_S[i]} \n")
@@ -96,4 +99,3 @@ for i in range(len(masses_phi)):
 
 for mass_phi,mass_s in zip(masses_phi,masses_S):
     os.system(f"./bin/mg5_aMC -f script_mH{mass_phi}_mS{mass_s}.txt") # Launch the Script in MG.
-

@@ -30,13 +30,14 @@ Branch_HEP = ["Figure 2e of Aux. Mat. 1000_275/Graph1D_y1;1",'Figure 2d of Aux. 
 
 #Constante
 c = 3e8# Light velocity in m/s
-tauN=np.geomspace(0.1,1e2,50) # New lifetime range
+tauN=np.geomspace(0.1,1e2,99) # New lifetime range
 
 Mass_phi = [1000,600,400, 200, 125] # Heavy Neutral Boson mass
 Mass_s = [275,150,100, 50, 55] # LLP mass (DH = Dark Higgs)
+Nevent = [10000,10000,10000,50000,50000] # Nbr of events
 
 count=0
-for fichier_selection, MG_fichier_selection,mass_phi,mass_s in zip(Fichier_selection, MG_Fichier_selection, Mass_H,Mass_s):
+for fichier_selection, MG_fichier_selection,mass_phi,mass_s, Nevent in zip(Fichier_selection, MG_Fichier_selection, Mass_H,Mass_s, nevent):
 
     #Pythia
     events = hepmc.HEPMC_EventFile(fichier_selection) # Open HEPMC file
@@ -68,14 +69,14 @@ for fichier_selection, MG_fichier_selection,mass_phi,mass_s in zip(Fichier_selec
 ###########################################################Computing the efficiencies and ploting the results###############################################################
 
     if mass_phi >= 400: # Condition if the sample is 'High-ET' or ' Low-ET'
-        MG_eff_highETX = cmfp.eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN) # Compute the efficiency from MG
-        eff_highETX = cmfp.eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, abs(pdg_tot_DH1), pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, abs(pdg_tot_DH2), tauN) # Compute the efficiency from Pythia
+        MG_eff_highETX = cmfp.eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN, nevent) # Compute the efficiency from MG
+        eff_highETX = cmfp.eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, abs(pdg_tot_DH1), pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, abs(pdg_tot_DH2), tauN, nevent) # Compute the efficiency from Pythia
         cmfp.plt_eff_high(MG_eff_highETX, eff_highETX, tauN, data_HEP, mass_phi, mass_s ) # Ploting and saving a comparison of all the results of efficiencies
         cmfp.plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, data_HEP)# Ploting and saving a comparison of the limits obtained with the map and by ATLAS.
 
     else:
-        MG_eff_lowETX = cmfp.eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN)
-        eff_lowETX = cmfp.eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, abs(pdg_tot_DH1), pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, abs(pdg_tot_DH2), tauN)
+        MG_eff_lowETX = cmfp.eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN, nevent)
+        eff_lowETX = cmfp.eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, abs(pdg_tot_DH1), pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, abs(pdg_tot_DH2), tauN, nevent)
         cmfp.plt_eff_low(MG_eff_lowETX, eff_lowETX, tauN, data_HEP, mass_phi, mass_s )
         cmfp.plt_cross_low(eff_lowETX, tauN, mass_phi, mass_s, data_HEP)
     count+=1

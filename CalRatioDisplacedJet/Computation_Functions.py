@@ -261,7 +261,7 @@ def decaylenghtDH2(px_DH2, py_DH2, pz_DH2, E_DH2, gamma_DH2, tauN):
 # Computation of the efficiency with the map from the data obtained with MG+Pythia8 for the high-ET samples (mH >= 400GeV).
 #########################################################################################
 
-def eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, pdg_tot_DH2, tauN):
+def eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, pdg_tot_DH2, tauN, nevent):
 
     eff_highETX = []
 
@@ -282,7 +282,7 @@ def eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, 
         eff_highETX.append(sum(queryMapResult))
     queryMapResult = np.array(queryMapResult)
     eff_highETX = np.array(eff_highETX)
-    eff_highETX = eff_highETX/10000 #efficiency/(nbr of event)
+    eff_highETX = eff_highETX/nevent #efficiency/(nbr of event)
 
     return eff_highETX
 
@@ -290,7 +290,7 @@ def eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, 
 # Computation of the efficiency with the map from the data obtained with MG+Pythia8 for the low-ET samples (mH <= 400GeV).
 #########################################################################################
 
-def eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, pdg_tot_DH2, tauN):
+def eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, pdg_tot_DH2, tauN,nevent):
 
     eff_lowETX = []
 
@@ -311,7 +311,7 @@ def eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, e
         eff_lowETX.append(sum(queryMapResult))
     queryMapResult = np.array(queryMapResult)
     eff_lowETX = np.array(eff_lowETX)
-    eff_lowETX = eff_lowETX/10000 #efficiency/(nbr of event)
+    eff_lowETX = eff_lowETX/nevent #efficiency/(nbr of event)
 
     return eff_lowETX
 
@@ -529,7 +529,7 @@ def decaylenght_MG_DH2(MG_px_DH2, MG_py_DH2, MG_pz_DH2, E_DH2, MG_gamma_DH2, tau
 # Computation of the efficiency with the map from the data obtained with MG for the high-ET samples (mH <= 400GeV).
 #########################################################################################
 
-def eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN):
+def eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN, nevent):
 
     MG_eff_highETX = []
 
@@ -550,7 +550,7 @@ def eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_
         MG_eff_highETX.append(sum(MG_queryMapResult))
     MG_queryMapResult = np.array(MG_queryMapResult)
     MG_eff_highETX = np.array(MG_eff_highETX)
-    MG_eff_highETX = MG_eff_highETX/10000 #eff/nbrevent
+    MG_eff_highETX = MG_eff_highETX/nevent #eff/nbrevent
 
     return MG_eff_highETX
 
@@ -558,7 +558,7 @@ def eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_
 # Computation of the efficiency with the map from the data obtained with MG for the low-ET samples (mH <= 400GeV).
 #########################################################################################
 
-def eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN):
+def eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN, nevent):
 
     MG_eff_lowETX = []
 
@@ -579,7 +579,7 @@ def eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_D
         MG_eff_lowETX.append(sum(MG_queryMapResult))
     MG_queryMapResult = np.array(MG_queryMapResult)
     MG_eff_lowETX = np.array(MG_eff_lowETX)
-    MG_eff_lowETX = MG_eff_lowETX/10000 #eff/nbrevent
+    MG_eff_lowETX = MG_eff_lowETX/nevent #eff/nbrevent
 
     return MG_eff_lowETX
 
@@ -637,7 +637,7 @@ def plt_eff_high(MG_eff_highETX, eff_highETX,tauN, data_HEP,  mass_phi , mass_s)
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)
     plt.ylabel('Efficiency', fontsize=20 )
     plt.legend(fontsize = 11, loc=1)
-    plt.savefig(f"./Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
+    plt.savefig(f"./Plots/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
     plt.close()
 
 
@@ -676,7 +676,7 @@ def plt_eff_low(MG_eff_lowETX, eff_lowETX,tauN, data_HEP,  mass_phi , mass_s):
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)
     plt.ylabel('Efficiency', fontsize=20 )
     plt.legend( fontsize = 10, loc=1)
-    plt.savefig(f"./Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
+    plt.savefig(f"./Plots/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
     plt.close()
 
 #########################################################################################
@@ -705,7 +705,7 @@ def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, data_HEP):
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     plt.legend( fontsize = 10, loc=3)
-    plt.savefig(f"./Cross_section_mH{mass_phi}_mS{mass_s}.png")
+    plt.savefig(f"./Plots/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
     plt.close()
 
 #########################################################################################
@@ -734,6 +734,6 @@ def plt_cross_Low(eff_lowETX , tauN, mass_phi, mass_s, data_HEP):
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     plt.legend( fontsize = 10, loc=3)
-    plt.savefig(f"./Cross_section_mH{mass_phi}_mS{mass_s}.png")
+    plt.savefig(f"./Plots/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
     plt.close()
 

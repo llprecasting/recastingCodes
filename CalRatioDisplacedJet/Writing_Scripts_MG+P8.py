@@ -8,13 +8,13 @@ nevent = [10000,10000,10000,50000,50000,50000]
 for i in range(len(masses_phi)):
     if masses_phi[i] <= 125:
         f = open(f"script_mH{masses_phi[i]}_mS{masses_S[i]}.txt", 'w') # Creation of the Script to follow for MG.
-        f.write(f"import model ./HAHM_variableMW_v3_UFO \n") # Import the model.
+        f.write(f"import model ./HAHM_MG5model_v3/HAHM_variableMW_v3_UFO \n") # Import the model.
         f.write(f"define f = u c d s u~ c~ d~ s~ b b~ e+ e- mu+ mu- ta+ ta- t t~ \n") # Define a fermion.
         f.write(f"generate g g > h HIG=1 HIW=0 QED=0 QCD=0, (h > h2 h2, h2 > f f) \n") # Generate the process studied.
         f.write(f"output Script_mH{masses_phi[i]}_mS{masses_S[i]} \n")
         f.write(f"launch Script_mH{masses_phi[i]}_mS{masses_S[i]} \n")
         f.write(f"1 \n") #Add Pythia
-        f.write(f"set nevents = {nevent[i]} \n" )
+        f.write(f"set nevents = {nevent[i]} \n" ) # change the number of event
         f.write(f"set pdlabel = lhapdf \n" ) # Set the Parton Distribution Function.
         f.write(f"set lhaid = 315000 \n" )
         f.write(f"set mhsinput {masses_S[i]} \n") # Set a mass for the LLP.
@@ -54,7 +54,7 @@ for i in range(len(masses_phi)):
 
     else:
         f = open(f"script_mH{masses_phi[i]}_mS{masses_S[i]}.txt", 'w')
-        f.write(f"import model ./HAHM_variableMW_v3_UFO \n")
+        f.write(f"import model ./HAHM_MG5model_v3/HAHM_variableMW_v3_UFO \n")
         f.write(f"define f = u c d s u~ c~ d~ s~ b b~ e+ e- mu+ mu- ta+ ta- t t~ \n")
         f.write(f"generate g g > h HIG=1 HIW=0 QED=0 QCD=0, (h > h2 h2, h2 > f f) \n")
         f.write(f"output Script_mH{masses_phi[i]}_mS{masses_S[i]} \n")

@@ -10,9 +10,6 @@ import mplhep as hep
 import lhe_parser as lhe
 import hepmc_parser as hepmc
 import random
-import uproot
-import yaml
-from yaml.loader import SafeLoader
 random.seed(123)
 hep.style.use("ATLAS")
 

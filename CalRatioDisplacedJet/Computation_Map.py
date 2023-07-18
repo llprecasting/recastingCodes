@@ -9,12 +9,9 @@ import tqdm
 import mplhep as hep
 import lhe_parser as lhe
 import hepmc_parser as hepmc
-import Calcul_Map_function_Pythia as cmfp
+import Computation_Functions as cmfp
 import random
 import math
-import uproot
-import yaml
-from yaml.loader import SafeLoader
 
 random.seed(123)
 hep.style.use("ATLAS") # Define a style for the plots
@@ -37,10 +34,10 @@ Mass_s = [275,150,100, 50, 55] # LLP mass (DH = Dark Higgs)
 Nevent = [10000,10000,10000,50000,50000] # Nbr of events
 
 count=0
-for fichier_selection, MG_fichier_selection,mass_phi,mass_s, Nevent in zip(Fichier_selection, MG_Fichier_selection, Mass_H,Mass_s, nevent):
+for file_selection, MG_file_selection,mass_phi,mass_s, nevent in zip(File_selection, MG_File_selection, Mass_phi,Mass_s, Nevent):
 
     #Pythia
-    events = hepmc.HEPMC_EventFile(fichier_selection) # Open HEPMC file
+    events = hepmc.HEPMC_EventFile(file_selection) # Open HEPMC file
     px_TOT, py_TOT, pz_TOT, E_TOT, mass_TOT,pdg_TOT = cmfp.parsing_hepmc(events) # Parsing the HEPMC file
     px_tot, py_tot, pz_tot, E_tot, mass_tot, pdg_tot = cmfp.conversion_one_list(px_TOT, py_TOT, pz_TOT, E_TOT, mass_TOT, pdg_TOT) # Obtaining data in one list
     px_DH1, px_DH2, py_DH1, py_DH2, pz_DH1, pz_DH2, pdg_tot_DH1, pdg_tot_DH2, E_DH1, E_DH2, mass_DH1, mass_DH2 = cmfp.recover(px_tot, py_tot, pz_tot, E_tot, mass_tot, pdg_tot) # Separate data from DH1 and DH2

@@ -9,10 +9,10 @@ import tqdm
 import mplhep as hep
 import lhe_parser as lhe
 import hepmc_parser as hepmc
+import uproot
 import random
 random.seed(123)
 hep.style.use("ATLAS")
-
 # set cst
 c = 3e8# Light velocity in m/s
 

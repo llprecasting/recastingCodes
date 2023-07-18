@@ -47,7 +47,7 @@ for file_selection, MG_file_selection,mass_phi,mass_s, nevent in zip(File_select
     Lxy_tot_DH2, Lz_tot_DH2 = cmfp.decaylenghtDH2(px_DH2, py_DH2, pz_DH2, E_DH2, gamma_DH2, tauN) # Computing the decay lenght for DH2
 
     #MG
-    MG_events = lhe.EventFile(MG_fichier_selection) # Open LHE file
+    MG_events = lhe.EventFile(MG_file_selection) # Open LHE file
     px, py, pz, pdg, E, MASS = cmfp.parsing_LHE(MG_events) #Parsing the LHE file
     MG_px_DH1, MG_py_DH1,MG_pz_DH1,MG_E_DH1,MG_mass_DH1,MG_pdg_DH1_1 = cmfp.recover_MG_DH1(px, py, pz, E, MASS, pdg) # Separate data from DH1 and DH2
     MG_pT_DH1,MG_eta_DH1, MG_gamma_DH1 = cmfp.kinematics_MG_DH1(MG_px_DH1,MG_py_DH1,MG_pz_DH1,MG_E_DH1) # Computing kinematics for DH1

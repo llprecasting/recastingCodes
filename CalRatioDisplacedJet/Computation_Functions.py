@@ -724,7 +724,7 @@ def plt_cross_Low(eff_lowETX , tauN, mass_H, mass_DH, data_HEP):
     Crr_Sec_obs_HEP = (Nsobs)/((np.array(data_HEP.values(axis='both')[1])) * 139e3 )
 
     for i in range(len(Crr_Sec_obs)):
-        if Crr_Sec_obs[i] < 10**4:
+        if Crr_Sec_obs_HEP[i] < 10**4:
             crr_Sec_HEP.append(Crr_Sec_obs_HEP[i])
             crr_Sec.append(Crr_Sec_obs[i])
             ctau.append(tauN[i])

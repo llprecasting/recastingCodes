@@ -709,17 +709,29 @@ def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, data_HEP):
 # Plot limits obtained with the map, to those obtain by ATLAS (Low-ET).
 #########################################################################################
 
-def plt_cross_Low(eff_lowETX , tauN, mass_phi, mass_s, data_HEP):
+def plt_cross_Low(eff_lowETX , tauN, mass_H, mass_DH, data_HEP):
 
     fig, ax = plt.subplots()
 
+
     Nsobs = 0.5630 * 26 # nbr of observed events = 26
 
-    Crr_Sec_obs = (Nsobs)/((np.array(eff_lowETX)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
+    crr_Sec = []
+    crr_Sec_HEP = []
+    ctau = []
+
+    Crr_Sec_obs = (Nsobs)/((np.array(eff_lowETX)) * 139e3 )
     Crr_Sec_obs_HEP = (Nsobs)/((np.array(data_HEP.values(axis='both')[1])) * 139e3 )
 
-    plt.plot(tauN, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)
-    plt.plot(tauN, Crr_Sec_obs_HEP, 'b', label ='Observed', linewidth = 2)
+    for i in range(len(Crr_Sec_obs)):
+        if Crr_Sec_obs[i] < 10**4:
+            crr_Sec_HEP.append(Crr_Sec_obs_HEP[i])
+            crr_Sec.append(Crr_Sec_obs[i])
+            ctau.append(tauN[i])
+
+    plt.plot(ctau, crr_Sec, 'r', label ='Map results', linewidth = 2)
+    plt.plot(ctau, crr_Sec_HEP, 'b', label ='Observed', linewidth = 2)
+
 
     plt.xscale('log')
     plt.yscale('log')

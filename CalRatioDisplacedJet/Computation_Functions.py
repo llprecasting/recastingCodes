@@ -11,8 +11,10 @@ import lhe_parser as lhe
 import hepmc_parser as hepmc
 import uproot
 import random
+import os
 random.seed(123)
 hep.style.use("ATLAS")
+
 # set cst
 c = 3e8# Light velocity in m/s
 
@@ -285,7 +287,7 @@ def eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, 
     eff_highETX = eff_highETX/nevent #efficiency/(nbr of event)
 
     Data_Eff_High = np. np.column_stack(eff_highETX)
-    np.savetxt(f'./Plots_High/Text_files_High/Efficiencies_Text_{mass_phi}_{mass_s}.txt', Data_Eff_High)
+    np.savetxt(f'./Plots_High/Efficiencies_Text_{mass_phi}_{mass_s}.txt', Data_Eff_High)
 
     return eff_highETX
 
@@ -317,7 +319,7 @@ def eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, e
     eff_lowETX = eff_lowETX/nevent #efficiency/(nbr of event)
 
     Data_Eff_Low = np. np.column_stack(eff_lowETX)
-    np.savetxt(f'./Plots_Low/Text_files_Low/Efficiencies_Text_{mass_phi}_{mass_s}.txt', Data_Eff_Low)
+    np.savetxt(f'./Plots_Low/Efficiencies_Text_{mass_phi}_{mass_s}.txt', Data_Eff_Low)
 
     return eff_lowETX
 
@@ -559,7 +561,7 @@ def eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_
     MG_eff_highETX = MG_eff_highETX/nevent #eff/nbrevent
 
     MG_Data_Eff_High = np.column_stack(MG_eff_highETX)
-    np.savetxt(f'./Plots_High/Text_files_High/Efficiencies_Text_{mass_phi}_{mass_s}.txt', MG_Data_Eff_High)
+    np.savetxt(f'./Plots_High/Efficiencies_Text_{mass_phi}_{mass_s}.txt', MG_Data_Eff_High)
 
     return MG_eff_highETX
 
@@ -591,7 +593,7 @@ def eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_D
     MG_eff_lowETX = MG_eff_lowETX/nevent #eff/nbrevent
 
     MG_Data_Eff_Low = np.column_stack(MG_eff_lowETX)
-    np.savetxt(f'./Plots_Low/Text_files_Low/Efficiencies_Text_{mass_phi}_{mass_s}.txt', MG_Data_Eff_Low)
+    np.savetxt(f'./Plots_Low/Efficiencies_Text_{mass_phi}_{mass_s}.txt', MG_Data_Eff_Low)
 
     return MG_eff_lowETX
 
@@ -656,7 +658,7 @@ def plt_eff_high(MG_eff_highETX, eff_highETX,tauN, data_HEP,  mass_phi , mass_s)
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)
     plt.ylabel('Efficiency', fontsize=20 )
     plt.legend(fontsize = 11, loc=1) # set the legend in the upper right corner
-    plt.savefig(f"./Plots_High/Efficiency_High/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
+    plt.savefig(f"./Plots_High/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
     plt.close()
 
 
@@ -699,7 +701,7 @@ def plt_eff_low(MG_eff_lowETX, eff_lowETX,tauN, data_HEP,  mass_phi , mass_s):
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)
     plt.ylabel('Efficiency', fontsize=20 )
     plt.legend( fontsize = 10, loc=1) # set the legend in the upper right corner
-    plt.savefig(f"./Plots_Low/Efficiency_Low/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
+    plt.savefig(f"./Plots_Low/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
     plt.close()
 
 #########################################################################################
@@ -710,7 +712,7 @@ def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit):
 
     fig, ax = plt.subplots()
 
-    Nsobs = 0.5630 * 26 # nbr of observed events = 26
+    Nsobs = 0.5630 * 26 # nbr of observed events = 26 ( factor )
 
     Crr_Sec_obs = (Nsobs)/((np.array(eff_highETX)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
 
@@ -727,7 +729,7 @@ def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit):
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     plt.legend( fontsize = 10, loc=3)
-    plt.savefig(f"./Plots_High/Cross_section_limits_High/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
+    plt.savefig(f"./Plots_High/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
     plt.close()
 
 #########################################################################################
@@ -755,6 +757,6 @@ def plt_cross_Low(eff_lowETX , tauN, , mass_phi, mass_s, branch_HEP_limit):
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     plt.legend( fontsize = 10, loc=3)
-    plt.savefig(f"./Plots_Low/Cross_section_limits_Low/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
+    plt.savefig(f"./Plots_Low/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
     plt.close()
 

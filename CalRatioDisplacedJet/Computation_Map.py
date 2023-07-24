@@ -12,6 +12,7 @@ import hepmc_parser as hepmc
 import Computation_Functions as cmfp
 import random
 import math
+import os
 
 random.seed(123)
 hep.style.use("ATLAS") # Define a style for the plots
@@ -38,6 +39,9 @@ Mass_phi = [1000,600,400, 200, 125] # Heavy Neutral Boson mass
 Mass_s = [275,150,100, 50, 55] # LLP mass (DH = Dark Higgs)
 Nevent = [10000,10000,10000,50000,50000] # Nbr of events
 HEP_Lifetime = [95,98,98,73,62]
+
+os.system("mkdir -p Plots_High")
+os.system("mkdir -p Plots_Low")
 
 count=0
 for file_selection, MG_file_selection,mass_phi,mass_s, nevent in zip(File_selection, MG_File_selection, Mass_phi,Mass_s, Nevent):

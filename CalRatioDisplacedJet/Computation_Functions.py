@@ -609,7 +609,7 @@ def eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_D
 # Computing HEP data
 #########################################################################################
 
-def elem_list(fichier_HEP, Branche_HEP, File_HEP_limit, Branch_HEP_limit):
+def elem_list(HEP, Branch_HEP, File_HEP_limit, Branch_HEP_limit):
 
     file_HEP = uproot.open(HEP) # open the file from HEP data for the efficiency
     data_HEP = file_HEP[Branch_HEP] # open the branch

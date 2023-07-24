@@ -102,8 +102,7 @@ def queryMapFromKinematics(pT1, eta1, Lxy1, Lz1, decay1, pT2, eta2, Lxy2, Lz2, d
   index_2 = getGlobalBinIndex(pT2, eta2, Lxy2, Lz2, decay2)
   if index_1 < 0 or index_2 < 0 :
     return 0
-  elif abs(eta1) > 2.5 or abs(eta2) > 2.5:
-    return 0
+
   else:
     return queryMapFromIndices(index_1, index_2, selection)
 

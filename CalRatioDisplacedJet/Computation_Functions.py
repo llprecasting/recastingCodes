@@ -34,15 +34,15 @@ def parsing_hepmc(events):
     for ie , event in enumerate(events):
         count=0
         for id, vertex in event.vertex.items():
-            if [p.pdg for p in vertex.incoming] == [25] and [p.pdg for p in vertex.outcoming] == [35, 35]:
+            if [p.pdg for p in vertex.incoming] == [25] and [p.pdg for p in vertex.outcoming] == [35, 35]: # PDGID 25 = Higgs, PDGID 35 Dark Higgs
                 px_TOT.append(list(p.px for p in vertex.outcoming)) # recover the x momenta in GeV
                 py_TOT.append(list(p.py for p in vertex.outcoming)) # recover the y momenta in GeV
                 pz_TOT.append(list(p.pz for p in vertex.outcoming)) # recover the z momenta in GeV
                 E_TOT.append(list(p.E for p in vertex.outcoming)) # recover the Energy in GeV
                 mass_TOT.append(list(p.mass for p in vertex.outcoming)) # recover the mass in GeV
 
-            if [p.pdg for p in vertex.incoming] == [35]:
-                pdg_TOT.append((list(p.pdg for p in vertex.outcoming))) # recover the PDG ID of the particle produced by the LLP
+            if [p.pdg for p in vertex.incoming] == [35]: # PDGID 35 Dark Higgs
+                pdg_TOT.append((list(p.pdg for p in vertex.outcoming))) # recover the PDG ID of the particle produced
 
                 count = count+1
                 if count==2: ##
@@ -113,25 +113,27 @@ def recover(px_tot, py_tot, pz_tot, E_tot, mass_tot,pdg_tot):
     pdg_tot_DH1 = []
     pdg_tot_DH2 = []
 
-    for i in range(0, len(px_tot),2):
+    for i in range(0, len(px_tot),2): # in the list, each even value is for DH1
         px_DH1.append(px_tot[i])
         py_DH1.append(py_tot[i])
         pz_DH1.append(pz_tot[i])
         E_DH1.append(E_tot[i])
         mass_DH1.append(mass_tot[i])
 
-    for i in range(1, len(px_tot),2):
+    for i in range(1, len(px_tot),2): # in the list, each odd value is for DH2
         px_DH2.append(px_tot[i])
         py_DH2.append(py_tot[i])
         pz_DH2.append(pz_tot[i])
         E_DH2.append(E_tot[i])
         mass_DH2.append(mass_tot[i])
 
-    for i in range(0, len(pdg_tot),4):
+    for i in range(0, len(pdg_tot),4): # recover the PDG ID of the particle produced by decay of DH1
         pdg_tot_DH1.append(pdg_tot[i])
 
-    for i in range(2, len(pdg_tot),4):
+    for i in range(2, len(pdg_tot),4): # recover the PDG ID of the particle produced by decay of DH2
         pdg_tot_DH2.append(pdg_tot[i])
+
+    # Convert all lists into arrays
 
     px_DH1 = np.array(px_DH1)/c # GeV/c
     py_DH1 = np.array(py_DH1)/c
@@ -155,14 +157,14 @@ def recover(px_tot, py_tot, pz_tot, E_tot, mass_tot,pdg_tot):
 
 def kinematics_DH1(px_DH1, py_DH1, pz_DH1, E_DH1):
 
-    vx_DH1 = (px_DH1*c**2)/E_DH1
+    vx_DH1 = (px_DH1*c**2)/E_DH1 #compute the velocities in each direction
     vy_DH1 = (py_DH1*c**2)/E_DH1
     vz_DH1 = (pz_DH1*c**2)/E_DH1
-    beta_DH1 = np.sqrt(vx_DH1**2 + vy_DH1**2 + vz_DH1**2)/c
-    gamma_DH1 = 1/(np.sqrt(1-beta_DH1**2))
+    beta_DH1 = np.sqrt(vx_DH1**2 + vy_DH1**2 + vz_DH1**2)/c # compute beta
+    gamma_DH1 = 1/(np.sqrt(1-beta_DH1**2)) # compute gamma
 
-    pT_DH1 = np.sqrt(px_DH1**2 + py_DH1**2)*c
-    eta_DH1 = np.arctanh(pz_DH1/(np.sqrt(px_DH1**2 + py_DH1**2 + pz_DH1**2)))
+    pT_DH1 = np.sqrt(px_DH1**2 + py_DH1**2)*c # compute the transverse momenta
+    eta_DH1 = np.arctanh(pz_DH1/(np.sqrt(px_DH1**2 + py_DH1**2 + pz_DH1**2))) # compute the pseudorapidity
 
     return beta_DH1, gamma_DH1, pT_DH1, eta_DH1
 
@@ -173,14 +175,15 @@ def kinematics_DH1(px_DH1, py_DH1, pz_DH1, E_DH1):
 
 def kinemamtics_DH2(px_DH2, py_DH2, pz_DH2, E_DH2):
 
-    vx_DH2 = (px_DH2*c**2)/E_DH2
+    vx_DH2 = (px_DH2*c**2)/E_DH2 #compute the velocities in each direction
     vy_DH2 = (py_DH2*c**2)/E_DH2
     vz_DH2 = (pz_DH2*c**2)/E_DH2
-    beta_DH2 = np.sqrt(vx_DH2**2 + vy_DH2**2 + vz_DH2**2)/c
-    gamma_DH2 = 1/(np.sqrt(1-beta_DH2**2))
+    beta_DH2 = np.sqrt(vx_DH2**2 + vy_DH2**2 + vz_DH2**2)/c # compute beta
+    gamma_DH2 = 1/(np.sqrt(1-beta_DH2**2)) # compute gamma
 
-    pT_DH2 = np.sqrt(px_DH2**2 + py_DH2**2)*c
-    eta_DH2 = np.arctanh(pz_DH2/(np.sqrt(px_DH2**2 + py_DH2**2 + pz_DH2**2)))
+    pT_DH2 = np.sqrt(px_DH2**2 + py_DH2**2)*c # compute the transverse momenta
+    eta_DH2 = np.arctanh(pz_DH2/(np.sqrt(px_DH2**2 + py_DH2**2 + pz_DH2**2))) # compute the pseudorapidity
+
     return beta_DH2, gamma_DH2, pT_DH2, eta_DH2
 
 #########################################################################################
@@ -212,11 +215,11 @@ def decaylenghtDH1(px_DH1, py_DH1, pz_DH1, E_DH1, gamma_DH1, tauN):
         Lxy_DH1 = []
 
         for i in range(len(gamma_DH1)):
-            lt = lifetime(tauN[ctau])
-            Lx_DH1.append((px_DH1[i]/E_DH1[i])*c**2 * lt * gamma_DH1[i])
+            lt = lifetime(tauN[ctau]) # set mean lifetime
+            Lx_DH1.append((px_DH1[i]/E_DH1[i])*c**2 * lt * gamma_DH1[i]) # compute the decay lenght in x,y,z
             Ly_DH1.append((py_DH1[i]/E_DH1[i])*c**2 * lt * gamma_DH1[i])
             Lz_DH1.append((abs(pz_DH1[i])/E_DH1[i])*c**2 * lt  * gamma_DH1[i] )
-            Lxy_DH1.append(np.sqrt((Lx_DH1[i])**2 + (Ly_DH1[i])**2))
+            Lxy_DH1.append(np.sqrt((Lx_DH1[i])**2 + (Ly_DH1[i])**2)) # compte the transverse decay lenght
 
         Lx_tot_DH1.append(Lx_DH1)
         Ly_tot_DH1.append(Ly_DH1)
@@ -242,11 +245,11 @@ def decaylenghtDH2(px_DH2, py_DH2, pz_DH2, E_DH2, gamma_DH2, tauN):
         Lxy_DH2 = []
 
         for i in range(len(gamma_DH2)):
-                lt = lifetime(tauN[ctau])
-                Lx_DH2.append((px_DH2[i]/E_DH2[i])*c**2 * lt * gamma_DH2[i])
+                lt = lifetime(tauN[ctau]) # set mean lifetime
+                Lx_DH2.append((px_DH2[i]/E_DH2[i])*c**2 * lt * gamma_DH2[i]) # compute the decay lenght in x,y,z
                 Ly_DH2.append((py_DH2[i]/E_DH2[i])*c**2 * lt * gamma_DH2[i])
                 Lz_DH2.append((abs(pz_DH2[i])/E_DH2[i])*c**2 * lt* gamma_DH2[i])
-                Lxy_DH2.append(np.sqrt((Lx_DH2[i])**2 + (Ly_DH2[i])**2))
+                Lxy_DH2.append(np.sqrt((Lx_DH2[i])**2 + (Ly_DH2[i])**2)) # compte the transverse decay lenght
 
         Lx_tot_DH2.append(Lx_DH2)
         Ly_tot_DH2.append(Ly_DH2)
@@ -258,7 +261,7 @@ def decaylenghtDH2(px_DH2, py_DH2, pz_DH2, E_DH2, gamma_DH2, tauN):
 # Computation of the efficiency with the map from the data obtained with MG+Pythia8 for the high-ET samples (mH >= 400GeV).
 #########################################################################################
 
-def eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, pdg_tot_DH2, tauN, nevent):
+def eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, pdg_tot_DH2, tauN, nevent, mass_phi, mass_s):
 
     eff_highETX = []
 
@@ -277,9 +280,12 @@ def eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, 
                                                             abs(pdg_tot_DH2[iEvent]),
                                                             selection = "high-ET"))
         eff_highETX.append(sum(queryMapResult))
-    queryMapResult = np.array(queryMapResult)
-    eff_highETX = np.array(eff_highETX)
+    queryMapResult = np.array(queryMapResult) #convertion into array
+    eff_highETX = np.array(eff_highETX) #convertion into array
     eff_highETX = eff_highETX/nevent #efficiency/(nbr of event)
+
+    Data_Eff_High = np. np.column_stack(eff_highETX)
+    np.savetxt(f'./Plots_High/Text_files_High/Efficiencies_Text_{mass_phi}_{mass_s}.txt', Data_Eff_High)
 
     return eff_highETX
 
@@ -287,7 +293,7 @@ def eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, 
 # Computation of the efficiency with the map from the data obtained with MG+Pythia8 for the low-ET samples (mH <= 400GeV).
 #########################################################################################
 
-def eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, pdg_tot_DH2, tauN,nevent):
+def eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, pdg_tot_DH2, tauN,nevent, mass_phi, mass_s):
 
     eff_lowETX = []
 
@@ -306,9 +312,12 @@ def eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, e
                                                             abs(pdg_tot_DH2[iEvent]),
                                                             selection = "low-ET"))
         eff_lowETX.append(sum(queryMapResult))
-    queryMapResult = np.array(queryMapResult)
-    eff_lowETX = np.array(eff_lowETX)
+    queryMapResult = np.array(queryMapResult) #convertion into array
+    eff_lowETX = np.array(eff_lowETX) #convertion into array
     eff_lowETX = eff_lowETX/nevent #efficiency/(nbr of event)
+
+    Data_Eff_Low = np. np.column_stack(eff_lowETX)
+    np.savetxt(f'./Plots_Low/Text_files_Low/Efficiencies_Text_{mass_phi}_{mass_s}.txt', Data_Eff_Low)
 
     return eff_lowETX
 
@@ -335,14 +344,14 @@ def parsing_LHE(MG_events):
     for event in MG_events:
         for particle in event:
             pdg.append(particle.pdg)
-            if particle.pdg == 35:
+            if particle.pdg == 35: # PDGID 35 Dark Higgs
                 px.append(particle.px)
                 py.append(particle.py)
                 pz.append(particle.pz)
                 E.append(particle.E)
                 MASS.append(particle.mass)
 
-    px = np.array(px)/c # GeV/c = kg m s⁻¹
+    px = np.array(px)/c # GeV/c
     py = np.array(py)/c
     pz = np.array(pz)/c
 
@@ -350,7 +359,7 @@ def parsing_LHE(MG_events):
 
 
 #########################################################################################
-# Recovering the data from LLP1 (PDG ID, px,py,pz,E,mass).
+# Recovering the data from MG (LHE) (PDG ID, px,py,pz,E,mass).
 #########################################################################################
 
 def recover_MG_DH1(px, py, pz, E, MASS, pdg):
@@ -379,7 +388,7 @@ def recover_MG_DH1(px, py, pz, E, MASS, pdg):
     for i in range(0,len(px),2):
         MG_mass_DH1.append(MASS[i]) #List with the mass from LLP1
 
-    MG_px_DH1 = np.array(MG_px_DH1)
+    MG_px_DH1 = np.array(MG_px_DH1) # convertion into arrays
     MG_py_DH1 = np.array(MG_py_DH1)
     MG_pz_DH1 = np.array(MG_pz_DH1)
     MG_E_DH1 = np.array(MG_E_DH1)
@@ -393,13 +402,13 @@ def recover_MG_DH1(px, py, pz, E, MASS, pdg):
 
 def kinematics_MG_DH1(MG_px_DH1,MG_py_DH1,MG_pz_DH1,MG_E_DH1 ):
 
-    MG_vx_DH1 = (MG_px_DH1*c**2)/MG_E_DH1
+    MG_vx_DH1 = (MG_px_DH1*c**2)/MG_E_DH1 #compute the velocities in each direction
     MG_vy_DH1 = (MG_py_DH1*c**2)/MG_E_DH1
     MG_vz_DH1 = (MG_pz_DH1*c**2)/MG_E_DH1
-    MG_beta_DH1 = np.sqrt(MG_vx_DH1**2 + MG_vy_DH1**2 + MG_vz_DH1**2)/c
-    MG_gamma_DH1 = 1/(np.sqrt(1-MG_beta_DH1**2))
-    MG_pT_DH1 = np.sqrt(MG_px_DH1**2 + MG_py_DH1**2)*c
-    MG_eta_DH1 = np.arctanh(MG_pz_DH1/(np.sqrt(MG_px_DH1**2 + MG_py_DH1**2 + MG_pz_DH1**2)))
+    MG_beta_DH1 = np.sqrt(MG_vx_DH1**2 + MG_vy_DH1**2 + MG_vz_DH1**2)/c # compute beta
+    MG_gamma_DH1 = 1/(np.sqrt(1-MG_beta_DH1**2)) # compute gamma
+    MG_pT_DH1 = np.sqrt(MG_px_DH1**2 + MG_py_DH1**2)*c # compute the transverse momenta
+    MG_eta_DH1 = np.arctanh(MG_pz_DH1/(np.sqrt(MG_px_DH1**2 + MG_py_DH1**2 + MG_pz_DH1**2))) # compute the pseudorapidity
 
     return MG_pT_DH1,MG_eta_DH1, MG_gamma_DH1
 
@@ -433,7 +442,7 @@ def recover_MG_DH2(px, py, pz, E, MASS, pdg):
     for i in range(1,len(px),2):
         MG_mass_DH2.append(MASS[i]) #List with the mass from LLP2
 
-    MG_px_DH2 = np.array(MG_px_DH2)
+    MG_px_DH2 = np.array(MG_px_DH2) # convertion into arrays
     MG_py_DH2 = np.array(MG_py_DH2)
     MG_pz_DH2 = np.array(MG_pz_DH2)
     MG_E_DH2 = np.array(MG_E_DH2)
@@ -447,14 +456,14 @@ def recover_MG_DH2(px, py, pz, E, MASS, pdg):
 
 def kinemamtics_MG_DH2(MG_px_DH2,MG_py_DH2,MG_pz_DH2,MG_E_DH2):
 
-    MG_vx_DH2 = (MG_px_DH2*c**2)/MG_E_DH2
+    MG_vx_DH2 = (MG_px_DH2*c**2)/MG_E_DH2 #compute the velocities in each direction
     MG_vy_DH2 = (MG_py_DH2*c**2)/MG_E_DH2
     MG_vz_DH2 = (MG_pz_DH2*c**2)/MG_E_DH2
-    MG_beta_DH2 = np.sqrt(MG_vx_DH2**2 + MG_vy_DH2**2 + MG_vz_DH2**2)/c
-    MG_gamma_DH2 = 1/(np.sqrt(1-MG_beta_DH2**2))
+    MG_beta_DH2 = np.sqrt(MG_vx_DH2**2 + MG_vy_DH2**2 + MG_vz_DH2**2)/c # compute beta
+    MG_gamma_DH2 = 1/(np.sqrt(1-MG_beta_DH2**2)) # compute gamma
 
-    MG_pT_DH2 = np.sqrt(MG_px_DH2**2 + MG_py_DH2**2)*c
-    MG_eta_DH2 = np.arctanh(MG_pz_DH2/(np.sqrt(MG_px_DH2**2 + MG_py_DH2**2 + MG_pz_DH2**2)))
+    MG_pT_DH2 = np.sqrt(MG_px_DH2**2 + MG_py_DH2**2)*c # compute the transverse momenta
+    MG_eta_DH2 = np.arctanh(MG_pz_DH2/(np.sqrt(MG_px_DH2**2 + MG_py_DH2**2 + MG_pz_DH2**2))) # compute the pseudorapidity
 
     return MG_pT_DH2,MG_eta_DH2, MG_gamma_DH2
 
@@ -477,13 +486,13 @@ def decaylenght_MG_DH1(MG_px_DH1, MG_py_DH1, MG_pz_DH1, E_DH1, MG_gamma_DH1, tau
         MG_Lxy_DH1 = []
 
         for i in range(len(MG_gamma_DH1)):
-            MG_lt = lifetime(tauN[ctau])
-            MG_Lx_DH1.append((MG_px_DH1[i]/E_DH1[i])*c**2 * MG_lt * MG_gamma_DH1[i])
+            MG_lt = lifetime(tauN[ctau]) # set the mean lifetime
+            MG_Lx_DH1.append((MG_px_DH1[i]/E_DH1[i])*c**2 * MG_lt * MG_gamma_DH1[i]) # compute the decay lenght in x,y,z
             MG_Ly_DH1.append((MG_py_DH1[i]/E_DH1[i])*c**2 * MG_lt * MG_gamma_DH1[i])
             MG_Lz_DH1.append((abs(MG_pz_DH1[i])/E_DH1[i])*c**2 * MG_lt  * MG_gamma_DH1[i] )
-            MG_Lxy_DH1.append(np.sqrt((MG_Lx_DH1[i])**2 + (MG_Ly_DH1[i])**2))
+            MG_Lxy_DH1.append(np.sqrt((MG_Lx_DH1[i])**2 + (MG_Ly_DH1[i])**2)) # compute the transverse decay lenght
 
-        MG_Lx_tot_DH1.append(MG_Lx_DH1)
+        MG_Lx_tot_DH1.append(MG_Lx_DH1) # convertion into arrays
         MG_Ly_tot_DH1.append(MG_Ly_DH1)
         MG_Lz_tot_DH1.append(MG_Lz_DH1)
         MG_Lxy_tot_DH1.append(MG_Lxy_DH1)
@@ -509,11 +518,11 @@ def decaylenght_MG_DH2(MG_px_DH2, MG_py_DH2, MG_pz_DH2, E_DH2, MG_gamma_DH2, tau
         MG_Lxy_DH2 = []
 
         for i in range(len(MG_gamma_DH2)):
-            MG_lt = lifetime(tauN[ctau])
-            MG_Lx_DH2.append((MG_px_DH2[i]/E_DH2[i])*c**2 * MG_lt * MG_gamma_DH2[i])
+            MG_lt = lifetime(tauN[ctau]) # set the mean lifetime
+            MG_Lx_DH2.append((MG_px_DH2[i]/E_DH2[i])*c**2 * MG_lt * MG_gamma_DH2[i]) # compute the decay lenght in x,y,z
             MG_Ly_DH2.append((MG_py_DH2[i]/E_DH2[i])*c**2 * MG_lt * MG_gamma_DH2[i])
             MG_Lz_DH2.append((abs(MG_pz_DH2[i])/E_DH2[i])*c**2 * MG_lt  * MG_gamma_DH2[i] )
-            MG_Lxy_DH2.append(np.sqrt((MG_Lx_DH2[i])**2 + (MG_Ly_DH2[i])**2))
+            MG_Lxy_DH2.append(np.sqrt((MG_Lx_DH2[i])**2 + (MG_Ly_DH2[i])**2)) # compute the transverse decay lenght
 
         MG_Lx_tot_DH2.append(MG_Lx_DH2)
         MG_Ly_tot_DH2.append(MG_Ly_DH2)
@@ -526,7 +535,7 @@ def decaylenght_MG_DH2(MG_px_DH2, MG_py_DH2, MG_pz_DH2, E_DH2, MG_gamma_DH2, tau
 # Computation of the efficiency with the map from the data obtained with MG for the high-ET samples (mH <= 400GeV).
 #########################################################################################
 
-def eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN, nevent):
+def eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN, nevent, mass_phi, mass_s):
 
     MG_eff_highETX = []
 
@@ -545,9 +554,12 @@ def eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_
                                                             abs(MG_pdg_DH2_1[iEvent]),
                                                             selection = "high-ET"))
         MG_eff_highETX.append(sum(MG_queryMapResult))
-    MG_queryMapResult = np.array(MG_queryMapResult)
-    MG_eff_highETX = np.array(MG_eff_highETX)
+    MG_queryMapResult = np.array(MG_queryMapResult) # convertion into arrays
+    MG_eff_highETX = np.array(MG_eff_highETX) # convertion into arrays
     MG_eff_highETX = MG_eff_highETX/nevent #eff/nbrevent
+
+    MG_Data_Eff_High = np.column_stack(MG_eff_highETX)
+    np.savetxt(f'./Plots_High/Text_files_High/Efficiencies_Text_{mass_phi}_{mass_s}.txt', MG_Data_Eff_High)
 
     return MG_eff_highETX
 
@@ -555,7 +567,7 @@ def eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_
 # Computation of the efficiency with the map from the data obtained with MG for the low-ET samples (mH <= 400GeV).
 #########################################################################################
 
-def eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN, nevent):
+def eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN, nevent, mass_phi, mass_s):
 
     MG_eff_lowETX = []
 
@@ -574,9 +586,12 @@ def eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_D
                                                             abs(MG_pdg_DH2_1[iEvent]),
                                                             selection = "low-ET"))
         MG_eff_lowETX.append(sum(MG_queryMapResult))
-    MG_queryMapResult = np.array(MG_queryMapResult)
-    MG_eff_lowETX = np.array(MG_eff_lowETX)
+    MG_queryMapResult = np.array(MG_queryMapResult) # convertion into arrays
+    MG_eff_lowETX = np.array(MG_eff_lowETX) # convertion into arrays
     MG_eff_lowETX = MG_eff_lowETX/nevent #eff/nbrevent
+
+    MG_Data_Eff_Low = np.column_stack(MG_eff_lowETX)
+    np.savetxt(f'./Plots_Low/Text_files_Low/Efficiencies_Text_{mass_phi}_{mass_s}.txt', MG_Data_Eff_Low)
 
     return MG_eff_lowETX
 
@@ -594,10 +609,13 @@ def eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_D
 
 def elem_list(HEP, Branch_HEP):
 
-    file_HEP = uproot.open(HEP) # name of the HEP file
-    data_HEP = file_HEP[Branch_HEP] # name of the HEP file
+    file_HEP = uproot.open(HEP) # open the file from HEP data for the efficiency
+    data_HEP = file_HEP[Branch_HEP] # open the branch
 
-    return data_HEP
+    file_HEP_limit = uproot.open(File_HEP_limit) # open the file from HEP data for the limits
+    branch_HEP_limit = file_HEP_limit[Branch_HEP_limit] # open the branch
+
+    return data_HEP, branch_HEP_limit
 
 #########################################################################################
 # Plots to compare the results of efficiency obtained with MG, MG+Pythia8 (High-ET).
@@ -605,19 +623,19 @@ def elem_list(HEP, Branch_HEP):
 
 def plt_eff_high(MG_eff_highETX, eff_highETX,tauN, data_HEP,  mass_phi , mass_s):
 
-    ## PLOT EFFICIENCY ##
+    ################## PLOT EFFICIENCY ##################
     fig, ax = plt.subplots()
 
-    # Plot MG ##################
+    ################## Plot efficiency from MG ##################
     plt.plot(tauN,MG_eff_highETX, 'k--', linewidth=2, label = 'MG')
 
-    #Plot pythia eff ##################
+    ################## Plot efficiency from MG+Pythia8 ##################
     plt.plot(tauN,eff_highETX, 'r', linewidth=2, label = 'MG + Pythia')
 
-    ################## HEP ##################
+    ################## Plot efficiency from HEP data ##################
     plt.plot(data_HEP.values(axis='both')[0],data_HEP.values(axis='both')[1], 'b')
 
-    ################ Errors from HEP ##################
+    ################ Uncertainties from HEP ##################
     plt.fill_between(data_HEP.values(axis='both')[0], data_HEP.values(axis='both')[1] +  data_HEP.errors('high')[1] , data_HEP.values(axis='both')[1] - data_HEP.errors('high')[1] , color = 'blue', label = r'ATLAS, with $\pm$ 1 $\sigma$ error bands',alpha=.7)
 
     ################## Uncertainties from Map ##################
@@ -633,8 +651,8 @@ def plt_eff_high(MG_eff_highETX, eff_highETX,tauN, data_HEP,  mass_phi , mass_s)
     plt.xscale('log')
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)
     plt.ylabel('Efficiency', fontsize=20 )
-    plt.legend(fontsize = 11, loc=1)
-    plt.savefig(f"./Plots/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
+    plt.legend(fontsize = 11, loc=1) # set the legend in the upper right corner
+    plt.savefig(f"./Plots_High/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
     plt.close()
 
 
@@ -644,19 +662,19 @@ def plt_eff_high(MG_eff_highETX, eff_highETX,tauN, data_HEP,  mass_phi , mass_s)
 
 def plt_eff_low(MG_eff_lowETX, eff_lowETX,tauN, data_HEP,  mass_phi , mass_s):
 
-    ## PLOT EFFICIENCY ##
+    ################## PLOT EFFICIENCY ##################
     fig, ax = plt.subplots()
 
-    ################## Plot MG ##################
+    ################## Plot efficiency from MG ##################
     plt.plot(tauN,MG_eff_lowETX, 'k--',linewidth=2, label = 'MG')
 
-    ################## Plot pythia eff ##################
+    ################## Plot efficiency from MG+Pythia8 ##################
     plt.plot(tauN,eff_lowETX, 'r', linewidth=2 ,label = 'MG + Pythia')
 
-    ################## hep ##################
+    ################## Plot efficiency from HEP data ##################
     plt.plot(data_HEP.values(axis='both')[0],data_HEP.values(axis='both')[1], 'b')
 
-    ################## Errors from HEP ##################
+    ################ Uncertainties from HEP ##################
     plt.fill_between(data_HEP.values(axis='both')[0], data_HEP.values(axis='both')[1] +  data_HEP.errors('high')[1] , data_HEP.values(axis='both')[1] - data_HEP.errors('high')[1] , color = 'blue', label = r'ATLAS, with $\pm$ 1 $\sigma$ error bands',alpha=.7)
 
     ################## Uncertainties from Map ##################
@@ -672,25 +690,24 @@ def plt_eff_low(MG_eff_lowETX, eff_lowETX,tauN, data_HEP,  mass_phi , mass_s):
     plt.xscale('log')
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)
     plt.ylabel('Efficiency', fontsize=20 )
-    plt.legend( fontsize = 10, loc=1)
-    plt.savefig(f"./Plots/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
+    plt.legend( fontsize = 10, loc=1) # set the legend in the upper right corner
+    plt.savefig(f"./Plots_Low/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
     plt.close()
 
 #########################################################################################
-# Plot limits obtained with the map, to those obtain by ATLAS (High-ET).
+# Plot limits obtained with the map, to compare with those obtain by ATLAS (High-ET).
 #########################################################################################
 
-def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, data_HEP):
+def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit):
 
     fig, ax = plt.subplots()
 
     Nsobs = 0.5630 * 26 # nbr of observed events = 26
 
     Crr_Sec_obs = (Nsobs)/((np.array(eff_highETX)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
-    Crr_Sec_obs_HEP = (Nsobs)/((np.array(data_HEP.values(axis='both')[1])) * 139e3 )
 
     plt.plot(tauN, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)
-    plt.plot(tauN, Crr_Sec_obs_HEP, 'b', label ='Observed', linewidth = 2)
+    plt.plot(tauN, np.array(branch_HEP_limit.values(axis='both')[1]), 'b', label ='Observed', linewidth = 2)
 
     plt.xscale('log')
     plt.yscale('log')
@@ -702,36 +719,23 @@ def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, data_HEP):
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     plt.legend( fontsize = 10, loc=3)
-    plt.savefig(f"./Plots/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
+    plt.savefig(f"./Plots_High/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
     plt.close()
 
 #########################################################################################
 # Plot limits obtained with the map, to those obtain by ATLAS (Low-ET).
 #########################################################################################
 
-def plt_cross_Low(eff_lowETX , tauN, mass_H, mass_DH, data_HEP):
+def plt_cross_Low(eff_lowETX , tauN, , mass_phi, mass_s, branch_HEP_limit):
 
     fig, ax = plt.subplots()
 
-
     Nsobs = 0.5630 * 26 # nbr of observed events = 26
 
-    crr_Sec = []
-    crr_Sec_HEP = []
-    ctau = []
-
     Crr_Sec_obs = (Nsobs)/((np.array(eff_lowETX)) * 139e3 )
-    Crr_Sec_obs_HEP = (Nsobs)/((np.array(data_HEP.values(axis='both')[1])) * 139e3 )
 
-    for i in range(len(Crr_Sec_obs)):
-        if Crr_Sec_obs_HEP[i] < 10**4:
-            crr_Sec_HEP.append(Crr_Sec_obs_HEP[i])
-            crr_Sec.append(Crr_Sec_obs[i])
-            ctau.append(tauN[i])
-
-    plt.plot(ctau, crr_Sec, 'r', label ='Map results', linewidth = 2)
-    plt.plot(ctau, crr_Sec_HEP, 'b', label ='Observed', linewidth = 2)
-
+    plt.plot(ctau, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)
+    plt.plot(tauN, np.array(branch_HEP_limit.values(axis='both')[1]), 'b', label ='Observed', linewidth = 2)
 
     plt.xscale('log')
     plt.yscale('log')
@@ -743,6 +747,6 @@ def plt_cross_Low(eff_lowETX , tauN, mass_H, mass_DH, data_HEP):
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     plt.legend( fontsize = 10, loc=3)
-    plt.savefig(f"./Plots/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
+    plt.savefig(f"./Plots_Low/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
     plt.close()
 

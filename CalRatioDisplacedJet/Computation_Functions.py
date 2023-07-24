@@ -736,7 +736,7 @@ def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit, factor
 # Plot limits obtained with the map, to those obtain by ATLAS (Low-ET).
 #########################################################################################
 
-def plt_cross_Low(eff_lowETX , tauN, , mass_phi, mass_s, branch_HEP_limit, factor):
+def plt_cross_Low(eff_lowETX , tauN, mass_phi, mass_s, branch_HEP_limit, factor):
 
     fig, ax = plt.subplots()
 

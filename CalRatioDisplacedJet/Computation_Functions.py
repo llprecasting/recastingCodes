@@ -641,12 +641,16 @@ def plt_eff_high(MG_eff_highETX, eff_highETX,tauN, data_HEP,  mass_phi , mass_s)
     ################## Uncertainties from Map ##################
     plt.fill_between(tauN, np.array(eff_highETX) + 0.25* np.array(eff_highETX), np.array(eff_highETX) - 0.25 * np.array(eff_highETX), label='MG+Pythia8, with error bands ', alpha=.7)
 
-    ################## Limits of validation ##################
-    ax.hlines(y=(0.25*(max(eff_highETX))), xmin=0, xmax=1e2, linewidth=2, color='g', label = 'Limits of validation' )
+    ################## Limits of validity ##################
+    ax.hlines(y=(0.25*(max(eff_highETX))), xmin=0, xmax=1e2, linewidth=2, color='g', label = 'Limits of validity' )
 
     # place a text box in upper left in axes coords
     props = dict(boxstyle='round', facecolor='white', alpha=0.5)
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+
+    x = np.linspace(0,100)
+    ax.fill_between(x, 0.25*(max(eff_lowETX)), color='black', alpha=.2, hatch="/", edgecolor="black", linewidth=1.0) # adding hatch
+    plt.ylim(0) # start at 0
 
     plt.xscale('log')
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)
@@ -680,12 +684,16 @@ def plt_eff_low(MG_eff_lowETX, eff_lowETX,tauN, data_HEP,  mass_phi , mass_s):
     ################## Uncertainties from Map ##################
     plt.fill_between(tauN, np.array(eff_lowETX) + 0.25* np.array(eff_lowETX), np.array(eff_lowETX) - 0.25*np.array(eff_lowETX), label='MG+Pythia8, with error bands ',alpha=.7)
 
-    ################## Limits of validation ##################
-    ax.hlines(y=(0.33*(max(eff_lowETX))), xmin=0, xmax=1e2, linewidth=2, color='g', label = 'Limits of validation' )
+    ################## Limits of validity ##################
+    ax.hlines(y=(0.33*(max(eff_lowETX))), xmin=0, xmax=1e2, linewidth=2, color='g', label = 'Limits of validity' )
 
     # place a text box in upper left in axes coords
     props = dict(boxstyle='round', facecolor='white', alpha=0.5)
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+
+    x = np.linspace(0,100)
+    ax.fill_between(x, 0.33*(max(eff_lowETX)), color='black', alpha=.2, hatch="/", edgecolor="black", linewidth=1.0) # adding hatch
+    plt.ylim(0) # start at 0
 
     plt.xscale('log')
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)

@@ -33,18 +33,17 @@ Branch_HEP_limit = ["Figure 6f of Aux. Mat./Graph1D_y1;1","Figure 6b of Aux. Mat
 
 #Constant
 c = 3e8# Light velocity in m/s
-tauN=np.geomspace(0.1,1e2,99) # New lifetime range
 
 Mass_phi = [1000,600,400, 200, 125] # Heavy Neutral Boson mass
 Mass_s = [275,150,100, 50, 55] # LLP mass (DH = Dark Higgs)
 Nevent = [10000,10000,10000,50000,50000] # Nbr of events
 HEP_Lifetime = [95,98,98,73,62]
 Factor = [1,1,1,1,0.0048]
-
 os.system("mkdir -p Plots_High")
 os.system("mkdir -p Plots_Low")
 
 count=0
+tauN=np.geomspace(0.1,1e2,HEP_Lifetime[count]) # New lifetime range
 for file_selection, MG_file_selection,mass_phi,mass_s, nevent, factor in zip(File_selection, MG_File_selection, Mass_phi,Mass_s, Nevent, Factor):
 
     #Pythia

@@ -286,7 +286,7 @@ def eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, 
     eff_highETX = np.array(eff_highETX) #convertion into array
     eff_highETX = eff_highETX/nevent #efficiency/(nbr of event)
 
-    Data_Eff_High = np. np.column_stack(eff_highETX)
+    Data_Eff_High = np.column_stack(eff_highETX)
     np.savetxt(f'./Plots_High/Efficiencies_Text_{mass_phi}_{mass_s}.txt', Data_Eff_High)
 
     return eff_highETX
@@ -318,7 +318,7 @@ def eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, pdg_tot_DH1, pT_DH2, e
     eff_lowETX = np.array(eff_lowETX) #convertion into array
     eff_lowETX = eff_lowETX/nevent #efficiency/(nbr of event)
 
-    Data_Eff_Low = np. np.column_stack(eff_lowETX)
+    Data_Eff_Low = np.column_stack(eff_lowETX)
     np.savetxt(f'./Plots_Low/Efficiencies_Text_{mass_phi}_{mass_s}.txt', Data_Eff_Low)
 
     return eff_lowETX

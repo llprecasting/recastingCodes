@@ -39,12 +39,13 @@ Mass_phi = [1000,600,400, 200, 125] # Heavy Neutral Boson mass
 Mass_s = [275,150,100, 50, 55] # LLP mass (DH = Dark Higgs)
 Nevent = [10000,10000,10000,50000,50000] # Nbr of events
 HEP_Lifetime = [95,98,98,73,62]
+Factor = [1,1,1,1,0.0048]
 
 os.system("mkdir -p Plots_High")
 os.system("mkdir -p Plots_Low")
 
 count=0
-for file_selection, MG_file_selection,mass_phi,mass_s, nevent in zip(File_selection, MG_File_selection, Mass_phi,Mass_s, Nevent):
+for file_selection, MG_file_selection,mass_phi,mass_s, nevent, factor in zip(File_selection, MG_File_selection, Mass_phi,Mass_s, Nevent, Factor):
 
     #Pythia
     events = hepmc.HEPMC_EventFile(file_selection) # Open HEPMC file
@@ -79,11 +80,11 @@ for file_selection, MG_file_selection,mass_phi,mass_s, nevent in zip(File_select
         MG_eff_highETX = cmfp.eff_map_MG_high(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN, nevent,  mass_phi, mass_s) # Compute the efficiency from MG
         eff_highETX = cmfp.eff_map_High(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, abs(pdg_tot_DH1), pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, abs(pdg_tot_DH2), tauN, nevent,  mass_phi, mass_s) # Compute the efficiency from Pythia
         cmfp.plt_eff_high(MG_eff_highETX, eff_highETX, tauN, data_HEP, mass_phi, mass_s ) # Ploting and saving a comparison of all the results of efficiencies
-        cmfp.plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit)# Ploting and saving a comparison of the limits obtained with the map and by ATLAS.
+        cmfp.plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit, factor)# Ploting and saving a comparison of the limits obtained with the map and by ATLAS.
 
     else:
         MG_eff_lowETX = cmfp.eff_map_MG_low(MG_pT_DH1, MG_eta_DH1,MG_Lxy_tot_DH1, MG_Lz_tot_DH1, MG_pdg_DH1_1, MG_pT_DH2, MG_eta_DH2, MG_Lxy_tot_DH2, MG_Lz_tot_DH2, MG_pdg_DH2_1, tauN, nevent, mass_phi, mass_s)
         eff_lowETX = cmfp.eff_map_Low(pT_DH1, eta_DH1, Lxy_tot_DH1, Lz_tot_DH1, abs(pdg_tot_DH1), pT_DH2, eta_DH2, Lxy_tot_DH2, Lz_tot_DH2, abs(pdg_tot_DH2), tauN, nevent, mass_phi, mass_s)
         cmfp.plt_eff_low(MG_eff_lowETX, eff_lowETX, tauN, data_HEP, mass_phi, mass_s )
-        cmfp.plt_cross_low(eff_lowETX, tauN, mass_phi, mass_s, branch_HEP_limit)
+        cmfp.plt_cross_low(eff_lowETX, tauN, mass_phi, mass_s, branch_HEP_limit, factor)
     count+=1

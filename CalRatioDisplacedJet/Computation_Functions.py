@@ -708,11 +708,11 @@ def plt_eff_low(MG_eff_lowETX, eff_lowETX,tauN, data_HEP,  mass_phi , mass_s):
 # Plot limits obtained with the map, to compare with those obtain by ATLAS (High-ET).
 #########################################################################################
 
-def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit):
+def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit, factor):
 
     fig, ax = plt.subplots()
 
-    Nsobs = 0.5630 * 26 # nbr of observed events = 26 ( factor )
+    Nsobs = 0.5630 * 26 * factor # nbr of observed events = 26 ( factor )
 
     Crr_Sec_obs = (Nsobs)/((np.array(eff_highETX)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
 
@@ -736,11 +736,11 @@ def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit):
 # Plot limits obtained with the map, to those obtain by ATLAS (Low-ET).
 #########################################################################################
 
-def plt_cross_Low(eff_lowETX , tauN, , mass_phi, mass_s, branch_HEP_limit):
+def plt_cross_Low(eff_lowETX , tauN, , mass_phi, mass_s, branch_HEP_limit, factor):
 
     fig, ax = plt.subplots()
 
-    Nsobs = 0.5630 * 26 # nbr of observed events = 26
+    Nsobs = 0.5630 * 26 * factor # nbr of observed events = 26
 
     Crr_Sec_obs = (Nsobs)/((np.array(eff_lowETX)) * 139e3 )
 

@@ -4,11 +4,9 @@ To process the recasting, please follow those instructions
 
 - In the same folder, download and place the model named : HAHM_MG5model_v3 from http://insti.physics.sunysb.edu/~curtin/hahm_mg.html. Extract the tarball in the MG5_aMC_v3_4_2 folder.
 
-- You will also need to download some files from HEP data from : https://www.hepdata.net/record/ins2043503?version=3\&table=Table\%201 ( They should be already there if you have downloaded all the files on github.
-) and add them in a folder named ' ATLAS_data ' which will be in your MG5_aMC_v3_4_2 folder.
+- You will also need the folder 'ATLAS_data' in this github repository and place this folder in your MG5_aMC_v3_4_2 folder. It contains files from HEP_Data from the ATLAS public results.
 
-
-- Launch madgraph by writing, in a konsole launched in the MG5_aMC_v3_4_2 folder : ./bin/mg5_aMC
+- Launch madgraph by writing, in a konsole (launched in the MG5_aMC_v3_4_2 folder) : ./bin/mg5_aMC
 
 - After entering in the MG konsole, install LHAPDF6 and Pythia8 by writing :
 

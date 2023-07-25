@@ -14,7 +14,7 @@ MG5_aMC> install lhapdf6
 
 And after :
 
-MG5_aMC> install Pythia8
+MG5_aMC> install pythia8
 
 It will take some minutes. You will also need to convert the model file by writing :
 

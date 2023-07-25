@@ -16,7 +16,9 @@ random.seed(123)
 hep.style.use("ATLAS")
 
 # set cst
-c = 3e8# Light velocity in m/s.
+c = 3e8# Light velocity in m/s
+
+#All plots are made with 10 000 events, if you want to try with other numbers of events, you will have to change the number of events in lines 285-314-551-580 for the calculation of the efficiency.
 
 #########################################################################################
 #Parsing the hepmc file from the hadronization of the MG outputs to recover the data from the process.

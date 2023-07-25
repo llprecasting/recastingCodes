@@ -701,8 +701,8 @@ def plt_eff_low(MG_eff_lowETX, eff_lowETX,tauN, data_HEP,  mass_phi , mass_s):
     plt.xlabel(r'c$\tau$ [m]', fontsize=20)
     plt.ylabel('Efficiency', fontsize=20 )
     plt.legend( fontsize = 10, loc=1) # set the legend in the upper right corner
-    plt.savefig(f"./Plots_Low/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png")
-    plt.close()
+    plt.savefig(f"./Plots_Low/Efficiency_comparison_mH{mass_phi}_mS{mass_s}.png") # save the plot
+    plt.close()fig
 
 #########################################################################################
 # Plot limits obtained with the map, to compare with those obtain by ATLAS (High-ET).
@@ -712,12 +712,12 @@ def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit, factor
 
     fig, ax = plt.subplots()
 
-    Nsobs = 0.5630 * 26 * factor # nbr of observed events = 26 ( factor )
+    Nsobs = 0.5630 * 26 * factor # nbr of observed events = 26
 
     Crr_Sec_obs = (Nsobs)/((np.array(eff_highETX)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
 
-    plt.plot(tauN, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)
-    plt.plot(tauN, np.array(branch_HEP_limit.values(axis='both')[1]), 'b', label ='Observed', linewidth = 2)
+    plt.plot(tauN, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2) # Cross section results from the map
+    plt.plot(tauN, np.array(branch_HEP_limit.values(axis='both')[1]), 'b', label ='Observed', linewidth = 2) # Cross section results from ATLAS
 
     plt.xscale('log')
     plt.yscale('log')
@@ -729,7 +729,7 @@ def plt_cross_High(eff_highETX, tauN, mass_phi, mass_s, branch_HEP_limit, factor
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     plt.legend( fontsize = 10, loc=3)
-    plt.savefig(f"./Plots_High/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
+    plt.savefig(f"./Plots_High/Cross_section_mH{mass_phi}_mS{mass_s}.png") # Save the plot
     plt.close()
 
 #########################################################################################
@@ -744,8 +744,8 @@ def plt_cross_Low(eff_lowETX , tauN, mass_phi, mass_s, branch_HEP_limit, factor)
 
     Crr_Sec_obs = (Nsobs)/((np.array(eff_lowETX)) * 139e3 )
 
-    plt.plot(ctau, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)
-    plt.plot(tauN, np.array(branch_HEP_limit.values(axis='both')[1]), 'b', label ='Observed', linewidth = 2)
+    plt.plot(ctau, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)# Cross section results from the map
+    plt.plot(tauN, np.array(branch_HEP_limit.values(axis='both')[1]), 'b', label ='Observed', linewidth = 2) # Cross section results from ATLAS
 
     plt.xscale('log')
     plt.yscale('log')
@@ -757,6 +757,6 @@ def plt_cross_Low(eff_lowETX , tauN, mass_phi, mass_s, branch_HEP_limit, factor)
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     plt.legend( fontsize = 10, loc=3)
-    plt.savefig(f"./Plots_Low/Cross_section_mH{mass_phi}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
+    plt.savefig(f"./Plots_Low/Cross_section_mH{mass_phi}_mS{mass_s}.png") # Save the plot
     plt.close()
 

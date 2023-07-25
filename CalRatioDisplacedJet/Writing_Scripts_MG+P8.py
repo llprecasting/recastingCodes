@@ -10,7 +10,7 @@ for i in range(len(masses_phi)):
         f = open(f"script_mH{masses_phi[i]}_mS{masses_S[i]}.txt", 'w') # Creation of the Script to follow for MG.
         f.write(f"import model ./HAHM_MG5model_v3/HAHM_variableMW_v3_UFO \n") # Import the model.
         f.write(f"define f = u c d s u~ c~ d~ s~ b b~ e+ e- mu+ mu- ta+ ta- t t~ \n") # Define a fermion.
-        f.write(f"generate g g > h HIG=1 HIW=0 QED=0 QCD=0, (h > h2 h2, h2 > f f) \n") # Generate the process studied.
+        f.write(f"generate g g > h HIG=1 HIW=0 QED=0 QCD=0, (h > h2 h2, h2 > f f) \n") # Generate the process.
         f.write(f"output Script_mH{masses_phi[i]}_mS{masses_S[i]} \n")
         f.write(f"launch Script_mH{masses_phi[i]}_mS{masses_S[i]} \n")
         f.write(f"1 \n") #Add Pythia

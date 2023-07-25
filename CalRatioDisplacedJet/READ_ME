@@ -1,4 +1,4 @@
-To process the recasting, please follow those instructions
+To process the recasting, please follow these instructions.
 
 - First of all, you will need to install this version of madgraph : MG5_aMC_v3.4.2.tar.gz from : https://launchpad.net/mg5amcnlo/+download
 
@@ -16,11 +16,13 @@ And after :
 
 MG5_aMC> install pythia8
 
-It will take some minutes. You will also need to convert the model file by writing :
+It will take some minutes.
+
+- You will also need to convert the model file by writing :
 
 MG5_aMC> convert model ./HAHM_MG5model_v3/HAHM_variableMW_v3_UFO
 
-MG is ready to generate events on your computer !
+MG is ready to generate events on your computer ! To continu, please be sure that everything that you download from the GitHub repository should be IN the folder MG5_aMC_v3_4_2 ( where is your madgraph )
 
 - Now, you can generate the scripts that MG will read by launching the function Writing_Scripts_MG+P8.py in the konsole with :
 

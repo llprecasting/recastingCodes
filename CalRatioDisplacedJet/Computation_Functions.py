@@ -175,7 +175,7 @@ def kinematics_DH1(px_DH1, py_DH1, pz_DH1, E_DH1):
 # Computation of the kinematics variable for LLP2 (velocities, beta, gamma, pT the transverse momenta, eta the pseudo-rapidity).
 #########################################################################################
 
-def kinemamtics_DH2(px_DH2, py_DH2, pz_DH2, E_DH2):
+def kinematics_DH2(px_DH2, py_DH2, pz_DH2, E_DH2):
 
     vx_DH2 = (px_DH2*c**2)/E_DH2 #compute the velocities in each direction
     vy_DH2 = (py_DH2*c**2)/E_DH2
@@ -651,7 +651,7 @@ def plt_eff_high(MG_eff_highETX, eff_highETX,tauN, data_HEP,  mass_phi , mass_s)
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_phi} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     x = np.linspace(0,100)
-    ax.fill_between(x, 0.25*(max(eff_lowETX)), color='black', alpha=.2, hatch="/", edgecolor="black", linewidth=1.0) # adding hatch
+    ax.fill_between(x, 0.25*(max(eff_highETX)), color='black', alpha=.2, hatch="/", edgecolor="black", linewidth=1.0) # adding hatch
     plt.ylim(0) # start at 0
 
     plt.xscale('log')

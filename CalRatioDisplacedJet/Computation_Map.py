@@ -43,8 +43,8 @@ os.system("mkdir -p Plots_High")
 os.system("mkdir -p Plots_Low")
 
 count=0
-tauN=np.geomspace(0.1,1e2,HEP_Lifetime[count]) # New lifetime range
 for file_selection, MG_file_selection,mass_phi,mass_s, nevent, factor in zip(File_selection, MG_File_selection, Mass_phi,Mass_s, Nevent, Factor):
+    tauN=np.geomspace(0.1,1e2,HEP_Lifetime[count]) # New lifetime range
 
     #Pythia
     events = hepmc.HEPMC_EventFile(file_selection) # Open HEPMC file
@@ -52,7 +52,7 @@ for file_selection, MG_file_selection,mass_phi,mass_s, nevent, factor in zip(Fil
     px_tot, py_tot, pz_tot, E_tot, mass_tot, pdg_tot = cmfp.conversion_one_list(px_TOT, py_TOT, pz_TOT, E_TOT, mass_TOT, pdg_TOT) # Obtaining data in one list
     px_DH1, px_DH2, py_DH1, py_DH2, pz_DH1, pz_DH2, pdg_tot_DH1, pdg_tot_DH2, E_DH1, E_DH2, mass_DH1, mass_DH2 = cmfp.recover(px_tot, py_tot, pz_tot, E_tot, mass_tot, pdg_tot) # Separate data from DH1 and DH2
     beta_DH1, gamma_DH1, pT_DH1, eta_DH1 = cmfp.kinematics_DH1(px_DH1, py_DH1, pz_DH1, E_DH1) # Computing kinematics for DH1
-    beta_DH2, gamma_DH2, pT_DH2, eta_DH2 = cmfp.kinemamtics_DH2(px_DH2, py_DH2, pz_DH2, E_DH2) # Computing kinematics for DH2
+    beta_DH2, gamma_DH2, pT_DH2, eta_DH2 = cmfp.kinematics_DH2(px_DH2, py_DH2, pz_DH2, E_DH2) # Computing kinematics for DH2
     Lxy_tot_DH1, Lz_tot_DH1 = cmfp.decaylenghtDH1(px_DH1, py_DH1, pz_DH1, E_DH1, gamma_DH1, tauN) # Computing the decay lenght for DH1
     Lxy_tot_DH2, Lz_tot_DH2 = cmfp.decaylenghtDH2(px_DH2, py_DH2, pz_DH2, E_DH2, gamma_DH2, tauN) # Computing the decay lenght for DH2
 
@@ -67,7 +67,7 @@ for file_selection, MG_file_selection,mass_phi,mass_s, nevent, factor in zip(Fil
     MG_Lxy_tot_DH2, MG_Lz_tot_DH2 = cmfp.decaylenght_MG_DH2(MG_px_DH2, MG_py_DH2, MG_pz_DH2, E_DH2, MG_gamma_DH2, tauN) # Computing decay lenght for DH2
 
     #HEP data
-    data_HEP = cmfp.elem_list(File_HEP[count], Branch_HEP[count], File_HEP_limit[count], Branch_HEP_limit[count]) # Recover public data from ATLAS to compare the results
+    data_HEP, branch_HEP_limit = cmfp.elem_list(File_HEP[count], Branch_HEP[count], File_HEP_limit[count], Branch_HEP_limit[count]) # Recover public data from ATLAS to compare the results
 
 ############################################################################################################################################################################
 ############################################################################################################################################################################

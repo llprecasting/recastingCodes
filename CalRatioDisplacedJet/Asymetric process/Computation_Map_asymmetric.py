@@ -17,17 +17,17 @@ import os
 random.seed(123)
 hep.style.use("ATLAS") # Define a style for the plots
 
-File_selection = ["./Script_Asymetric_mZp300_mS200/Events/run_01/tag_1_pythia8_events.hepmc.gz", "./Script_Asymetric_mZp150_mS100/Events/run_01/tag_1_pythia8_events.hepmc.gz","./Script_Asymetric_mZp110_mS80/Events/run_01/tag_1_pythia8_events.hepmc.gz", "./Script_Asymetric_mZp80_mS50/Events/run_01/tag_1_pythia8_events.hepmc.gz", "./Script_Asymetric_mZp40_mS5/Events/run_01/tag_1_pythia8_events.hepmc.gz"] # file that Pythia8 outputs
+File_selection = ["./Script_Asymetric_mZp300_mS200/Events/run_01/tag_1_pythia8_events.hepmc.gz", "./Script_Asymetric_mZp150_mS100/Events/run_01/tag_1_pythia8_events.hepmc.gz","./Script_Asymetric_mZp110_mS80/Events/run_01/tag_1_pythia8_events.hepmc.gz", "./Script_Asymetric_mZp80_mS50/Events/run_01/tag_1_pythia8_events.hepmc.gz"] # file that Pythia8 outputs
 
-MG_File_selection = ['./Script_Asymetric_mZp300_mS200/Events/run_01/unweighted_events.lhe.gz', './Script_Asymetric_mZp150_mS100/Events/run_01/unweighted_events.lhe.gz', './Script_Asymetric_mZp110_mS80/Events/run_01/unweighted_events.lhe.gz', './Script_Asymetric_mZp80_mS50/Events/run_01/unweighted_events.lhe.gz' ,'./Script_Asymetric_mZp40_mS5/Events/run_01/unweighted_events.lhe.gz' ] # file that MadGraph outputs
+MG_File_selection = ['./Script_Asymetric_mZp300_mS200/Events/run_01/unweighted_events.lhe.gz', './Script_Asymetric_mZp150_mS100/Events/run_01/unweighted_events.lhe.gz', './Script_Asymetric_mZp110_mS80/Events/run_01/unweighted_events.lhe.gz', './Script_Asymetric_mZp80_mS50/Events/run_01/unweighted_events.lhe.gz'] # file that MadGraph outputs
 
 #Constant
 c = 3e8# Light velocity in m/s
 
-Mass_Zp = [300,150,110, 80, 40] # Heavy Neutral Boson mass
-Mass_s = [200,100,80, 50, 5] # LLP mass (DH = Dark Higgs)
-Nevent = [10000,10000,10000,10000,10000] # Nbr of events
-Factor = [1,1,1,1,1]
+Mass_Zp = [300,150,110, 80] # Heavy Neutral Boson mass
+Mass_s = [200,100,80, 50] # LLP mass (DH = Dark Higgs)
+Nevent = [10000,10000,10000,10000] # Nbr of events
+Factor = [1,1,1,1]
 os.system("mkdir -p Plots_High")
 os.system("mkdir -p Plots_Low")
 

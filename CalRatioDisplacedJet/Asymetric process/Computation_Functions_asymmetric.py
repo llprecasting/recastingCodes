@@ -656,7 +656,7 @@ def plt_cross_Low(eff_lowETX , tauN, mass_Zp, mass_s, factor):
 
     Crr_Sec_obs = (Nsobs)/((np.array(eff_lowETX)) * 139e3 )
 
-    plt.plot(ctau, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)
+    plt.plot(tauN, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)
 
     plt.xscale('log')
     plt.yscale('log')

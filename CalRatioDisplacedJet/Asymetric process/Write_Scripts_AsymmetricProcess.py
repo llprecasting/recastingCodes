@@ -6,7 +6,7 @@ nevent = [10000,10000,10000,50000,50000]
 
 for i in range(len(masses_Zp)):
         f = open(f"Script_Asymetric_mZp{masses_Zp[i]}_mS{masses_S[i]}.txt", 'w') # Creation of the Script to follow for MG.
-        f.write(f"import model ./HAHM_variableMW_v3_UFO \n") # Import the model.
+        f.write(f"import model ./HAHM_MG5model_v3/HAHM_variableMW_v3_UFO \n") # Import the model.
         f.write(f"define q = u c d s u~ c~ d~ s~ b b~ t t~ \n") # Define a quark.
         f.write(f"define f = u c d s u~ c~ d~ s~ b b~ e+ e- mu+ mu- ta+ ta- t t~ \n") # Define a fermion.
         f.write(f"generate q q > Zp h2 HIG=1 HIW=1 QED=2 QCD=0,  (Zp > f f), (h2 > f f) \n") # Generate the process.
@@ -51,6 +51,6 @@ for i in range(len(masses_Zp)):
         f.write(f"set cut_decays = F\n" )
         f.write(f"exit")
 
-for mass_phi,mass_s in zip(masses_phi,masses_S):
-    os.system(f"./bin/mg5_aMC -f script_mH{mass_phi}_mS{mass_s}.txt") # Launch the Script in MG.
+for mass_Zp,mass_s in zip(masses_Zp,masses_S):
+    os.system(f"./bin/mg5_aMC -f Script_Asymetric_mZp{mass_Zp}_mS{mass_s}.txt") # Launch the Script in MG.
 

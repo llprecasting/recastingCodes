@@ -6,7 +6,7 @@ You will need first of all :
 
 - To install this version of madgraph : MG5_aMC_v3.4.2.tar.gz from : https://launchpad.net/mg5amcnlo/+download
 
-- In the same folder, download and place the model named : HAHM_MG5model_v3 from http://insti.physics.sunysb.edu/~curtin/hahm_mg.html. Extract the tarball in the MG5_aMC_v3_4_2 folder.
+- In the same folder, download and place the model named : HAHM_MG5model_v3 from http://insti.physics.sunysb.edu/~curtin/hahm_mg.html . Extract the tarball in the MG5_aMC_v3_4_2 folder.
 
 - Launch madgraph by writing, in a konsole launched in the MG5_aMC_v3_4_2 folder : ./bin/mg5_aMC
 
@@ -16,7 +16,7 @@ MG5_aMC> install lhapdf6
 
 And after :
 
-MG5_aMC> install Pythia8
+MG5_aMC> install pythia8
 
 It will take some minutes. You will also need to convert the model file by writing :
 

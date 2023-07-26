@@ -2,7 +2,7 @@ import os
 
 masses_Zp = [300,150,110,80,40]
 masses_S = [200,100,80,50,5]
-nevent = [10000,10000,10000,50000,50000]
+nevent = [10000,10000,10000,10000,10000]
 
 for i in range(len(masses_Zp)):
         f = open(f"Script_Asymetric_mZp{masses_Zp[i]}_mS{masses_S[i]}.txt", 'w') # Creation of the Script to follow for MG.

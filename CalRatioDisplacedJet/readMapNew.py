@@ -106,23 +106,3 @@ def queryMapFromKinematics(pT1, eta1, Lxy1, Lz1, decay1, pT2, eta2, Lxy2, Lz2, d
   else:
     return queryMapFromIndices(index_1, index_2, selection)
 
-
-# Example
-llp_pT_1, llp_pT_2 = 133, 340
-llp_eta_1, llp_eta_2 = 1.23, 1.1
-llp_Lxy_1, llp_Lxy_2 = 1.3, 1.4
-llp_Lz_1, llp_Lz_2 = 1.34, 4.56
-llp_decay_1, llp_decay_2 = 5,5
-#
-llp_globalBinIndex_1 = getGlobalBinIndex(llp_pT_1, llp_eta_1, llp_Lxy_1, llp_Lz_1, llp_decay_1)
-llp_globalBinIndex_2 = getGlobalBinIndex(llp_pT_2, llp_eta_2, llp_Lxy_2, llp_Lz_2, llp_decay_2)
-#
-print("LLP_1 -- pt=%.2f, eta=%.2f, Lxy=%.2f, Lz=%.2f, decay=%d ==> INDEX=%d, %s" % ( llp_pT_1, llp_eta_1, llp_Lxy_1, llp_Lz_1, llp_decay_1, llp_globalBinIndex_1, getBinLabelFromIndex(llp_globalBinIndex_1)))
-print("LLP_2 -- pt=%.2f, eta=%.2f, Lxy=%.2f, Lz=%.2f, decay=%d ==> INDEX=%d, %s" % ( llp_pT_2, llp_eta_2, llp_Lxy_2, llp_Lz_2, llp_decay_2, llp_globalBinIndex_2, getBinLabelFromIndex(llp_globalBinIndex_2)))
-
-# so to use over a signal MC dataset, loop over your events, keeping track of the event weight
-# for each event, get the LLP truth kinematic info, and query the map to get the probability that this event would enter Region A of the search
-# for all events, the sum the event_weight*prob. Then divide through by sum of event weights, to get the effiency in region A
-# you can do this for both High-ET and low-ET selections and see which one is best.
-
-

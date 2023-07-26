@@ -18,8 +18,6 @@ hep.style.use("ATLAS")
 # set cst
 c = 3e8 # Light velocity in m/s
 
-#All plots are made with 10 000 events, if you want to try with other numbers of events, you will have to change the number of events in lines 285-314-551-580 for the calculation of the efficiency.
-
 #########################################################################################
 #Parsing the hepmc file from the hadronization of the MG outputs to recover the data from the process.
 #########################################################################################
@@ -44,6 +42,7 @@ def parsing_hepmc_DH(events):
                 mass_TOT_DH.append(list(p.mass for p in vertex.incoming))
                 pdg_TOT_DH.append(list(p.pdg for p in vertex.outcoming))
 
+
     return px_TOT_DH, py_TOT_DH, pz_TOT_DH, E_TOT_DH, mass_TOT_DH, pdg_TOT_DH
 
 def parsing_hepmc_Zp(events):
@@ -57,7 +56,7 @@ def parsing_hepmc_Zp(events):
     for ie , event in enumerate(events):
         count=0
         for id, vertex in event.vertex.items():
-            if [p.pdg for p in vertex.incoming] == [32] and [p.pdg for p in vertex.outcoming] == [1, -1] or [p.pdg for p in vertex.incoming] == [32] and [p.pdg for p in vertex.outcoming] == [2, -2] or [p.pdg for p in vertex.incoming] == [32] and [p.pdg for p in vertex.outcoming] == [3, -3] or [p.pdg for p in vertex.incoming] == [32] and [p.pdg for p in vertex.outcoming] == [4, -4] or [p.pdg for p in vertex.incoming] == [32] and [p.pdg for p in vertex.outcoming] == [5, -5] or [p.pdg for p in vertex.incoming] == [32] and [p.pdg for p in vertex.outcoming] == [6, -6] or [p.pdg for p in vertex.incoming] == [32] and [p.pdg for p in vertex.outcoming] == [11, -11] or [p.pdg for p in vertex.incoming] == [32] and [p.pdg for p in vertex.outcoming] == [13, -13] or [p.pdg for p in vertex.incoming] == [32] and [p.pdg for p in vertex.outcoming] == [15, -15]:
+            if [p.pdg for p in vertex.incoming] == [1023] and [p.pdg for p in vertex.outcoming] == [1, -1] or [p.pdg for p in vertex.incoming] == [1023] and [p.pdg for p in vertex.outcoming] == [2, -2] or [p.pdg for p in vertex.incoming] == [1023] and [p.pdg for p in vertex.outcoming] == [3, -3] or [p.pdg for p in vertex.incoming] == [1023] and [p.pdg for p in vertex.outcoming] == [4, -4] or [p.pdg for p in vertex.incoming] == [1023] and [p.pdg for p in vertex.outcoming] == [5, -5] or [p.pdg for p in vertex.incoming] == [1023] and [p.pdg for p in vertex.outcoming] == [6, -6] or [p.pdg for p in vertex.incoming] == [1023] and [p.pdg for p in vertex.outcoming] == [11, -11] or [p.pdg for p in vertex.incoming] == [1023] and [p.pdg for p in vertex.outcoming] == [13, -13] or [p.pdg for p in vertex.incoming] == [1023] and [p.pdg for p in vertex.outcoming] == [15, -15]:
                 px_TOT_Zp.append(list(p.px for p in vertex.incoming))
                 py_TOT_Zp.append(list(p.py for p in vertex.incoming))
                 pz_TOT_Zp.append(list(p.pz for p in vertex.incoming))
@@ -159,7 +158,7 @@ def conversion_one_list_DH(px_TOT_DH, py_TOT_DH, pz_TOT_DH, E_TOT_DH, mass_TOT_D
 
 def kinematics_DH(P8_px_DH, P8_py_DH, P8_pz_DH, P8_E_DH):
 
-    #computing the velocities to obtain beta, gamma and boost DH1
+    #computing the velocities to obtain beta, gamma and boost DH
     vx_DH = (P8_px_DH*c**2)/P8_E_DH #compute the velocities in each direction in m/s
     vy_DH = (P8_py_DH*c**2)/P8_E_DH
     vz_DH = (P8_pz_DH*c**2)/P8_E_DH
@@ -259,7 +258,7 @@ def decaylenghtZp(P8_px_Zp, P8_py_Zp, P8_pz_Zp, P8_E_Zp, gamma_Zp, tauN):
 # Computation of the efficiency with the map from the data obtained with MG+Pythia8 for the high-ET samples (mH >= 400GeV).
 #########################################################################################
 
-def eff_map_High(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, pdg_tot_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, pdg_tot_Zp, tauN, nevent, mass_Zp, mass_s):
+def eff_map_High(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, P8_pdg_Zp, tauN, nevent, mass_Zp, mass_s):
 
     eff_highETX = []
 
@@ -270,12 +269,12 @@ def eff_map_High(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, pdg_tot_DH, pT_Zp, eta_Zp
                                                             eta_DH[iEvent],
                                                             Lxy_tot_DH[index][iEvent],
                                                             Lz_tot_DH[index][iEvent],
-                                                            abs(pdg_tot_DH[iEvent]),
+                                                            abs(P8_pdg_DH[iEvent]),
                                                             pT_Zp[iEvent],
                                                             eta_Zp[iEvent],
                                                             Lxy_tot_Zp[index][iEvent],
                                                             Lz_tot_Zp[index][iEvent],
-                                                            abs(pdg_tot_Zp[iEvent]),
+                                                            abs(P8_pdg_Zp[iEvent]),
                                                             selection = "high-ET"))
         eff_highETX.append(sum(queryMapResult))
     queryMapResult = np.array(queryMapResult) #convertion into array
@@ -291,22 +290,22 @@ def eff_map_High(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, pdg_tot_DH, pT_Zp, eta_Zp
 # Computation of the efficiency with the map from the data obtained with MG+Pythia8 for the low-ET samples (mH <= 400GeV).
 #########################################################################################
 
-def eff_map_Low(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, pdg_tot_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, pdg_tot_Zp, tauN,nevent, mass_Zp, mass_s):
+def eff_map_Low(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, P8_pdg_Zp, tauN,nevent, mass_Zp, mass_s):
 
     eff_lowETX = []
     for index in tqdm.tqdm(range(len(tauN))):
         queryMapResult = []
-        for iEvent in range(len(pT_DH1)):
+        for iEvent in range(len(pT_DH)):
             queryMapResult.append(rmN.queryMapFromKinematics(pT_DH[iEvent],
                                                             eta_DH[iEvent],
                                                             Lxy_tot_DH[index][iEvent],
                                                             Lz_tot_DH[index][iEvent],
-                                                            abs(pdg_tot_DH[iEvent]),
+                                                            abs(P8_pdg_DH[iEvent]),
                                                             pT_Zp[iEvent],
                                                             eta_Zp[iEvent],
                                                             Lxy_tot_Zp[index][iEvent],
                                                             Lz_tot_Zp[index][iEvent],
-                                                            abs(pdg_tot_Zp[iEvent]),
+                                                            abs(P8_pdg_Zp[iEvent]),
                                                             selection = "low-ET"))
         eff_lowETX.append(sum(queryMapResult))
     queryMapResult = np.array(queryMapResult) #convertion into array
@@ -366,7 +365,7 @@ def parsing_LHE_Zp(MG_events):
     MG_MASS_Zp = []
     for event in MG_events:
         for particle in event:
-            if particle.pdg == 32:
+            if particle.pdg == 1023:
                 MG_px_Zp.append(particle.px)
                 MG_py_Zp.append(particle.py)
                 MG_pz_Zp.append(particle.pz)
@@ -483,7 +482,7 @@ def eff_map_MG_high(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, 
 
     for index in tqdm.tqdm(range(len(tauN))):
         MG_queryMapResult = []
-        for iEvent in range(len(MG_pT_DH1)):
+        for iEvent in range(len(MG_pT_DH)):
             MG_queryMapResult.append(rmN.queryMapFromKinematics(MG_pT_DH[iEvent],
                                                             MG_eta_DH[iEvent],
                                                             MG_Lxy_tot_DH[index][iEvent],
@@ -515,7 +514,7 @@ def eff_map_MG_low(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, M
 
     for index in tqdm.tqdm(range(len(tauN))):
         MG_queryMapResult = []
-        for iEvent in range(len(MG_pT_DH1)):
+        for iEvent in range(len(MG_pT_DH)):
             MG_queryMapResult.append(rmN.queryMapFromKinematics(MG_pT_DH[iEvent],
                                                             MG_eta_DH[iEvent],
                                                             MG_Lxy_tot_DH[index][iEvent],
@@ -571,7 +570,7 @@ def plt_eff_high(MG_eff_highETX, eff_highETX,tauN,  mass_Zp , mass_s):
     ax.text(0.05, 0.95, f" $ m_Φ $ = {mass_Zp} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     x = np.linspace(0,100)
-    ax.fill_between(x, 0.25*(max(eff_lowETX)), color='black', alpha=.2, hatch="/", edgecolor="black", linewidth=1.0) # adding hatch
+    ax.fill_between(x, 0.25*(max(eff_highETX)), color='black', alpha=.2, hatch="/", edgecolor="black", linewidth=1.0) # adding hatch
     plt.ylim(0) # start at 0
 
     plt.xscale('log')

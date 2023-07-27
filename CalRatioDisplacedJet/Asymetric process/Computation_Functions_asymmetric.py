@@ -652,7 +652,7 @@ def plt_cross_Low(eff_lowETX , tauN, mass_Zp, mass_s, factor):
 
     fig, ax = plt.subplots()
 
-    Nsobs = 0.5630 * 26 * factor # nbr of observed events = 26
+    Nsobs = 0.6592 * 26 * factor # nbr of observed events = 26
 
     Crr_Sec_obs = (Nsobs)/((np.array(eff_lowETX)) * 139e3 )
 

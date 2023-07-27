@@ -34,4 +34,4 @@ It will write five scripts and launch the associated madgraph generation. This g
 
 python3 Computation_Map_asymmetric.py
 
-It will also be long ( more than 2h ) and at the end, you will have the plots, the limits and the values in a text files, so that you do not have to redo the entire run.
+It will also be long ( ~1h ) and at the end, you will have the plots, the limits and the values in a text files, so that you do not have to redo the entire run.

@@ -1,3 +1,4 @@
+ 
 import sys
 import numpy as np
 import scipy.stats
@@ -197,14 +198,14 @@ def lifetime(avgtau = 4.3):
 # Decay lenght computation for LLP1.
 #########################################################################################
 
-def decaylenghtDH(P8_px_DH, P8_py_DH, P8_pz_DH, P8_E_DH, gamma_DH, tauN):
+def decaylenghtDH(P8_px_DH, P8_py_DH, P8_pz_DH, P8_E_DH, gamma_DH, tauN_DH):
 
     Lx_tot_DH = []
     Ly_tot_DH = []
     Lz_tot_DH = []
     Lxy_tot_DH = []
 
-    for ctau in range(len(tauN)):
+    for ctau in range(len(tauN_DH)):
 
         Lx_DH = []
         Ly_DH = []
@@ -212,7 +213,7 @@ def decaylenghtDH(P8_px_DH, P8_py_DH, P8_pz_DH, P8_E_DH, gamma_DH, tauN):
         Lxy_DH = []
 
         for i in range(len(gamma_DH)):
-            lt = lifetime(tauN[ctau])
+            lt = lifetime(tauN_DH[ctau])
             Lx_DH.append((P8_px_DH[i]/P8_E_DH[i])*c**2 * lt * gamma_DH[i])
             Ly_DH.append((P8_py_DH[i]/P8_E_DH[i])*c**2 * lt * gamma_DH[i])
             Lz_DH.append((abs(P8_pz_DH[i])/P8_E_DH[i])*c**2 * lt  * gamma_DH[i])
@@ -229,20 +230,20 @@ def decaylenghtDH(P8_px_DH, P8_py_DH, P8_pz_DH, P8_E_DH, gamma_DH, tauN):
 # Decay lenght computation for LLP2.
 #########################################################################################
 
-def decaylenghtZp(P8_px_Zp, P8_py_Zp, P8_pz_Zp, P8_E_Zp, gamma_Zp, tauN):
+def decaylenghtZp(P8_px_Zp, P8_py_Zp, P8_pz_Zp, P8_E_Zp, gamma_Zp, tauN_Zp):
     Lx_tot_Zp = []
     Ly_tot_Zp = []
     Lz_tot_Zp = []
     Lxy_tot_Zp = []
 
-    for ctau in range(len(tauN)):
+    for ctau in range(len(tauN_Zp)):
         Lx_Zp = []
         Ly_Zp = []
         Lz_Zp = []
         Lxy_Zp = []
 
         for i in range(len(gamma_Zp)):
-                lt = lifetime(tauN[ctau])
+                lt = lifetime(tauN_Zp[ctau])
                 Lx_Zp.append((P8_px_Zp[i]/P8_E_Zp[i])*c**2 * lt * gamma_Zp[i])
                 Ly_Zp.append((P8_py_Zp[i]/P8_E_Zp[i])*c**2 * lt * gamma_Zp[i])
                 Lz_Zp.append((abs(P8_pz_Zp[i])/P8_E_Zp[i])*c**2 * lt* gamma_Zp[i])
@@ -255,29 +256,30 @@ def decaylenghtZp(P8_px_Zp, P8_py_Zp, P8_pz_Zp, P8_E_Zp, gamma_Zp, tauN):
     return Lxy_tot_Zp, Lz_tot_Zp
 
 #########################################################################################
-# Computation of the efficiency with the map from the data obtained with MG+Pythia8 for the high-ET samples.
+# Computation of the efficiency with the map from the data obtained with MG+Pythia8 for the high-ET samples (mZp >= 400GeV).
 #########################################################################################
 
-def eff_map_High(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, P8_pdg_Zp, tauN, nevent, mass_Zp, mass_s):
+def eff_map_High(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, P8_pdg_Zp, tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s):
 
     eff_highETX = []
-
-    for index in tqdm.tqdm(range(len(tauN))):
+    for index_Zp in range(len(tauN_Zp)):
         queryMapResult = []
-        for iEvent in range(len(pT_DH)):
-            queryMapResult.append(rmN.queryMapFromKinematics(pT_DH[iEvent],
-                                                            eta_DH[iEvent],
-                                                            Lxy_tot_DH[index][iEvent],
-                                                            Lz_tot_DH[index][iEvent],
-                                                            abs(P8_pdg_DH[iEvent]),
-                                                            pT_Zp[iEvent],
-                                                            eta_Zp[iEvent],
-                                                            Lxy_tot_Zp[index][iEvent],
-                                                            Lz_tot_Zp[index][iEvent],
-                                                            abs(P8_pdg_Zp[iEvent]),
-                                                            selection = "high-ET"))
-        eff_highETX.append(sum(queryMapResult))
-    queryMapResult = np.array(queryMapResult) #convertion into array
+        eff_lifetime=[]
+        for index_DH in tqdm.tqdm(range(len(tauN_DH))):
+            for iEvent in range(len(pT_DH)):
+                queryMapResult.append(rmN.queryMapFromKinematics(pT_DH[iEvent],
+                                                                eta_DH[iEvent],
+                                                                Lxy_tot_DH[index_DH][iEvent],
+                                                                Lz_tot_DH[index_DH][iEvent],
+                                                                abs(P8_pdg_DH[iEvent]),
+                                                                pT_Zp[iEvent],
+                                                                eta_Zp[iEvent],
+                                                                Lxy_tot_Zp[index_Zp][iEvent],
+                                                                Lz_tot_Zp[index_Zp][iEvent],
+                                                                abs(P8_pdg_Zp[iEvent]),
+                                                                selection = "high-ET"))
+            eff_lifetime.append(sum(queryMapResult))
+        eff_highETX.append(eff_lifetime)
     eff_highETX = np.array(eff_highETX) #convertion into array
     eff_highETX = eff_highETX/nevent #efficiency/(nbr of event)
 
@@ -287,28 +289,30 @@ def eff_map_High(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp,
     return eff_highETX
 
 #########################################################################################
-# Computation of the efficiency with the map from the data obtained with MG+Pythia8 for the low-ET samples.
+# Computation of the efficiency with the map from the data obtained with MG+Pythia8 for the low-ET samples (mZp <= 400GeV).
 #########################################################################################
 
-def eff_map_Low(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, P8_pdg_Zp, tauN,nevent, mass_Zp, mass_s):
+def eff_map_Low(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, P8_pdg_Zp, tauN_DH, tauN_Zp ,nevent, mass_Zp, mass_s):
 
     eff_lowETX = []
-    for index in tqdm.tqdm(range(len(tauN))):
+    for index_Zp in range(len(tauN_Zp)):
         queryMapResult = []
-        for iEvent in range(len(pT_DH)):
-            queryMapResult.append(rmN.queryMapFromKinematics(pT_DH[iEvent],
-                                                            eta_DH[iEvent],
-                                                            Lxy_tot_DH[index][iEvent],
-                                                            Lz_tot_DH[index][iEvent],
-                                                            abs(P8_pdg_DH[iEvent]),
-                                                            pT_Zp[iEvent],
-                                                            eta_Zp[iEvent],
-                                                            Lxy_tot_Zp[index][iEvent],
-                                                            Lz_tot_Zp[index][iEvent],
-                                                            abs(P8_pdg_Zp[iEvent]),
-                                                            selection = "low-ET"))
-        eff_lowETX.append(sum(queryMapResult))
-    queryMapResult = np.array(queryMapResult) #convertion into array
+        eff_lifetime=[]
+        for index_DH in tqdm.tqdm(range(len(tauN_DH))):
+            for iEvent in range(len(pT_DH)):
+                queryMapResult.append(rmN.queryMapFromKinematics(pT_DH[iEvent],
+                                                                eta_DH[iEvent],
+                                                                Lxy_tot_DH[index_DH][iEvent],
+                                                                Lz_tot_DH[index_DH][iEvent],
+                                                                abs(P8_pdg_DH[iEvent]),
+                                                                pT_Zp[iEvent],
+                                                                eta_Zp[iEvent],
+                                                                Lxy_tot_Zp[index_Zp][iEvent],
+                                                                Lz_tot_Zp[index_Zp][iEvent],
+                                                                abs(P8_pdg_Zp[iEvent]),
+                                                                selection = "low-ET"))
+    eff_lifetime.append(sum(queryMapResult))
+        eff_lowETX.append(eff_lifetime)
     eff_lowETX = np.array(eff_lowETX) #convertion into array
     eff_lowETX = eff_lowETX/nevent #efficiency/(nbr of event)
 
@@ -411,14 +415,14 @@ def kinematics_MG_Zp(MG_px_Zp,MG_py_Zp,MG_pz_Zp,MG_E_Zp):
 # Decay lenght computation for LLP1.
 #########################################################################################
 
-def decaylenght_MG_DH(MG_px_DH, MG_py_DH, MG_pz_DH, MG_E_DH, MG_gamma_DH, tauN):
+def decaylenght_MG_DH(MG_px_DH, MG_py_DH, MG_pz_DH, MG_E_DH, MG_gamma_DH, tauN_DH):
 
     MG_Lx_tot_DH = []
     MG_Ly_tot_DH = []
     MG_Lz_tot_DH = []
     MG_Lxy_tot_DH = []
 
-    for ctau in range(len(tauN)):
+    for ctau in range(len(tauN_DH)):
 
         MG_Lx_DH = []
         MG_Ly_DH = []
@@ -426,7 +430,7 @@ def decaylenght_MG_DH(MG_px_DH, MG_py_DH, MG_pz_DH, MG_E_DH, MG_gamma_DH, tauN):
         MG_Lxy_DH = []
 
         for i in range(len(MG_gamma_DH)):
-            MG_lt = lifetime(tauN[ctau])
+            MG_lt = lifetime(tauN_DH[ctau])
             MG_Lx_DH.append((MG_px_DH[i]/MG_E_DH[i])*c**2 * MG_lt * MG_gamma_DH[i])
             MG_Ly_DH.append((MG_py_DH[i]/MG_E_DH[i])*c**2 * MG_lt * MG_gamma_DH[i])
             MG_Lz_DH.append((abs(MG_pz_DH[i])/MG_E_DH[i])*c**2 * MG_lt  * MG_gamma_DH[i] )
@@ -444,14 +448,14 @@ def decaylenght_MG_DH(MG_px_DH, MG_py_DH, MG_pz_DH, MG_E_DH, MG_gamma_DH, tauN):
 # Decay lenght computation for LLP2.
 #########################################################################################
 
-def decaylenght_MG_Zp(MG_px_Zp, MG_py_Zp, MG_pz_Zp, MG_E_Zp, MG_gamma_Zp, tauN):
+def decaylenght_MG_Zp(MG_px_Zp, MG_py_Zp, MG_pz_Zp, MG_E_Zp, MG_gamma_Zp, tauN_Zp):
 
     MG_Lx_tot_Zp = []
     MG_Ly_tot_Zp = []
     MG_Lz_tot_Zp = []
     MG_Lxy_tot_Zp = []
 
-    for ctau in range(len(tauN)):
+    for ctau in range(len(tauN_Zp)):
 
         MG_Lx_Zp = []
         MG_Ly_Zp = []
@@ -459,7 +463,7 @@ def decaylenght_MG_Zp(MG_px_Zp, MG_py_Zp, MG_pz_Zp, MG_E_Zp, MG_gamma_Zp, tauN):
         MG_Lxy_Zp = []
 
         for i in range(len(MG_gamma_Zp)):
-            MG_lt = lifetime(tauN[ctau])
+            MG_lt = lifetime(tauN_Zp[ctau])
             MG_Lx_Zp.append((MG_px_Zp[i]/MG_E_Zp[i])*c**2 * MG_lt * MG_gamma_Zp[i])
             MG_Ly_Zp.append((MG_py_Zp[i]/MG_E_Zp[i])*c**2 * MG_lt * MG_gamma_Zp[i])
             MG_Lz_Zp.append((abs(MG_pz_Zp[i])/MG_E_Zp[i])*c**2 * MG_lt  * MG_gamma_Zp[i] )
@@ -476,28 +480,31 @@ def decaylenght_MG_Zp(MG_px_Zp, MG_py_Zp, MG_pz_Zp, MG_E_Zp, MG_gamma_Zp, tauN):
 # Computation of the efficiency with the map from the data obtained with MG for the high-ET samples.
 #########################################################################################
 
-def eff_map_MG_high(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, MG_pT_Zp, MG_eta_Zp, MG_Lxy_tot_Zp, MG_Lz_tot_Zp, MG_pdg_Zp, tauN, nevent, mass_Zp, mass_s):
+def eff_map_MG_high(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, MG_pT_Zp, MG_eta_Zp, MG_Lxy_tot_Zp, MG_Lz_tot_Zp, MG_pdg_Zp, tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s):
 
     MG_eff_highETX = []
-
-    for index in tqdm.tqdm(range(len(tauN))):
+    for index_Zp in range(len(tauN_Zp)):
         MG_queryMapResult = []
-        for iEvent in range(len(MG_pT_DH)):
-            MG_queryMapResult.append(rmN.queryMapFromKinematics(MG_pT_DH[iEvent],
-                                                            MG_eta_DH[iEvent],
-                                                            MG_Lxy_tot_DH[index][iEvent],
-                                                            MG_Lz_tot_DH[index][iEvent],
-                                                            abs(MG_pdg_DH[iEvent]),
-                                                            MG_pT_Zp[iEvent],
-                                                            MG_eta_Zp[iEvent],
-                                                            MG_Lxy_tot_Zp[index][iEvent],
-                                                            MG_Lz_tot_Zp[index][iEvent],
-                                                            abs(MG_pdg_Zp[iEvent]),
-                                                            selection = "high-ET"))
-        MG_eff_highETX.append(sum(MG_queryMapResult))
-    MG_queryMapResult = np.array(MG_queryMapResult) # convertion into arrays
-    MG_eff_highETX = np.array(MG_eff_highETX) # convertion into arrays
-    MG_eff_highETX = MG_eff_highETX/nevent #eff/nbrevent
+        MG_eff_lifetime=[]
+        for index_DH in tqdm.tqdm(range(len(tauN_DH))):
+            for iEvent in range(len(MG_pT_DH)):
+                MG_queryMapResult.append(rmN.queryMapFromKinematics(MG_pT_DH[iEvent],
+                                                                MG_eta_DH[iEvent],
+                                                                MG_Lxy_tot_DH[index_DH][iEvent],
+                                                                MG_Lz_tot_DH[index_DH][iEvent],
+                                                                abs(MG_pdg_DH[iEvent]),
+                                                                MG_pT_Zp[iEvent],
+                                                                MG_eta_Zp[iEvent],
+                                                                MG_Lxy_tot_Zp[index_Zp][iEvent],
+                                                                MG_Lz_tot_Zp[index_Zp][iEvent],
+                                                                abs(MG_pdg_Zp[iEvent]),
+                                                                selection = "high-ET"))
+
+
+            MG_eff_lifetime.append(sum(MG_queryMapResult))
+        MG_eff_highETX.append(MG_eff_lifetime)
+    MG_eff_highETX = np.array(MG_eff_highETX) #convertion into array
+    MG_eff_highETX = MG_eff_highETX//nevent #eff/nbrevent
 
     MG_Data_Eff_High = np.column_stack(MG_eff_highETX)
     np.savetxt(f'./Plots_High/Efficiencies_Text_{mass_Zp}_{mass_s}.txt', MG_Data_Eff_High)
@@ -508,27 +515,30 @@ def eff_map_MG_high(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, 
 # Computation of the efficiency with the map from the data obtained with MG for the low-ET samples.
 #########################################################################################
 
-def eff_map_MG_low(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, MG_pT_Zp, MG_eta_Zp, MG_Lxy_tot_Zp, MG_Lz_tot_Zp, MG_pdg_Zp, tauN, nevent, mass_Zp, mass_s):
+def eff_map_MG_low(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, MG_pT_Zp, MG_eta_Zp, MG_Lxy_tot_Zp, MG_Lz_tot_Zp, MG_pdg_Zp, tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s):
 
     MG_eff_lowETX = []
-
-    for index in tqdm.tqdm(range(len(tauN))):
+    for index_Zp in range(len(tauN_Zp)):
         MG_queryMapResult = []
-        for iEvent in range(len(MG_pT_DH)):
-            MG_queryMapResult.append(rmN.queryMapFromKinematics(MG_pT_DH[iEvent],
-                                                            MG_eta_DH[iEvent],
-                                                            MG_Lxy_tot_DH[index][iEvent],
-                                                            MG_Lz_tot_DH[index][iEvent],
-                                                            abs(MG_pdg_DH[iEvent]),
-                                                            MG_pT_Zp[iEvent],
-                                                            MG_eta_Zp[iEvent],
-                                                            MG_Lxy_tot_Zp[index][iEvent],
-                                                            MG_Lz_tot_Zp[index][iEvent],
-                                                            abs(MG_pdg_Zp[iEvent]),
-                                                            selection = "low-ET"))
-        MG_eff_lowETX.append(sum(MG_queryMapResult))
-    MG_queryMapResult = np.array(MG_queryMapResult) # convertion into arrays
-    MG_eff_lowETX = np.array(MG_eff_lowETX) # convertion into arrays
+        MG_eff_lifetime=[]
+        for index_DH in tqdm.tqdm(range(len(tauN_DH))):
+            for iEvent in range(len(MG_pT_DH)):
+                queryMapResult.append(rmN.queryMapFromKinematics(MG_pT_DH[iEvent],
+                                                                MG_eta_DH[iEvent],
+                                                                MG_Lxy_tot_DH[index_DH][iEvent],
+                                                                MG_Lz_tot_DH[index_DH][iEvent],
+                                                                abs(MG_pdg_DH[iEvent]),
+                                                                MG_pT_Zp[iEvent],
+                                                                MG_eta_Zp[iEvent],
+                                                                MG_Lxy_tot_Zp[index_Zp][iEvent],
+                                                                MG_Lz_tot_Zp[index_Zp][iEvent],
+                                                                abs(MG_pdg_Zp[iEvent]),
+                                                                selection = "low-ET"))
+
+
+            MG_eff_lifetime.append(sum(MG_queryMapResult))
+        MG_eff_lowETX.append(MG_eff_lifetime)
+    MG_eff_lowETX = np.array(MG_eff_lowETX) #convertion into array
     MG_eff_lowETX = MG_eff_lowETX/nevent #eff/nbrevent
 
     MG_Data_Eff_Low = np.column_stack(MG_eff_lowETX)
@@ -671,3 +681,26 @@ def plt_cross_Low(eff_lowETX , tauN, mass_Zp, mass_s, factor):
     plt.savefig(f"./Plots_Low/Cross_section_mZp{mass_Zp}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
     plt.close()
 
+#########################################################################################
+# Plot limits obtained with the map, to those obtain by ATLAS (Low-ET).
+#########################################################################################
+
+def plt_contour_high(tauN_DH, tauN_Zp, eff_highETX):
+
+    plt.contour(tauN_DH, tauN_Zp, eff_highETX)
+
+    # place a text box in upper left in axes coords
+    props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+    ax.text(0.05, 0.95, f" $ m_Zp $ = {mass_Zp} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+    plt.xscale('log')
+    plt.yscale('log')
+
+def plt_contour_high(tauN_DH, tauN_Zp, eff_lowETX):
+
+    # place a text box in upper left in axes coords
+    props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+    ax.text(0.05, 0.95, f" $ m_Zp $ = {mass_Zp} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+
+    plt.contour(tauN_DH, tauN_Zp, eff_lowETX)
+    plt.xscale('log')
+    plt.yscale('log')

@@ -687,24 +687,36 @@ def plt_cross_Low(eff_lowETX , tauN, mass_Zp, mass_s, factor):
 
 def plt_contour_high(tauN_DH, tauN_Zp, eff_highETX):
 
+    fig, ax = plt.subplots()
+
+
     plt.contour(tauN_DH, tauN_Zp, eff_highETX)
 
     # place a text box in upper left in axes coords
     props = dict(boxstyle='round', facecolor='white', alpha=0.5)
     ax.text(0.05, 0.95, f" $ m_Zp $ = {mass_Zp} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-    plt.savefig(f"./Plots_High/Contour_mZp{mass_Zp}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
     plt.colorbar()
     plt.xscale('log')
     plt.yscale('log')
+    plt.xlabel('cTau_DH [m]',fontsize = 20)
+    plt.ylabel('cTau_Zp [m]',fontsize = 20)
+    plt.savefig(f"./Plots_High/Contour_mZp{mass_Zp}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
+
 
 def plt_contour_low(tauN_DH, tauN_Zp, eff_lowETX):
+
+    fig, ax = plt.subplots()
+
 
     # place a text box in upper left in axes coords
     props = dict(boxstyle='round', facecolor='white', alpha=0.5)
     ax.text(0.05, 0.95, f" $ m_Zp $ = {mass_Zp} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     plt.contour(tauN_DH, tauN_Zp, eff_lowETX)
-    plt.savefig(f"./Plots_Low/Contour_mZp{mass_Zp}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
     plt.colorbar()
     plt.xscale('log')
     plt.yscale('log')
+    plt.xlabel('cTau_DH [m]',fontsize = 20)
+    plt.ylabel('cTau_Zp [m]',fontsize = 20)
+    plt.savefig(f"./Plots_Low/Contour_mZp{mass_Zp}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
+

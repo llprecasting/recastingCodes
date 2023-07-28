@@ -67,9 +67,9 @@ for file_selection, MG_file_selection,mass_Zp,mass_s, nevent, factor in zip(File
     if mass_Zp >= 150: # Condition if the sample is 'High-ET' or ' Low-ET'
         MG_eff_highETX = cmfpa_DL.eff_map_MG_high(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, MG_pT_Zp, MG_eta_Zp, MG_Lxy_tot_Zp, MG_Lz_tot_Zp, MG_pdg_Zp , tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s) # Compute the efficiency from MG
         eff_highETX = cmfpa_DL.eff_map_High(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, P8_pdg_Zp, tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s) # Compute the efficiency from Pythia
-        cmfpa_DL.plt_contour_high(tauN_DH, tauN_Zp, eff_highETX)
+        cmfpa_DL.plt_contour_high(tauN_DH, tauN_Zp, eff_highETX, mass_Zp, mass_s)
     else:
         MG_eff_lowETX = cmfpa_DL.eff_map_MG_low(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, MG_pT_Zp, MG_eta_Zp, MG_Lxy_tot_Zp, MG_Lz_tot_Zp, MG_pdg_Zp, tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s)
         eff_lowETX = cmfpa_DL.eff_map_Low(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, P8_pdg_Zp, tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s)
-        cmfpa_DL.plt_contour_low(tauN_DH, tauN_Zp, eff_lowETX)
+        cmfpa_DL.plt_contour_low(tauN_DH, tauN_Zp, eff_lowETX, mass_Zp, mass_s)
     count+=1

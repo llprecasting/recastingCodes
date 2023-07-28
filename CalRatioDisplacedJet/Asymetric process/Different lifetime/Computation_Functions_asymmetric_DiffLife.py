@@ -685,7 +685,7 @@ def plt_cross_Low(eff_lowETX , tauN, mass_Zp, mass_s, factor):
 # Plot limits obtained with the map, to those obtain by ATLAS (Low-ET).
 #########################################################################################
 
-def plt_contour_high(tauN_DH, tauN_Zp, eff_highETX):
+def plt_contour_high(tauN_DH, tauN_Zp, eff_highETX, mass_Zp, mass_s):
 
     fig, ax = plt.subplots()
 
@@ -703,7 +703,7 @@ def plt_contour_high(tauN_DH, tauN_Zp, eff_highETX):
     plt.savefig(f"./Plots_High/Contour_mZp{mass_Zp}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
 
 
-def plt_contour_low(tauN_DH, tauN_Zp, eff_lowETX):
+def plt_contour_low(tauN_DH, tauN_Zp, eff_lowETX, mass_Zp, mass_s):
 
     fig, ax = plt.subplots()
 

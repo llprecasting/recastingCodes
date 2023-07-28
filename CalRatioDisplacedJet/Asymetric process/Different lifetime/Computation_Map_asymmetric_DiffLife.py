@@ -9,7 +9,7 @@ import tqdm
 import mplhep as hep
 import lhe_parser as lhe
 import hepmc_parser as hepmc
-import Computation_Functions_asymmetric_DiffLife.py as cmfpa_DL
+import Computation_Functions_asymmetric_DiffLife as cmfpa_DL
 import random
 import math
 import os
@@ -28,8 +28,8 @@ Mass_Zp = [300,150,110, 80] # Heavy Neutral Boson mass
 Mass_s = [200,100,80, 50] # LLP mass (DH = Dark Higgs)
 Nevent = [10000,10000,10000,10000] # Nbr of events
 Factor = [1,1,1,1]
-#os.system("mkdir -p Plots_High")
-#os.system("mkdir -p Plots_Low")
+os.system("mkdir -p Plots_High")
+os.system("mkdir -p Plots_Low")
 
 count=0
 tauN_DH = np.geomspace(0.1,1e2,12) # New lifetime range
@@ -67,9 +67,9 @@ for file_selection, MG_file_selection,mass_Zp,mass_s, nevent, factor in zip(File
     if mass_Zp >= 150: # Condition if the sample is 'High-ET' or ' Low-ET'
         MG_eff_highETX = cmfpa_DL.eff_map_MG_high(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, MG_pT_Zp, MG_eta_Zp, MG_Lxy_tot_Zp, MG_Lz_tot_Zp, MG_pdg_Zp , tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s) # Compute the efficiency from MG
         eff_highETX = cmfpa_DL.eff_map_High(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, P8_pdg_Zp, tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s) # Compute the efficiency from Pythia
-        plt_contour_high(tauN_DH, tauN_Zp, eff_highETX)
+        cmfpa_DL.plt_contour_high(tauN_DH, tauN_Zp, eff_highETX)
     else:
         MG_eff_lowETX = cmfpa_DL.eff_map_MG_low(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, MG_pT_Zp, MG_eta_Zp, MG_Lxy_tot_Zp, MG_Lz_tot_Zp, MG_pdg_Zp, tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s)
         eff_lowETX = cmfpa_DL.eff_map_Low(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, Lxy_tot_Zp, Lz_tot_Zp, P8_pdg_Zp, tauN_DH, tauN_Zp, nevent, mass_Zp, mass_s)
-        plt_contour_high(tauN_DH, tauN_Zp, eff_lowETX)
+        cmfpa_DL.plt_contour_low(tauN_DH, tauN_Zp, eff_lowETX)
     count+=1

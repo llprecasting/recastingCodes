@@ -311,7 +311,7 @@ def eff_map_Low(pT_DH, eta_DH, Lxy_tot_DH, Lz_tot_DH, P8_pdg_DH, pT_Zp, eta_Zp, 
                                                                 Lz_tot_Zp[index_Zp][iEvent],
                                                                 abs(P8_pdg_Zp[iEvent]),
                                                                 selection = "low-ET"))
-    eff_lifetime.append(sum(queryMapResult))
+            eff_lifetime.append(sum(queryMapResult))
         eff_lowETX.append(eff_lifetime)
     eff_lowETX = np.array(eff_lowETX) #convertion into array
     eff_lowETX = eff_lowETX/nevent #efficiency/(nbr of event)
@@ -523,7 +523,7 @@ def eff_map_MG_low(MG_pT_DH, MG_eta_DH,MG_Lxy_tot_DH, MG_Lz_tot_DH, MG_pdg_DH, M
         MG_eff_lifetime=[]
         for index_DH in tqdm.tqdm(range(len(tauN_DH))):
             for iEvent in range(len(MG_pT_DH)):
-                queryMapResult.append(rmN.queryMapFromKinematics(MG_pT_DH[iEvent],
+                MG_queryMapResult.append(rmN.queryMapFromKinematics(MG_pT_DH[iEvent],
                                                                 MG_eta_DH[iEvent],
                                                                 MG_Lxy_tot_DH[index_DH][iEvent],
                                                                 MG_Lz_tot_DH[index_DH][iEvent],
@@ -692,15 +692,19 @@ def plt_contour_high(tauN_DH, tauN_Zp, eff_highETX):
     # place a text box in upper left in axes coords
     props = dict(boxstyle='round', facecolor='white', alpha=0.5)
     ax.text(0.05, 0.95, f" $ m_Zp $ = {mass_Zp} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+    plt.savefig(f"./Plots_High/Contour_mZp{mass_Zp}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
+    plt.colorbar()
     plt.xscale('log')
     plt.yscale('log')
 
-def plt_contour_high(tauN_DH, tauN_Zp, eff_lowETX):
+def plt_contour_low(tauN_DH, tauN_Zp, eff_lowETX):
 
     # place a text box in upper left in axes coords
     props = dict(boxstyle='round', facecolor='white', alpha=0.5)
     ax.text(0.05, 0.95, f" $ m_Zp $ = {mass_Zp} GeV, $m_S$ = {mass_s} GeV" , transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
     plt.contour(tauN_DH, tauN_Zp, eff_lowETX)
+    plt.savefig(f"./Plots_Low/Contour_mZp{mass_Zp}_mS{mass_s}.png") #create a new fodlder ' Plots ' and save the fig in it
+    plt.colorbar()
     plt.xscale('log')
     plt.yscale('log')

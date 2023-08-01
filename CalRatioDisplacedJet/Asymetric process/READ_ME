@@ -1,0 +1,37 @@
+Those python files are made for the processing of an asymetric process that involves the Z prime.
+
+They work as the same way as the symetric process seen before.
+
+You will need first of all :
+
+- To install this version of madgraph : MG5_aMC_v3.4.2.tar.gz from : https://launchpad.net/mg5amcnlo/+download
+
+- In the same folder, download and place the model named : HAHM_MG5model_v3 from http://insti.physics.sunysb.edu/~curtin/hahm_mg.html . Extract the tarball in the MG5_aMC_v3_4_2 folder.
+
+- Launch madgraph by writing, in a konsole launched in the MG5_aMC_v3_4_2 folder : ./bin/mg5_aMC
+
+- After entering in the MG konsole, install LHAPDF6 and Pythia8 by writing :
+
+MG5_aMC> install lhapdf6
+
+And after :
+
+MG5_aMC> install pythia8
+
+It will take some minutes. You will also need to convert the model file by writing :
+
+MG5_aMC> convert model ./HAHM_MG5model_v3/HAHM_variableMW_v3_UFO
+
+MG is ready to generate events on your computer !
+
+- Now, you can generate the scripts that MG will read by launching the function Write_Scripts_AsymetricProcess.py in the konsole with :
+
+python3 Write_Scripts_AsymetricProcess.py
+
+It will write five scripts and launch the associated madgraph generation. This generation is long. After approximately +2h of running, all files should be ready.
+
+- To process the data and obtain plots and limits, you can now launch in the konsole :
+
+python3 Computation_Map_asymmetric.py
+
+It will also be long ( ~1h ) and at the end, you will have the plots, the limits and the values in a text files, so that you do not have to redo the entire run.

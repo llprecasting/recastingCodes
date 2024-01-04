@@ -1,0 +1,24 @@
+# Uncomment the line below to skip this analysis altogether
+# @MG5aMC skip_analysis
+
+@MG5aMC stdout_lvl=INFO
+
+@MG5aMC inputs = *.lhe
+@MG5aMC analysis_name = analysis1
+
+# Multiparticle definition
+define vl = 12 14 16
+define vl~ = -16 -14 -12
+define invisible = ve ve~ vm vm~ vt n1 vt~ vl vl~ n1
+
+# Histogram drawer (options: matplotlib or root)
+set main.graphic_render = matplotlib
+
+# Global event variables
+plot THT   40 0 500 [logY]
+plot MET   40 0 1000 [logY]
+plot SQRTS 40 0 500 [logY]
+plot MET   40 0 1000
+# PT and ETA distributions of all particles
+plot  PT(go[1]) 40 0  500 [logY]
+plot  PT(go[2]) 40 0  500 [logY]

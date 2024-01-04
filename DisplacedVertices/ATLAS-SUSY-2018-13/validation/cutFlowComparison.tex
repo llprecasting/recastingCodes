@@ -1,0 +1,55 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[portuguese]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{graphicx}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage[T1]{fontenc}
+\oddsidemargin=1.0cm \topmargin=-0.30cm \textheight=24.5cm
+
+% For multirow tables
+\usepackage{multirow}
+
+\usepackage{caption}
+
+
+\begin{document}
+
+\begin{flushleft}
+
+
+\begin{table}
+	\begin{center}
+		\caption{Comparison of cut flows for SUSY-2016-08 and the recasting procedure described in the auxiliary material. Pythia 8.240 and FastJet 3.3.2 were used for the recasting values as well as the efficiency tables provided by the auxiliary material.}\label{tab:ResultsTable}
+		\small
+		\begin{tabular}{l@{\hskip4pt} c c c c} \hline
+			$\left( m_{\tilde g}  (GeV), m_{\tilde \chi_1^0} (GeV), \tau (ns) \right)$   & \begin{tabular}{@{}c@{}}$\left(2000,100,1\right)$ \\  (ATLAS)\end{tabular}  &  \begin{tabular}{@{}c@{}}$\left(2000,100,1\right)$ \\  (Recast)\end{tabular}  & \begin{tabular}{@{}c@{}}$\left(2000,1800,1\right)$ \\  (ATLAS)\end{tabular} & \begin{tabular}{@{}c@{}}$\left(2000,1800,1\right)$ \\  (Recast)\end{tabular}     \\
+			\hline
+			\noalign{\vskip 2mm}
+			Initial Events & 32 & 32 & 32 & 32\\[0.5ex]
+			Trigger-based data reduction & 32 & -- & 27 & --\\[0.5ex]
+			Event cleaning & 32 & -- & 27 & --\\[0.5ex]
+			Good Runs List & 32 & -- & 27 & --\\[0.5ex]
+			Primary vertex & 32 & -- & 27 & --\\[0.5ex]
+			NCB veto & 32 & -- & 26 & --\\[0.5ex]
+			$E_{T}^{miss}$ trigger & 31 & -- & 24 & --\\[0.5ex]
+			$E_{T}^{miss}$ filter ($E_T^{miss} > 200$ GeV for recast) & 31 & 30.4 & 17 & 16\\[0.5ex]
+			Offline $E_{T}^{miss}$ (event selection eff. for recast) & 29 & 26.8 & 7 & 10.2\\[0.5ex]
+			\hline
+			DV fiducial acceptance & 28 & -- & 6 & --\\[0.5ex]
+			DV fit quality & 27 & -- & 6 & --\\[0.5ex]
+			DV displacement & 27 & -- & 6 & --\\[0.5ex]
+			Material veto & 22 & -- & 5 & --\\[0.5ex]
+			Disabled module veto & 22 & -- & 5 & --\\[0.5ex]
+			DV track multplicity & 15 & -- & 3 & --\\[0.5ex]
+			DV mass (vertex level eff. for recast) & 14 & 14.4 & 2 & 4.0\\[0.5ex]			
+			\hline\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+
+\end{flushleft}
+
+
+\end{document}

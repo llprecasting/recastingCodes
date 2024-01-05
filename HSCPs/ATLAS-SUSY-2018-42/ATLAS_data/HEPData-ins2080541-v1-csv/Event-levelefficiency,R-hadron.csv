@@ -1,0 +1,145 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t97
+#: name: Event-level efficiency, R-hadron
+#: description: Event-level efficiency for the R-hadron pair-production model with m(N1) = 100 GeV for various masses and lifetimes. The efficiency is defined as the fraction of events satisfying the selection of trigger, event and jet cleaning, ETmiss and primary vertex requirements per events satisfying the acceptance criteria.
+#: data_file: tabaux6_effEvent_rhadron.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: Acc/Eff
+#: keyword phrases: Supersymmetry | SUSY
+#: Model,R-hadron / $m(\tilde{\chi}_{1}^{0})$ = 100 GeV
+#: Lifetime,0.3 ns
+Mass [GeV],Event-level Efficiency
+400.0,0.657
+450.0,--
+500.0,0.785
+550.0,--
+600.0,0.758
+650.0,--
+700.0,0.79
+800.0,0.886
+1000.0,0.951
+1200.0,0.966
+1400.0,0.939
+1600.0,1.0
+1800.0,1.0
+2000.0,--
+2200.0,--
+2400.0,--
+2600.0,--
+2800.0,--
+3000.0,--
+
+#: Model,R-hadron / $m(\tilde{\chi}_{1}^{0})$ = 100 GeV
+#: Lifetime,1 ns
+Mass [GeV],Event-level Efficiency
+400.0,0.464
+450.0,0.541
+500.0,0.602
+550.0,0.641
+600.0,0.687
+650.0,0.722
+700.0,0.754
+800.0,0.791
+1000.0,0.853
+1200.0,0.883
+1400.0,0.913
+1600.0,0.947
+1800.0,0.947
+2000.0,0.959
+2200.0,--
+2400.0,--
+2600.0,--
+2800.0,--
+3000.0,--
+
+#: Model,R-hadron / $m(\tilde{\chi}_{1}^{0})$ = 100 GeV
+#: Lifetime,3 ns
+Mass [GeV],Event-level Efficiency
+400.0,0.387
+450.0,--
+500.0,0.529
+550.0,--
+600.0,0.628
+650.0,--
+700.0,0.704
+800.0,0.76
+1000.0,0.829
+1200.0,0.873
+1400.0,0.905
+1600.0,0.917
+1800.0,0.934
+2000.0,0.943
+2200.0,0.957
+2400.0,0.959
+2600.0,0.964
+2800.0,--
+3000.0,--
+
+#: Model,R-hadron / $m(\tilde{\chi}_{1}^{0})$ = 100 GeV
+#: Lifetime,10 ns
+Mass [GeV],Event-level Efficiency
+400.0,0.395
+450.0,0.46
+500.0,0.513
+550.0,0.558
+600.0,0.595
+650.0,0.635
+700.0,0.662
+800.0,0.713
+1000.0,0.779
+1200.0,0.824
+1400.0,0.849
+1600.0,0.88
+1800.0,0.892
+2000.0,0.902
+2200.0,0.913
+2400.0,0.928
+2600.0,0.929
+2800.0,0.929
+3000.0,0.932
+
+#: Model,R-hadron / $m(\tilde{\chi}_{1}^{0})$ = 100 GeV
+#: Lifetime,30 ns
+Mass [GeV],Event-level Efficiency
+400.0,0.334
+450.0,--
+500.0,0.428
+550.0,--
+600.0,0.5
+650.0,--
+700.0,0.552
+800.0,0.594
+1000.0,0.645
+1200.0,0.68
+1400.0,0.707
+1600.0,0.719
+1800.0,0.727
+2000.0,0.731
+2200.0,0.737
+2400.0,0.736
+2600.0,0.731
+2800.0,0.733
+3000.0,0.735
+
+#: Model,R-hadron / $m(\tilde{\chi}_{1}^{0})$ = 100 GeV
+#: Lifetime,Stable
+Mass [GeV],Event-level Efficiency
+400.0,0.168
+450.0,0.195
+500.0,0.21
+550.0,0.226
+600.0,0.237
+650.0,0.253
+700.0,0.261
+800.0,0.276
+1000.0,0.295
+1200.0,0.302
+1400.0,0.301
+1600.0,0.297
+1800.0,0.283
+2000.0,0.28
+2200.0,0.267
+2400.0,0.25
+2600.0,0.238
+2800.0,0.222
+3000.0,0.208
+

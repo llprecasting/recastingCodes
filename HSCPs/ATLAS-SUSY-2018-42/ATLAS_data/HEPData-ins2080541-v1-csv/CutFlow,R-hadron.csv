@@ -1,0 +1,49 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t109
+#: name: Cut Flow, R-hadron
+#: description: Passing events in event selection steps for the R-hadron pair-production model with m(N1) = 100 GeV for various masses and lifetimes.
+#: data_file: tabaux18_cutflow_rhadron.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: N
+#: keyword phrases: Supersymmetry | SUSY
+#: Model,R-hadron $m(\tilde{g})$ = 2.2 TeV, $m(\tilde{\chi}_{1}^{0})$ = 100 GeV
+#: Lifetime,10 ns
+Selection,Events
+Total,49.5
+Event and jet Cleaning,49.0
+Trigger,47.1
+Primary vertex,47.1
+$E_{T}^{miss}>170$ GeV,45.7
+Track in PV,35.1
+$p_{T} > 50$ GeV,25.2
+Track quality requirements,19.6
+Track isolation,16.9
+$p_{T} > 120$ GeV,16.8
+Track momentum uncertainty,15.1
+$|\eta|<1.8$,14.2
+"$m_{T}({track},{p}_{{T}}^{{ miss}}) > 130$ GeV",12.8
+Electron veto,12.8
+Hadron/tau veto,12.3
+"$dE/dx\in[1.8,2.4] {MeV~cm^{2}/g}$",1.67
+$dE/dx>2.4 {MeV~cm^{2}/g}$,9.34
+
+#: Model,R-hadron $m(\tilde{g})$ = 2.2 TeV, $m(\tilde{\chi}_{1}^{0})$ = 100 GeV
+#: Lifetime,10 ns
+Selection,Efficiency
+Total,1.0
+Event and jet Cleaning,0.99
+Trigger,0.951
+Primary vertex,0.951
+$E_{T}^{miss}>170$ GeV,0.924
+Track in PV,0.71
+$p_{T} > 50$ GeV,0.509
+Track quality requirements,0.397
+Track isolation,0.342
+$p_{T} > 120$ GeV,0.34
+Track momentum uncertainty,0.306
+$|\eta|<1.8$,0.287
+"$m_{T}({track},{p}_{{T}}^{{ miss}}) > 130$ GeV",0.259
+Electron veto,0.258
+Hadron/tau veto,0.249
+"$dE/dx\in[1.8,2.4] {MeV~cm^{2}/g}$",0.034
+$dE/dx>2.4 {MeV~cm^{2}/g}$,0.189
+

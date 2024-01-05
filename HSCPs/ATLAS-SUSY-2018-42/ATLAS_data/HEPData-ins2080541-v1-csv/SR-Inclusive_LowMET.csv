@@ -1,0 +1,82 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t52
+#: name: SR-Inclusive_Low MET
+#: description: Expected and observed distributions in SR-Inclusive_Low of missing transverse momentum. The expected background distribution is calculated for each |eta| slice using CR-kin control region as the template and applying the scale factor using the dE/dx distribution in CR-dEdx of the corresponding |eta| slice. The last bins of the plots include overflow events above the range.
+#: data_file: figaux17a_met_Inclusive_Low.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: N
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,Inclusive_Low
+met [Entries / 100],met [Entries / 100] LOW,met [Entries / 100] HIGH,Background [Entries / 100],"sys,background +","sys,background -"
+135.0,100.0,170.0,0.0,1e-06,-1e-06
+185.0,170.0,200.0,195.0,31.0,-31.0
+220.0,200.0,240.0,120.0,16.9,-16.9
+260.0,240.0,280.0,71.0,10.0,-10.0
+310.0,280.0,340.0,41.1,5.23,-5.23
+360.0,340.0,380.0,21.6,3.33,-3.33
+410.0,380.0,440.0,12.0,1.62,-1.62
+470.0,440.0,500.0,6.31,0.958,-0.958
+550.0,500.0,600.0,3.13,0.395,-0.395
+700.0,600.0,800.0,0.966,0.148,-0.148
+825.0,800.0,850.0,1.72,0.102,-0.102
+
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,Inclusive_Low
+met [Entries / 100],met [Entries / 100] LOW,met [Entries / 100] HIGH,Data [Entries / 100],stat +,stat -
+135.0,100.0,170.0,0.0,0,0
+185.0,170.0,200.0,210.0,26.5,-26.5
+220.0,200.0,240.0,150.0,19.4,-19.4
+260.0,240.0,280.0,72.5,13.5,-13.5
+310.0,280.0,340.0,45.0,8.66,-8.66
+360.0,340.0,380.0,2.5,2.5,-2.5
+410.0,380.0,440.0,13.3,4.71,-4.71
+470.0,440.0,500.0,8.33,3.73,-3.73
+550.0,500.0,600.0,2.0,1.41,-1.41
+700.0,600.0,800.0,0.5,0.5,-0.5
+825.0,800.0,850.0,0.0,0,0
+
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,Inclusive_Low
+met [Entries / 100],met [Entries / 100] LOW,met [Entries / 100] HIGH,"$m(\tilde{g}) = 2.2 ~\text{TeV}, m(\tilde{\chi}_{1}^{0}) = 100 ~\text{GeV}, \tau(\tilde{g}) = 10 ~\text{ns}$ [Entries / 100]"
+135.0,100.0,170.0,0.0
+185.0,170.0,200.0,0.104
+220.0,200.0,240.0,0.135
+260.0,240.0,280.0,0.123
+310.0,280.0,340.0,0.15
+360.0,340.0,380.0,0.131
+410.0,380.0,440.0,0.177
+470.0,440.0,500.0,0.179
+550.0,500.0,600.0,0.179
+700.0,600.0,800.0,0.138
+825.0,800.0,850.0,1.75
+
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,Inclusive_Low
+met [Entries / 100],met [Entries / 100] LOW,met [Entries / 100] HIGH,"$m(\tilde{\chi}_{1}^{\pm}) = 1.3 ~\text{TeV}, \tau(\tilde{\chi}_{1}^{\pm}) = 10 ~\text{ns}$ [Entries / 100]"
+135.0,100.0,170.0,0.0
+185.0,170.0,200.0,0.448
+220.0,200.0,240.0,0.356
+260.0,240.0,280.0,0.26
+310.0,280.0,340.0,0.191
+360.0,340.0,380.0,0.149
+410.0,380.0,440.0,0.108
+470.0,440.0,500.0,0.0619
+550.0,500.0,600.0,0.0536
+700.0,600.0,800.0,0.0285
+825.0,800.0,850.0,0.135
+
+#: SQRT(S) [GeV],,,13000.0
+#: REGION,,,Inclusive_Low
+met [Entries / 100],met [Entries / 100] LOW,met [Entries / 100] HIGH,"$m(\tilde{\tau}) =  400 ~\text{GeV}, \tau(\tilde{\tau}) = 10 ~\text{ns}$ [Entries / 100]"
+135.0,100.0,170.0,0.0
+185.0,170.0,200.0,4.9
+220.0,200.0,240.0,4.01
+260.0,240.0,280.0,2.74
+310.0,280.0,340.0,1.65
+360.0,340.0,380.0,1.13
+410.0,380.0,440.0,0.973
+470.0,440.0,500.0,0.432
+550.0,500.0,600.0,0.269
+700.0,600.0,800.0,0.0443
+825.0,800.0,850.0,0.0579
+

@@ -1,0 +1,50 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t78
+#: name: Cross Section Limit, Chargino 4ns
+#: description: The expected upper limits on cross-section for charginos with lifetime (c) 10 ns, (d) 30 ns, and (e) stable.
+#: data_file: figaux28b_XSExclusion_dEdx_Multibin_Internal_C1C1_4.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: CLs
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+#: keyword reactions: p p --> CHARGINO CHARGINO | p p --> CHARGINO NEUTRALINO
+Chargino Mass [TeV],Expected limit [pb],"exp,1-sigma +","exp,1-sigma -"
+0.4,0.00548,0.00259,-0.00127
+0.6,0.00294,0.0011,-0.000658
+0.7,0.00237,0.00102,-0.000594
+0.8,0.00198,0.000921,-0.00034
+0.9,0.00182,0.000719,-0.000294
+1.0,0.00155,0.000641,-0.000339
+1.1,0.00141,0.000556,-0.000286
+1.2,0.00129,0.000567,-0.000276
+1.3,0.00125,0.000458,-0.000215
+1.4,0.00114,0.000429,-0.0002
+1.5,0.00111,0.00049,-0.00013
+1.6,0.00108,0.000452,-0.000124
+
+Chargino Mass [TeV],Observed limit [pb]
+0.4,0.0105
+0.6,0.00264
+0.7,0.00193
+0.8,0.00191
+0.9,0.0023
+1.0,0.00249
+1.1,0.00273
+1.2,0.00292
+1.3,0.00286
+1.4,0.00248
+1.5,0.00237
+1.6,0.00248
+
+Chargino Mass [TeV],Signal Cross Section [pb]
+0.4,0.175
+0.6,0.0285
+0.7,0.0132
+0.8,0.00658
+0.9,0.00342
+1.0,0.00182
+1.1,0.00101
+1.2,0.000562
+1.3,0.000322
+1.4,0.000184
+1.5,0.000106
+1.6,6.05e-05
+

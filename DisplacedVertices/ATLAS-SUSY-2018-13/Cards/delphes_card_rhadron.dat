@@ -561,8 +561,8 @@ module TreeWriter TreeWriter {
 # add Branch InputArray BranchName BranchClass
 #  add Branch Delphes/allParticles Particle GenParticle
 #  add Branch Delphes/partons Parton GenParticle  
-  add Branch HSCPFilter/daughters hscpDaughters GenParticle
-  add Branch HSCPFilter/llpParticles llps GenParticle
+  add Branch LLPFilter/daughters llpDaughters GenParticle
+  add Branch LLPFilter/llpParticles llps GenParticle
   add Branch DMFilter/dmParticles dmParticles GenParticle
   add Branch DMMissingET/momentum DMMissingET MissingET  
 

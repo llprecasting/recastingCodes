@@ -1,12 +1,6 @@
 #!/bin/sh
 
-currentDIR="$( pwd )"
-
-[ ! -d "$1" ] && echo "Directory $1 DOES NOT exists.\n Please, pass a valid folder path as the first argument of the installer" && exit
-
-
-homeDIR="$(cd "$(dirname "$1")" >/dev/null; pwd -P)/$(basename "$1")"
-echo "Installation will take place in $homeDIR"
+homeDIR="$( pwd )"
 
 echo "[Checking system dependencies]"
 PKG_OK=$(dpkg-query -W -f='${Status}' autoconf 2>/dev/null | grep -c "ok installed")

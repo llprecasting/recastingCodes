@@ -7,9 +7,9 @@ import glob
 import pyslha
 import time
 import progressbar as P
-from ATLAS_data.effFunctions import (getMuonRecoEff,getTriggerEff,getTrackEff,
-                                     getSelectionEff,getTargetMass,getMassSelEff,
-                                     massLong,massShort)
+# from ATLAS_data.effFunctions import (getMuonRecoEff,getTriggerEff,getTrackEff,
+                                    #  getSelectionEff,getTargetMass,getMassSelEff,
+                                    #  massLong,massShort)
 
 delphesDir = os.path.abspath("./DelphesLLP")
 os.environ['ROOT_INCLUDE_PATH'] = os.path.join(delphesDir,"external")

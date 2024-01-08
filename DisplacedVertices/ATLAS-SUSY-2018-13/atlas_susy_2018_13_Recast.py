@@ -8,6 +8,7 @@ import glob
 import pyslha
 import time
 import progressbar as P
+from helper import LLP
 # from ATLAS_data.effFunctions import (getMuonRecoEff,getTriggerEff,getTrackEff,
                                     #  getSelectionEff,getTargetMass,getMassSelEff,
                                     #  massLong,massShort)
@@ -26,114 +27,16 @@ ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
 
-class LLP(object):
+def getLLPs(llps,daughters):
 
-    def __init__(self, candidate, daughters=[]) -> None:
-        self._candidate = candidate
-        self.directDaughters = []
-        self.finalDaughters = []
-        self._selectedDecays = []
-        self._nTracks = None
-        self._mDV = None
-
-        if daughters:
-            for d in daughters:
-                if d.M1 < 0 and d.Status == 1:
-                    self.finalDaughters.append(d)
-                    if d.Charge == 0:
-                        continue
-                    if d.Statue != 1:
-                        continue
-                    pTratio = abs(d.PT/d.Charge)
-                    if pTratio < 1.0:
-                        continue
-                    self._selectedDecays.append(d)
-                else:
-                    self.directDaughters.append(d)
-
-            # Consistency checks:
-            pTot = np.array([self.E,self.Px,self.Py,self.Pz])
-            for d in self.directDaughters:
-                pTot -= np.array([d.E,d.Px,d.Py,d.Pz])
-            if np.linalg.norm(pTot) < 1e-4:
-                raise ValueError("Error getting direct daughters, momentum conservation violated!")
-
-            pTot = np.array([self.E,self.Px,self.Py,self.Pz])
-            for d in self.finalDaughters:
-                pTot -= np.array([d.E,d.Px,d.Py,d.Pz])
-            if np.linalg.norm(pTot) < 1e-4:
-                raise ValueError("Error getting final daughters, momentum conservation violated!")
-            
-            rList = [np.sqrt(d.X**2 + d.Y**2 + d.Z**2) for d in self.directDaughters]
-            if max(rList)/min(rList) > 1.001:
-                raise ValueError("Direct daughters do not have the same production vertex!")
-            
-            daughter = self.directDaughters[0]
-            self.Xd = daughter.X
-            self.Yd = daughter.Y
-            self.Zd = daughter.Z
-            self.r_decay = np.sqrt(self.Xd**2+self.Yd**2)
-            self.z_decay = self.Zd
-
-            trimom = np.sqrt(self.Px**2 +self.Py**2 + self.Pz**2)
-            self.beta = trimom/self.E
-            self.gbeta = trimom/self.Mass
-
-
-
-    def __getattribute__(self, attr: str) -> Any:
-        if hasattr(self,attr):
-            return getattr(self,attr)
-        else:
-            return getattr(self._candidate,attr)
-        
-    @property
-    def mDV(self):
-        if self._mDV is not None:
-            return self._mDV
-        else:
-            pTot = np.zeros(4)
-            for d in self._selectedDecays:
-                p = np.array([0.,d.Px,d.Py,d.Pz])
-                mpion = 0.140
-                p[0] = np.sqrt(mpion**2 + np.dot(p[1:],p[1:]))
-                pTot += p
-            mDV = np.sqrt(pTot[0]**2 - np.dot(pTot[1:],pTot[1:]))
-            self._mDV = mDV
-            return mDV
-        
-    @property
-    def nTracks(self):
-        return len(self._selectedDecays)
-
-def getLLPCandidates(llps,daughters):
-
-    candidates = []
+    llps = []
     for ip in range(llps.GetEntries()):
-        p = llps.At(ip)
-        if p.Status == 1:
-            p.r_decay = np.inf
-            p.z_decay = np.inf
-            candidates.append(p)
-            continue
+        p = llps.At(ip)        
+        # Get all daughters
+        llp_daughters = [daughters.At(d) for d in range(p.D1,p.D2+1)]
+        llps.append(LLP(p,llp_daughters))
         
-        # If LLP is unstable compute its decay position from daughter
-        d1 = p.D1
-        daughter = daughters.At(d1)
-        # Get the LLP decay radius from the first daughter production vertex:
-        p.Xd = daughter.X
-        p.Yd = daughter.Y
-        p.Zd = daughter.Z
-        p.r_decay = np.sqrt(p.Xd**2+p.Yd**2)
-        candidates.append(p)
-
-    for p in candidates:
-        # Add beta and gamma*beta
-        trimom = np.sqrt(p.Px**2 +p.Py**2 + p.Pz**2)
-        p.beta = trimom/p.E
-        p.gbeta = trimom/p.Mass
-
-    return candidates
+    return llps
 
 def getJets(jets,pTmin=50.0,etaMax=5.0):
     """
@@ -151,117 +54,34 @@ def getJets(jets,pTmin=50.0,etaMax=5.0):
     
     return jetsSel
 
-def getDisplacedJets(jets,llps,daughters,skipPIDs=[1000022]):
+def getDisplacedJets(jets,llps,skipPIDs=[1000022]):
     """
     Select from the list of all jets, the displaced jets associated
     with a LLP decay.
     """
 
     displacedJets = []
-    for ijet in range(jets.GetEntries()):
-        jet = jets.At(ijet)
+    for jet in jets:
         deltaRmin = 0.3
-        llp = None
-        for idaughter in range(daughters.GetEntries()):
-            daughter = daughters.At(idaughter)
-            # Keep only primary daughters:
-            if daughter.M1 < 0 or daughter.M2 > len(llps):
+        llpMatch = None
+        for llp in llps: 
+            for daughter in llp.directDaughters:
+                if abs(daughter.PID) in skipPIDs:
+                    continue
+                deltaR = np.sqrt((jet.Eta-daughter.Eta)**2 + (jet.Phi-daughter.Phi)**2)
+                if deltaR < deltaRmin:
+                    deltaRmin = deltaR
+                    llpMatch = llp # Store LLP parent
+        
+        jet.llp = llpMatch
+        if llpMatch is not None:
+            R = np.sqrt(llpMatch.Xd**2 + llpMatch.Yd**2 + llpMatch.Zd**2)
+            if R > 3870:
                 continue
-            if abs(daughter.PID) in skipPIDs:
-                continue
-            deltaR = np.sqrt((jet.Eta-daughter.Eta)**2 + (jet.Phi-daughter.Phi)**2)
-            if deltaR < deltaRmin:
-                deltaRmin = deltaR
-                llp = llps.At(daughter.M1) # Store LLP parent
-        jet.llp = llp
-        if llp is not None:
             displacedJets.append(jet)
     
     return displacedJets
 
-    
-
-
-
-
-def applyLLPSelection(llpList,pT=50.,eta=2.4,r=500.):
-
-    selLLPs = []
-    for llp in llpList:
-        if llp.PT < pT: continue 
-        if abs(llp.Eta) > eta: continue
-        if llp.r_decay < r: continue
-        selLLPs.append(llp)
-    
-    return selLLPs
-
-def applyIsolation(llpList,pTmax=5.0):
-
-    isoLLPs = []
-    # Apply isolation requirement for LLP tracks
-    for llp in llpList:
-        sumPT = llp.SumPtCharged
-        if sumPT > pTmax: continue
-        isoLLPs.append(llp)
-    return isoLLPs
-
-
-def applyMuonTagging(llpList):
-
-    """
-    Computes the probability of reconstructing the llp as a muon.
-    :param llpList: List of GenParticle objects
-    """
-
-    muonsLLP = []
-    for llp in llpList:
-        if llp.r_decay < 3.9e3 and llp.z_decay < 6e3: # Skip decays before MS
-            continue
-        
-        beta = llp.beta
-        eta = abs(llp.Eta)
-        eff = getMuonRecoEff(beta,eta,llp.PID)
-        # Randomly reconstrunct the LLP as a muon
-        if np.random.uniform() < eff:
-            continue
-        muonsLLP.append(llp)
-    
-    return muonsLLP
-
-def removeFromMET(particles,METobj):
-    """
-    Removes the contribution from the particles in the list
-    to the total MET.
-    """
-
-    metx = METobj.MET*np.cos(METobj.Phi)
-    mety = METobj.MET*np.sin(METobj.Phi)
-
-    if particles:
-        # Remove particles from MET:            
-        pxTot = sum([p.Px for p in particles])
-        pyTot = sum([p.Py for p in particles])        
-        metx = (metx-pxTot)
-        mety = (mety-pyTot)
-    
-    return [metx,mety]
-
-
-def applyMTCut(llps,METvector):
-    """
-    Remove tracks which have mT < 130 GeV
-    """
-
-    selLLPs = []
-    met = np.sqrt(METvector[0]**2 + METvector[1]**2)    
-    for llp in llps:
-        pTllp = [llp.Px,llp.Py]
-        cosdphi = np.dot(pTllp,METvector)/(llp.PT*met)
-        mT = np.sqrt(2*llp.PT*met*(1-cosdphi))
-        if mT < 130.: continue
-        selLLPs.append(llp)
-    
-    return selLLPs
 
 def getModelDict(inputFiles,model):
 
@@ -302,7 +122,7 @@ def getModelDict(inputFiles,model):
     return modelInfoDict
 
 # ### Define dictionary to store data
-def getRecastData(inputFiles,pTcut=60.,normalize=False,model='wino'):
+def getRecastData(inputFiles,normalize=False,model='gluino'):
 
     if len(inputFiles) > 1:
         print('Combining files:')
@@ -312,17 +132,6 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False,model='wino'):
     modelDict = getModelDict(inputFiles,model)
     if not modelDict:
         modelDict = {}
-
-    # Select mass windows accoding to lifetime
-    # (use long lifetime by default)
-    if 'width' not in modelDict or (modelDict['width'] > 0 and (6.582e-25/modelDict['width']) < 1e-9):
-        massWindows = massShort
-        lifetimeRegime = 'Short Lifetime'
-    else:
-        massWindows = massLong
-        lifetimeRegime = 'Long Lifetime'
-
-    massWindows = massWindows[['Mass_window_Low','Mass_window_High','Target_Mass_GeV']]
 
     modelDict['Total MC Events'] = 0
 
@@ -341,18 +150,16 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False,model='wino'):
     yields = {}
     totalweightPB = 0.0
     # Keep track of yields for each dataset
-    cutFlow = { "Total" : 0.0,
-                "Trigger" : 0.0,
-                "$E_{T}^{miss}>170$ GeV" : 0.0,
-                "$p_{T} > 50$ GeV" : 0.0,
-                "Track isolation" : 0.0,
-                "$p_{T} > 120$ GeV" : 0.0,
-                "$|\eta|<1.8$" : 0.0,
-                "$m_{T}({track},{p}_{{T}}^{{ miss}}) > 130$ GeV" : 0.0,
-                "(Acceptance)" : 0.0,
-                "(SR-Low - no mass Window)" : 0.0,
-                "(SR-High - no mass Window)" : 0.0          
+    cutFlowHighPT = { "Total" : 0.0,
+                "Jet selection" : 0.0,
+                # "$R_{xy},z <$ 300 mm" : 0.0,
+                # "$R_{DV} > 4$ mm" : 0.0,
+                # "$nTracks >= 5$" : 0.0,
+                # "mDV > 10 GeV" : 0.0
+                "DV selection" : 0.0
                 }
+    
+    cutFlowTrackless = {k : v for k,v in cutFlowHighPT.items()}
 
 
     progressbar = P.ProgressBar(widgets=["Reading %i Events: " %modelDict['Total MC Events'], 
@@ -361,6 +168,7 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False,model='wino'):
     progressbar.start()
 
     ntotal = 0
+    totalweightPB = 0.0
     for inputFile in inputFiles:
         f = ROOT.TFile(inputFile,'read')
         tree = f.Get("Delphes")
@@ -374,56 +182,81 @@ def getRecastData(inputFiles,pTcut=60.,normalize=False,model='wino'):
             
             ntotal += 1
             progressbar.update(ntotal)
-            tree.GetEntry(ievt)        
+            tree.GetEntry(ievt)   
+            weightPB = tree.Weight.At(0).Weight     
+            weightPB = weightPB*norm
+            totalweightPB += weightPB
+            ns = weightPB*1e3*lumi # number of signal events
 
-            metCalo = tree.MissingETCalo.At(0).MET
-            llpCandidates = getLLPCandidates(tree.llps,tree.llpDaughters)
-            dmParticles = [tree.dmParticles.At(idm) for idm in range(tree.dmParticles.GetEntries())]
+            llps = getLLPs(tree.llps,tree.llpDaughters)
+            jets = getJets(tree.GenJet,pTmin=25.,etaMax=5.0)
+            jetsDisp = getDisplacedJets(jets,llps)
+            
+            # Event acceptance:
+            highPT_acc = acceptance(jets,jetsDisp,sr='HighPT')
+            trackless_acc = acceptance(jets,jetsDisp,sr='Trackless')                        
+
+
+            cutFlowHighPT["Total"] += ns
+            cutFlowTrackless["Total"] += ns
+            if (not highPT_acc) and (not trackless_acc):
+                continue
+
+            if highPT_acc:
+                cutFlowHighPT["Jet selection"] += ns
+            if trackless_acc:
+                cutFlowTrackless["Jet selection"] += ns
+            
+            # Event efficiency
+            highPT_eff = eventEff(jets,llps,sr='HighPT')
+            trackless_eff = eventEff(jets,llps,sr='Trackless')
+
+            # Vertex acceptances:
+            v_acc = np.array([vertexAcc(llp) for llp in llps])
+            
+            # Vertex efficiencies:
+            v_eff = np.array([vertexEff(llp) for llp in llps])
+            
+            wvertex = 1.0-np.prod(1.0-v_acc*v_eff)
+            
+            # Add to the total weight in each SR:
+            cutFlowHighPT["DV selection"] += ns*highPT_acc*highPT_eff*wvertex
+            cutFlowTrackless["DV selection"] += ns*highPT_acc*highPT_eff*wvertex
 
         f.Close()
     progressbar.finish()
 
-    modelDict['Total xsec-pTcut (pb)'] = cutFlow['Total']/(1e3*lumi)
-    # Store total (combined xsec)
     modelDict['Total xsec (pb)'] = totalweightPB
     print('\nCross-section (pb) = %1.3e\n' %totalweightPB)
 
     # Compute normalized cutflow
-    for key,val in cutFlow.items():
-        if key == 'Total':
-            continue
-        valRound = float('%1.3e' %val)
-        valNorm = float('%1.3e' %(val/cutFlow['Total']))
-        cutFlow[key] = (valRound,valNorm)
-    cutFlow['Total'] = (float('%1.3e' %cutFlow['Total']),1.0)
+    for cutFlow in [cutFlowHighPT,cutFlowTrackless]:
+        for key,val in cutFlow.items():
+            if key == 'Total':
+                continue
+            valRound = float('%1.3e' %val)
+            valNorm = float('%1.3e' %(val/cutFlow['Total']))
+            cutFlow[key] = (valRound,valNorm)
+        cutFlow['Total'] = (float('%1.3e' %cutFlow['Total']),1.0)
 
     
     # Create a dictionary for storing data
-    dataDict = {'Luminosity (1/fb)' : lumi, 'Regime' : lifetimeRegime}
+    dataDict = {'Luminosity (1/fb)' : lumi}
     # Signal regions
-    if not yields:
-        dataDict['SR'] = ['SR-Inclusive_Low', 'SR-Inclusive_High']
-        dataDict['Target Mass [GeV]'] = [0.0,0.0]
-        dataDict['$N_s$'] = [0.0,0.0]
-        dataDict['$\sigma_{Ns}$'] = [0.0,0.0]
-    else:
-        dataDict['SR'] = []
-        dataDict['Target Mass [GeV]'] = []
-        dataDict['$N_s$'] = []
-        dataDict['$\sigma_{Ns}$'] = []
+    dataDict['SR'] = ['HighPT', 'Trackless']
+    dataDict['$N_s$'] = [0.0,0.0]
+    dataDict['$\sigma_{Ns}$'] = [0.0,0.0]
 
-        # Total signal regions = mass targets * (Low, High)
-        for targetMass in yields.keys():
-            for sr in yields[targetMass]:
-                ns = np.array(yields[targetMass][sr])
-                nsTot = sum(ns)
-                nsError = np.sqrt(sum(ns**2))
-                if not nsTot:
-                    continue # Skip empty bins
-                dataDict['SR'].append(sr)
-                dataDict['Target Mass [GeV]'].append(targetMass)
-                dataDict['$N_s$'].append(nsTot)
-                dataDict['$\sigma_{Ns}$'].append(nsError)    
+    for cutFlow in [cutFlowHighPT,cutFlowTrackless]:
+    ns = np.array(yields[targetMass][sr])
+    nsTot = sum(ns)
+    nsError = np.sqrt(sum(ns**2))
+    if not nsTot:
+        continue # Skip empty bins
+    dataDict['SR'].append(sr)
+    dataDict['Target Mass [GeV]'].append(targetMass)
+    dataDict['$N_s$'].append(nsTot)
+    dataDict['$\sigma_{Ns}$'].append(nsError)    
 
     # Expand cutflow and modelDict to match number of rows in dataDict:
     for key,val in cutFlow.items():

@@ -36,23 +36,15 @@ set ExecutionPath {
   MuonEfficiency
   MuonIsolation
 
-  MissingET
-  MissingETCalo
-
   LLPFilter
   DMFilter
   DMMissingET
 
   NeutrinoFilter
+  
+  JetFilter
   GenJetFinder
-  GenMissingET
-
-  FastJetFinder
-
-  JetEnergyScale
-
   JetFlavorAssociation
-
   BTagging
   TauTagging
 
@@ -650,6 +642,31 @@ module PdgCodeFilter NeutrinoFilter {
 }
 
 #####################
+# Jet Filter
+#####################
+
+module PdgCodeFilter JetFilter {
+
+  set InputArray Delphes/stableParticles
+  set OutputArray filteredParticles
+
+  set PTMin 0.0
+  # Exclude neutrinos
+  add PdgCode {12}
+  add PdgCode {14}
+  add PdgCode {16}
+  add PdgCode {-12}
+  add PdgCode {-14}
+  add PdgCode {-16}
+  # Exclude muons
+  add PdgCode {13}
+  add PdgCode {-13}
+  # Exclude neutralinos
+  add PdgCode {1000022}
+
+}
+
+#####################
 # Dark Matter Filter
 #####################
 
@@ -675,7 +692,7 @@ module PdgCodeFilter DMFilter {
 #####################
 
 module FastJetFinder GenJetFinder {
-  set InputArray NeutrinoFilter/filteredParticles
+  set InputArray JetFilter/filteredParticles
 
   set OutputArray jets
 
@@ -686,16 +703,6 @@ module FastJetFinder GenJetFinder {
   set JetPTMin 20.0
 }
 
-
-#########################
-# Gen Missing ET merger
-########################
-
-module Merger GenMissingET {
-# add InputArray InputArray
-  add InputArray NeutrinoFilter/filteredParticles
-  set MomentumOutputArray momentum
-}
 
 
 ###############################
@@ -707,34 +714,6 @@ module Merger DMMissingET {
   set MomentumOutputArray momentum
 }
 
-############
-# Jet finder
-############
-
-module FastJetFinder FastJetFinder {
-  set InputArray Calorimeter/towers
-
-  set OutputArray jets
-
-  # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt
-  set JetAlgorithm 6
-  set ParameterR 0.6
-
-  set JetPTMin 20.0
-}
-
-##################
-# Jet Energy Scale
-##################
-
-module EnergyScale JetEnergyScale {
-  set InputArray FastJetFinder/jets
-  set OutputArray jets
-
-  # scale formula for jets
-  set ScaleFormula {  sqrt( (3.0 - 0.2*(abs(eta)))^2 / pt + 1.0 )  }
-}
-
 ########################
 # Jet Flavor Association
 ########################
@@ -744,7 +723,7 @@ module JetFlavorAssociation JetFlavorAssociation {
   set PartonInputArray Delphes/partons
   set ParticleInputArray Delphes/allParticles
   set ParticleLHEFInputArray Delphes/allParticlesLHEF
-  set JetInputArray JetEnergyScale/jets
+  set JetInputArray GenJetFinder/jets
 
   set DeltaR 0.5
   set PartonPTMin 1.0
@@ -757,7 +736,7 @@ module JetFlavorAssociation JetFlavorAssociation {
 ###########
 
 module BTagging BTagging {
-  set JetInputArray JetEnergyScale/jets
+  set JetInputArray GenJetFinder/jets
 
   set BitNumber 0
 
@@ -786,7 +765,7 @@ module TrackCountingTauTagging TauTagging {
   set ParticleInputArray Delphes/allParticles
   set PartonInputArray Delphes/partons
   set TrackInputArray TrackMerger/tracks
-  set JetInputArray JetEnergyScale/jets
+  set JetInputArray GenJetFinder/jets
 
   set DeltaR 0.2
   set DeltaRTrack 0.2
@@ -823,7 +802,7 @@ module UniqueObjectFinder UniqueObjectFinder {
   add InputArray PhotonIsolation/photons photons
   add InputArray ElectronIsolation/electrons electrons
   add InputArray MuonIsolation/muons muons
-  add InputArray JetEnergyScale/jets jets
+  add InputArray GenJetFinder/jets jets
 }
 
 ##################
@@ -848,14 +827,14 @@ module TreeWriter TreeWriter {
 #  add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
 
   add Branch GenJetFinder/jets GenJet Jet
-  add Branch GenMissingET/momentum GenMissingET MissingET
+#  add Branch GenMissingET/momentum GenMissingET MissingET
 
   add Branch UniqueObjectFinder/jets Jet Jet
   add Branch UniqueObjectFinder/electrons Electron Electron
   add Branch UniqueObjectFinder/photons Photon Photon
   add Branch UniqueObjectFinder/muons Muon Muon
-  add Branch MissingET/momentum MissingET MissingET
-  add Branch MissingETCalo/momentum MissingETCalo MissingET
+#  add Branch MissingET/momentum MissingET MissingET
+#  add Branch MissingETCalo/momentum MissingETCalo MissingET
   add Branch ScalarHT/energy ScalarHT ScalarHT
 }
 

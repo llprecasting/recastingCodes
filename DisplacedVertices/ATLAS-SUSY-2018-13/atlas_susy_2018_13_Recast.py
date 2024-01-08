@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os,glob
+from typing import Any
 import numpy as np
 import pandas as pd
 import glob
@@ -25,6 +26,86 @@ ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
 
+class LLP(object):
+
+    def __init__(self, candidate, daughters=[]) -> None:
+        self._candidate = candidate
+        self.directDaughters = []
+        self.finalDaughters = []
+        self._selectedDecays = []
+        self._nTracks = None
+        self._mDV = None
+
+        if daughters:
+            for d in daughters:
+                if d.M1 < 0 and d.Status == 1:
+                    self.finalDaughters.append(d)
+                    if d.Charge == 0:
+                        continue
+                    if d.Statue != 1:
+                        continue
+                    pTratio = abs(d.PT/d.Charge)
+                    if pTratio < 1.0:
+                        continue
+                    self._selectedDecays.append(d)
+                else:
+                    self.directDaughters.append(d)
+
+            # Consistency checks:
+            pTot = np.array([self.E,self.Px,self.Py,self.Pz])
+            for d in self.directDaughters:
+                pTot -= np.array([d.E,d.Px,d.Py,d.Pz])
+            if np.linalg.norm(pTot) < 1e-4:
+                raise ValueError("Error getting direct daughters, momentum conservation violated!")
+
+            pTot = np.array([self.E,self.Px,self.Py,self.Pz])
+            for d in self.finalDaughters:
+                pTot -= np.array([d.E,d.Px,d.Py,d.Pz])
+            if np.linalg.norm(pTot) < 1e-4:
+                raise ValueError("Error getting final daughters, momentum conservation violated!")
+            
+            rList = [np.sqrt(d.X**2 + d.Y**2 + d.Z**2) for d in self.directDaughters]
+            if max(rList)/min(rList) > 1.001:
+                raise ValueError("Direct daughters do not have the same production vertex!")
+            
+            daughter = self.directDaughters[0]
+            self.Xd = daughter.X
+            self.Yd = daughter.Y
+            self.Zd = daughter.Z
+            self.r_decay = np.sqrt(self.Xd**2+self.Yd**2)
+            self.z_decay = self.Zd
+
+            trimom = np.sqrt(self.Px**2 +self.Py**2 + self.Pz**2)
+            self.beta = trimom/self.E
+            self.gbeta = trimom/self.Mass
+
+
+
+    def __getattribute__(self, attr: str) -> Any:
+        if hasattr(self,attr):
+            return getattr(self,attr)
+        else:
+            return getattr(self._candidate,attr)
+        
+    @property
+    def mDV(self):
+        if self._mDV is not None:
+            return self._mDV
+        else:
+            pTot = np.zeros(4)
+            for d in self._selectedDecays:
+                p = np.array([0.,d.Px,d.Py,d.Pz])
+                mpion = 0.140
+                p[0] = np.sqrt(mpion**2 + np.dot(p[1:],p[1:]))
+                pTot += p
+            mDV = np.sqrt(pTot[0]**2 - np.dot(pTot[1:],pTot[1:]))
+            self._mDV = mDV
+            return mDV
+        
+    @property
+    def nTracks(self):
+        return len(self._selectedDecays)
+
 def getLLPCandidates(llps,daughters):
 
     candidates = []
@@ -40,8 +121,10 @@ def getLLPCandidates(llps,daughters):
         d1 = p.D1
         daughter = daughters.At(d1)
         # Get the LLP decay radius from the first daughter production vertex:
-        p.r_decay = np.sqrt(daughter.X**2+daughter.Y**2)      
-        p.z_decay = daughter.Z        
+        p.Xd = daughter.X
+        p.Yd = daughter.Y
+        p.Zd = daughter.Z
+        p.r_decay = np.sqrt(p.Xd**2+p.Yd**2)
         candidates.append(p)
 
     for p in candidates:
@@ -51,6 +134,55 @@ def getLLPCandidates(llps,daughters):
         p.gbeta = trimom/p.Mass
 
     return candidates
+
+def getJets(jets,pTmin=50.0,etaMax=5.0):
+    """
+    Select jets with pT > pTmin and |eta| < etaMax
+    """
+
+    jetsSel = []
+    for ijet in range(jets.GetEntries()):
+        jet = jets.At(ijet)
+        if jet.PT < pTmin:
+            continue
+        if abs(jet.Eta) > etaMax:
+            continue
+        jetsSel.append(jet)
+    
+    return jetsSel
+
+def getDisplacedJets(jets,llps,daughters,skipPIDs=[1000022]):
+    """
+    Select from the list of all jets, the displaced jets associated
+    with a LLP decay.
+    """
+
+    displacedJets = []
+    for ijet in range(jets.GetEntries()):
+        jet = jets.At(ijet)
+        deltaRmin = 0.3
+        llp = None
+        for idaughter in range(daughters.GetEntries()):
+            daughter = daughters.At(idaughter)
+            # Keep only primary daughters:
+            if daughter.M1 < 0 or daughter.M2 > len(llps):
+                continue
+            if abs(daughter.PID) in skipPIDs:
+                continue
+            deltaR = np.sqrt((jet.Eta-daughter.Eta)**2 + (jet.Phi-daughter.Phi)**2)
+            if deltaR < deltaRmin:
+                deltaRmin = deltaR
+                llp = llps.At(daughter.M1) # Store LLP parent
+        jet.llp = llp
+        if llp is not None:
+            displacedJets.append(jet)
+    
+    return displacedJets
+
+    
+
+
+
 
 def applyLLPSelection(llpList,pT=50.,eta=2.4,r=500.):
 

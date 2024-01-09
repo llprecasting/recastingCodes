@@ -3,11 +3,7 @@
 import os,glob
 from typing import Any
 import numpy as np
-import pandas as pd
 import glob
-import pyslha
-import time
-
 
 
 class LLP(object):
@@ -31,6 +27,8 @@ class LLP(object):
                     if d.Charge == 0:
                         continue
                     if d.Statue != 1:
+                        continue
+                    if d.PT < 1.0:
                         continue
                     pTratio = abs(d.PT/d.Charge)
                     if pTratio < 1.0:

@@ -9,9 +9,7 @@ import pyslha
 import time
 import progressbar as P
 from helper import LLP
-# from ATLAS_data.effFunctions import (getMuonRecoEff,getTriggerEff,getTrackEff,
-                                    #  getSelectionEff,getTargetMass,getMassSelEff,
-                                    #  massLong,massShort)
+from ATLAS_data.effFunctions import eventEff,vertexEff
 
 delphesDir = os.path.abspath("./DelphesLLP")
 os.environ['ROOT_INCLUDE_PATH'] = os.path.join(delphesDir,"external")
@@ -82,7 +80,57 @@ def getDisplacedJets(jets,llps,skipPIDs=[1000022]):
     
     return displacedJets
 
+def acceptance(jets,jetsDisp,sr):
+    passAcc = 0.0
+    if sr == 'HighPT':
+        # Apply HighPT jet selection    
+        njet250 = len([j for j in jets if j.PT > 250.0])
+        njet195 = len([j for j in jets if j.PT > 195.0])
+        njet116 = len([j for j in jets if j.PT > 116.0])
+        njet90 = len([j for j in jets if j.PT > 90.0])
+        if (njet250 >= 4) or (njet195 >= 5) or (njet116 >= 6) or (njet90 >= 7):
+            passAcc = 1.0
+    elif sr == 'Trackless':    
+        # Apply Trackless jet selection (only if HighPT has failed)    
+        njet137 = len([j for j in jets if j.PT > 137.0])
+        njet101 = len([j for j in jets if j.PT > 101.0])
+        njet83 = len([j for j in jets if j.PT > 83.0])
+        njet55 = len([j for j in jets if j.PT > 55.0])
+        njetDisp70 = len([j for j in jetsDisp if j.PT > 70.0])
+        njetDisp50 = len([j for j in jetsDisp if j.PT > 50.0])
+        if (njet137 >= 4) or (njet101 >= 5) or (njet83 >= 6) or (njet55 >= 7):
+            if (njetDisp70 >=1) or (njetDisp50 >= 2):
+                passAcc = 1.0
+    
+    return passAcc
 
+def vertexAcc(llp):
+    
+    passAcc = 1.0
+    
+    if np.sqrt(llp.Xd**2 + llp.Yd**2) > 300.0 or abs(llp.Zd) > 300.0:
+        passAcc = 0.0
+        
+    if llp.np.sqrt(llp.Xd**2 + llp.Yd**2) < 4.0:
+        passAcc = 0.0
+    
+    maxD0 = 0.0
+    for d in llp.finalDaughters:
+        if d.Charge == 0: # Skip neutral
+            continue
+        d0 = abs((d.Y*d.Px - d.X*d.Px)/d.PT)
+        maxD0 = max(maxD0,d0)
+    if maxD0 < 2.0:
+        passAcc = 0.0
+            
+    if llp.nTracks < 5:
+        passAcc = 0.0
+        
+    if llp.mDV < 10.:
+        passAcc = 0.0
+        
+    return passAcc
+    
 def getModelDict(inputFiles,model):
 
     if model == 'wino':

@@ -26,7 +26,7 @@ class LLP(object):
                     self.finalDaughters.append(d)
                     if d.Charge == 0:
                         continue
-                    if d.Statue != 1:
+                    if d.Status != 1:
                         continue
                     if d.PT < 1.0:
                         continue
@@ -39,19 +39,16 @@ class LLP(object):
 
             # Consistency checks:
             pTot = np.array([self.E,self.Px,self.Py,self.Pz])
-            for d in self.directDaughters:
+            pNorm = np.linalg.norm(pTot)
+            for d in self.directDaughters:                
                 pTot -= np.array([d.E,d.Px,d.Py,d.Pz])
-            if np.linalg.norm(pTot) < 1e-4:
+                # print(d.PID,pTot)
+            if np.linalg.norm(pTot)/pNorm > 1e-5:
                 raise ValueError("Error getting direct daughters, momentum conservation violated!")
-
-            pTot = np.array([self.E,self.Px,self.Py,self.Pz])
-            for d in self.finalDaughters:
-                pTot -= np.array([d.E,d.Px,d.Py,d.Pz])
-            if np.linalg.norm(pTot) < 1e-4:
-                raise ValueError("Error getting final daughters, momentum conservation violated!")
             
             rList = [np.sqrt(d.X**2 + d.Y**2 + d.Z**2) for d in self.directDaughters]
-            if max(rList)/min(rList) > 1.001:
+
+            if max(rList) != min(rList) and abs(max(rList)-min(rList))/(max(rList)+min(rList)) > 0.01:
                 raise ValueError("Direct daughters do not have the same production vertex!")
             
             daughter = self.directDaughters[0]
@@ -66,12 +63,14 @@ class LLP(object):
             self.gbeta = trimom/self.Mass
 
 
-
-    def __getattribute__(self, attr: str) -> Any:
-        if hasattr(self,attr):
-            return getattr(self,attr)
-        else:
-            return getattr(self._candidate,attr)
+    def __getattr__(self, attr: str) -> Any:
+        try:
+            return self.__getattribute__(attr)
+        except AttributeError:
+            try:
+                return self._candidate.__getattribute__(attr)
+            except:
+                raise AttributeError("Could not get attribute %s" %attr)
         
     @property
     def mDV(self):

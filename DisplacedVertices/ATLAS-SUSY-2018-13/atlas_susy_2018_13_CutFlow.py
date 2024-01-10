@@ -104,14 +104,14 @@ def eventAcc(jets,jetsDisp,sr):
     
     return passAcc
 
-def vertexAcc(llp):
+def vertexAcc(llp,Rmax=np.inf,zmax=np.inf,Rmin=0.0,d0min=0.0,nmin=0,mDVmin=0):
     
     passAcc = 1.0
     
-    if np.sqrt(llp.Xd**2 + llp.Yd**2) > 300.0 or abs(llp.Zd) > 300.0:
+    if np.sqrt(llp.Xd**2 + llp.Yd**2) > Rmax or abs(llp.Zd) > zmax:
         passAcc = 0.0
         
-    if np.sqrt(llp.Xd**2 + llp.Yd**2) < 4.0:
+    if np.sqrt(llp.Xd**2 + llp.Yd**2) < Rmin:
         passAcc = 0.0
     
     maxD0 = 0.0
@@ -120,13 +120,13 @@ def vertexAcc(llp):
             continue
         d0 = abs((d.Y*d.Px - d.X*d.Px)/d.PT)
         maxD0 = max(maxD0,d0)
-    if maxD0 < 2.0:
+    if maxD0 < d0min:
         passAcc = 0.0
             
-    if llp.nTracks < 5:
+    if llp.nTracks < nmin:
         passAcc = 0.0
         
-    if llp.mDV < 10.:
+    if llp.mDV < mDVmin:
         passAcc = 0.0
         
     return passAcc
@@ -170,7 +170,7 @@ def getModelDict(inputFiles,model):
     return modelInfoDict
 
 # ### Define dictionary to store data
-def getRecastData(inputFiles,normalize=False,model='gluino'):
+def getCutFlow(inputFiles,normalize=False,model='gluino',sr='HighPT',nevts=-1):
 
     if len(inputFiles) > 1:
         print('Combining files:')
@@ -197,18 +197,15 @@ def getRecastData(inputFiles,normalize=False,model='gluino'):
     lumi = 139.0
     totalweightPB = 0.0
     # Keep track of yields for each dataset
-    cutFlowHighPT = { "Total" : 0.0,
+    cutFlowAcceptance = { "Total" : 0.0,
                 "Jet selection" : 0.0,
-                # "$R_{xy},z <$ 300 mm" : 0.0,
-                # "$R_{DV} > 4$ mm" : 0.0,
-                # "$nTracks >= 5$" : 0.0,
-                # "mDV > 10 GeV" : 0.0
-                "DV selection" : 0.0
+                "$R_{xy},z <$ 300 mm" : 0.0,
+                "$R_{DV} > 4$ mm" : 0.0,
+                "$d_0 > 2$ mm" : 0.0,
+                "$nTracks >= 5$" : 0.0,
+                "mDV > 10 GeV" : 0.0
                 }
     
-    cutFlowTrackless = {k : v for k,v in cutFlowHighPT.items()}
-
-
     progressbar = P.ProgressBar(widgets=["Reading %i Events: " %modelDict['Total MC Events'], 
                                 P.Percentage(),P.Bar(marker=P.RotatingMarker()), P.ETA()])
     progressbar.maxval = modelDict['Total MC Events']
@@ -219,7 +216,8 @@ def getRecastData(inputFiles,normalize=False,model='gluino'):
     for inputFile in inputFiles:
         f = ROOT.TFile(inputFile,'read')
         tree = f.Get("Delphes")
-        nevts = tree.GetEntries()
+        if nevts < 0:
+            nevts = tree.GetEntries()
         if normalize:
             norm =nevtsDict[inputFile]/modelDict['Total MC Events']
         else:
@@ -240,33 +238,33 @@ def getRecastData(inputFiles,normalize=False,model='gluino'):
             jetsDisp = getDisplacedJets(jets,llps)
             
             # Event acceptance:
-            highPT_acc = eventAcc(jets,jetsDisp,sr='HighPT')
-            trackless_acc = eventAcc(jets,jetsDisp,sr='Trackless')                        
+            jet_acc = eventAcc(jets,jetsDisp,sr=sr)
 
+            cutFlowAcceptance["Total"] += ns
+            if (not jet_acc): continue
+            ns = ns*jet_acc
 
-            cutFlowHighPT["Total"] += ns
-            cutFlowTrackless["Total"] += ns
-            if (not highPT_acc) and (not trackless_acc):
-                continue
+            cutFlowAcceptance["Jet selection"] += ns
+            
+            llpsSel = [llp for llp in llps if vertexAcc(llp,Rmax=300.0,zmax=300.0)]
+            if not llpsSel: continue
+            cutFlowAcceptance["$R_{xy},z <$ 300 mm"] += ns
 
-            cutFlowHighPT["Jet selection"] += ns*highPT_acc
-            cutFlowTrackless["Jet selection"] += ns*trackless_acc
-            
-            # Event efficiency
-            highPT_eff = eventEff(jets,llps,sr='HighPT')
-            trackless_eff = eventEff(jets,llps,sr='Trackless')
+            llpsSel = [llp for llp in llps if vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0)]
+            if not llpsSel: continue
+            cutFlowAcceptance["$R_{DV} > 4$ mm"] += ns
 
-            # Vertex acceptances:
-            v_acc = np.array([vertexAcc(llp) for llp in llps])
-            
-            # Vertex efficiencies:
-            v_eff = np.array([vertexEff(llp) for llp in llps])
-            
-            wvertex = 1.0-np.prod(1.0-v_acc*v_eff)
-            
-            # Add to the total weight in each SR:
-            cutFlowHighPT["DV selection"] += ns*highPT_acc*highPT_eff*wvertex
-            cutFlowTrackless["DV selection"] += ns*trackless_acc*trackless_eff*wvertex
+            llpsSel = [llp for llp in llps if vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0,d0min=2.0)]
+            if not llpsSel: continue
+            cutFlowAcceptance["$d_0 > 2$ mm"] += ns
+
+            llpsSel = [llp for llp in llps if vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0,d0min=2.0,nmin=5)]
+            if not llpsSel: continue
+            cutFlowAcceptance["$nTracks >= 5$"] += ns
+
+            llpsSel = [llp for llp in llps if vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0,d0min=2.0,nmin=5,mDVmin=10.0)]
+            if not llpsSel: continue
+            cutFlowAcceptance["mDV > 10 GeV"] += ns
 
         f.Close()
     progressbar.finish()
@@ -275,7 +273,7 @@ def getRecastData(inputFiles,normalize=False,model='gluino'):
     print('\nCross-section (pb) = %1.3e\n' %totalweightPB)
 
     # Compute normalized cutflow
-    for cutFlow in [cutFlowHighPT,cutFlowTrackless]:
+    for cutFlow in [cutFlowAcceptance]:
         for key,val in cutFlow.items():
             if key == 'Total':
                 continue
@@ -284,32 +282,11 @@ def getRecastData(inputFiles,normalize=False,model='gluino'):
             cutFlow[key] = (valRound,valNorm)
         cutFlow['Total'] = (float('%1.3e' %cutFlow['Total']),1.0)
 
+    print('Acceptance for %s:' %sr)
+    for k,v in cutFlowAcceptance.items():
+        print('%s : %1.1f\%' %(k,v[1]*1e2))
     
-    # Create a dictionary for storing data
-    dataDict = {}
-    dataDict['Luminosity (1/fb)'] = []
-    dataDict['SR'] = []
-    dataDict['$N_s$'] = []
-    # Signal regions
-    cutFlows = {'HighPT' : cutFlowHighPT, 'Trackless' : cutFlowTrackless}
-    for sr,cutFlow in cutFlows.items():
-        dataDict['Luminosity (1/fb)'].append(lumi)
-        dataDict['SR'].append(sr)
-        dataDict['$N_s$'].append(cutFlow["DV selection"][0])
-        for cut in cutFlow:
-            if cut not in dataDict:
-                dataDict[cut] = []
-            dataDict[cut].append(cutFlow[cut])
-
-    # Expand modelDict to match number of rows in dataDict:
-    for key,val in modelDict.items():
-        modelDict[key] = [val]*len(dataDict['SR'])
-
-    # Create a dictionary for storing data
-    dataDict.update(modelDict)
-   
-
-    return dataDict
+    return
 
 
 if __name__ == "__main__":
@@ -329,6 +306,11 @@ if __name__ == "__main__":
             help='If set, the input files will be considered to refer to multiple samples of the same process and their weights will be normalized.')
     ap.add_argument('-m', '--model', required=False,type=str,default='wino',
             help='Defines which model should be considered for extracting model parameters (stau,wino,gluino).')
+    ap.add_argument('-s', '--SR', required=False,type=str,default='HighPT',
+            help='Defines which signal region should be considered for the cutflow (HighPT or Trackless).')
+    ap.add_argument('-N', '--nevts', required=False,type=int,default=-1,
+            help='Maximum number of events to use.')
+
 
     ap.add_argument('-v', '--verbose', default='info',
             help='verbose level (debug, info, warning or error). Default is info')
@@ -358,13 +340,6 @@ if __name__ == "__main__":
     if os.path.splitext(outputFile)[1] != '.pcl':
         outputFile = os.path.splitext(outputFile)[0] + '.pcl'
 
-    dataDict = getRecastData(inputFiles,args.normalize,args.model)
-
-    # #### Create pandas DataFrame
-    df = pd.DataFrame.from_dict(dataDict)
-
-    # ### Save DataFrame to pickle file
-    print('Saving to',outputFile)
-    df.to_pickle(outputFile)
+    getCutFlow(inputFiles,args.normalize,args.model,args.SR,args.nevts)
 
     print("\n\nDone in %3.2f min" %((time.time()-t0)/60.))

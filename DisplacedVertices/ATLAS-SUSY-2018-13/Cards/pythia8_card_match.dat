@@ -46,7 +46,7 @@ JetMatching:qCut         = -1.0
 JetMatching:doShowerKt   = off
 ! A value of -1 means that it is automatically guessed by MadGraph.
 ! It is however always safer to explicitly set it.
-JetMatching:nJetMax      = -1
+JetMatching:nJetMax      = 2
 !
 ! --------------------------------------------------------------------
 ! Parameters relevant only when performing CKKW-L merging, which can
@@ -58,7 +58,7 @@ JetMatching:nJetMax      = -1
 ! Central merging scale values you want to be used.
 ! If equal to -1.0, then MadGraph5_aMC@NLO will set this automatically
 ! based on the parameter 'ktdurham' of the run_card.dat
-Merging:TMS              = -1.0
+!Merging:TMS              = -1.0
 ! This must be set manually, according to Pythia8 directives.
 ! An example of possible value is 'pp>LEPTONS,NEUTRINOS'
 ! Alternatively, from Pythia v8.223 onwards, the value 'guess' can be 
@@ -67,10 +67,10 @@ Merging:TMS              = -1.0
 ! of the hard process. This guess is prone to errors if the desired hard 
 ! process is complicated (i.e. contains light partons). The user should
 ! then be wary of suspicious error messages in the Pythia log file. 
-Merging:Process          = <set_by_user>
+!Merging:Process          = <set_by_user>
 ! A value of -1 means that it is automatically guessed by MadGraph.
 ! It is however always safer to explicitly set it.
-Merging:nJetMax  		 = -1
+!Merging:nJetMax  		 = -1
 !
 ! For all merging schemes, decide whehter you want the merging scale
 ! variation computed for only the central weights or all other 
@@ -87,8 +87,3 @@ Next:numberShowEvent = 1           ! print event record n times
 RHadrons:allow = on
 RHadrons:allowDecay = on
 RHadrons:probGluinoball = 0.1
-
-
-Tune:pp = 21 ! A14 tune with NNPDF2.3LO
-
-

@@ -47,8 +47,8 @@
 #          chff=ChFF in gamma-UPC            [eq.(13) in 2207.03012] *
 #          none=No PDF, same as lhapdf with lppx=0                   *
 #*********************************************************************
-     lhapdf    = pdlabel     ! PDF set 
-     247000    = lhaid     ! if pdlabel=lhapdf, this is the lhapdf number
+     nn23lo1    = pdlabel     ! PDF set 
+     230000    = lhaid     ! if pdlabel=lhapdf, this is the lhapdf number
 # To see heavy ion options: type "update ion_pdf"
 #*********************************************************************
 # Renormalization and factorization scales                           *
@@ -68,7 +68,25 @@
   False     = gridpack  !True = setting up the grid pack
   0.001 = time_of_flight ! threshold (in mm) below which the invariant livetime is not written (-1 means not written)
   average =  event_norm       ! average/sum. Normalization of the weight in the LHEF
-# To see MLM/CKKW  merging options: type "update MLM" or "update CKKW"
+#*********************************************************************
+# Matching parameter (MLM only)
+#*********************************************************************
+ 1 = ickkw            ! 0 no matching, 1 MLM
+ 1.0 = alpsfact         ! scale factor for QCD emission vx
+ False = chcluster        ! cluster only according to channel diag
+ 5 = asrwgtflavor     ! highest quark flavor for a_s reweight
+ True  = auto_ptj_mjj  ! Automatic setting of ptj and mjj if xqcut >0
+                                   ! (turn off for VBF and single top processes)
+ 150.0   = xqcut   ! minimum kt jet measure between partons
+
+#***********************************************************************
+# Turn on either the ktdurham or ptlund cut to activate                *
+# CKKW(L) merging with Pythia8 [arXiv:1410.3012, arXiv:1109.4829]      *
+#***********************************************************************
+ -1.0  =  ktdurham
+ 0.4   =  dparameter
+ -1.0  =  ptlund
+ 1, 2, 3, 4, 5, 6, 21, 82  =  pdgs_for_merging_cut ! PDGs for two cuts above
 
 #*********************************************************************
 #
@@ -82,10 +100,12 @@
 			     ! 2 is new strategy (using only the denominator)
 # To see advanced option for Phase-Space optimization: type "update psoptim"			     
 #*********************************************************************
-# Customization (custom cuts/scale/bias/...)                         *
-# list of files containing fortran function that overwrite default   *
+# Generation bias, check the wiki page below for more information:   *
+#  'cp3.irmp.ucl.ac.be/projects/madgraph/wiki/LOEventGenerationBias' *
 #*********************************************************************
-  = custom_fcts ! List of files containing user hook function
+ None = bias_module  ! Bias type of bias, [None, ptj_bias, -custom_folder-]
+ {'ptj_bias_target_ptj': 100.0, 'ptj_bias_enhancement_power': 1.0} = bias_parameters ! Specifies the parameters of the module.
+#
 #*******************************                                                 
 # Parton level cuts definition *
 #*******************************
@@ -96,11 +116,18 @@
 # BW cutoff (M+/-bwcutoff*Gamma) ! Define on/off-shell for "$" and decay  
 #*********************************************************************
   15.0  = bwcutoff      ! (M+/-bwcutoff*Gamma)
+ #*********************************************************************
+ # Apply pt/E/eta/dr/mij/kt_durham cuts on decay products or not
+ # (note that etmiss/ptll/ptheavy/ht/sorted cuts always apply)
+ #*********************************************************************
+   False  = cut_decays    ! Cut decay products 
 #*********************************************************************
 # Standard Cuts                                                      *
 #*********************************************************************
 # Minimum and maximum pt's (for max, -1 means no cut)                *
 #*********************************************************************
+ 20.0  = ptj       ! minimum pt for the jets 
+ -1.0  = ptjmax    ! maximum pt for the jets
  {} = pt_min_pdg ! pt cut for other particles (use pdg code). Applied on particle and anti-particle
  {}	= pt_max_pdg ! pt cut for other particles (syntax e.g. {6: 100, 25: 50}) 
 #
@@ -109,6 +136,7 @@
 #*********************************************************************
 # Maximum and minimum absolute rapidity (for max, -1 means no cut)   *
 #*********************************************************************
+ 5.0 = etaj    ! max rap for the jets 
  {} = eta_min_pdg ! rap cut for other particles (use pdg code). Applied on particle and anti-particle
  {} = eta_max_pdg ! rap cut for other particles (syntax e.g. {6: 2.5, 23: 5})
 #*********************************************************************
@@ -128,7 +156,7 @@
 # maximal pdg code for quark to be considered as a light jet         *
 # (otherwise b cuts are applied)                                     *
 #*********************************************************************
- 4 = maxjetflavor    ! Maximum jet pdg code
+ 5 = maxjetflavor    ! Maximum jet pdg code
 #*********************************************************************
 #
 #*********************************************************************

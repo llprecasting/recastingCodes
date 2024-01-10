@@ -174,7 +174,7 @@ int run(int nevents, const string & cfgfile, const string & infile, const string
   // End of event loop.
   }
 
-  float evtNorm = 32./float(nevents);
+  float evtNorm = 100./float(nevents);
   cout << " Initial number of events = " << float(nevents)*evtNorm << endl;
   cout << " Number of events after pre-selection MET cut = " << nCutsMET*evtNorm << endl;
   cout << " Number of events after pre-selection DV cut = " << nCutsDV*evtNorm << endl;

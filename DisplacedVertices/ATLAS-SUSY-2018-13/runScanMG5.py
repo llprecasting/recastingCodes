@@ -143,10 +143,16 @@ def generateEvents(parser):
         logger.error('Run folder %s not found.' %runFolder)
         return False
 
-    if 'runcard' in pars and os.path.isfile(pars['runcard']):    
-        shutil.copyfile(pars['runcard'],os.path.join(runFolder,'Cards/run_card.dat'))
-    if 'paramcard' in pars and os.path.isfile(pars['paramcard']):
-        shutil.copyfile(pars['paramcard'],os.path.join(runFolder,'Cards/param_card.dat'))    
+    if 'runcard' in pars:
+        if os.path.isfile(pars['runcard']):    
+            shutil.copyfile(pars['runcard'],os.path.join(runFolder,'Cards/run_card.dat'))
+        else:
+            raise ValueError("Run card %s not found" %pars['runcard'])
+    if 'paramcard' in pars:
+        if os.path.isfile(pars['paramcard']):
+            shutil.copyfile(pars['paramcard'],os.path.join(runFolder,'Cards/param_card.dat'))    
+        else:
+            raise ValueError("Param card %s not found" %pars['paramcard'])
 
 
     # By default do not run Pythia or Delphes
@@ -225,10 +231,10 @@ def generateEvents(parser):
         logger.debug('Removing  %s' %hepmcFile)
         if os.path.isfile(hepmcFile):
             os.remove(hepmcFile)
-        logFile = os.path.join(runFolder,'Events',runInfo['run number'], '%s_pythia8.log'  %runInfo['run tag'])
-        logger.debug('Removing  %s' %logFile)
-        if os.path.isfile(logFile):
-            os.remove(logFile)
+        # logFile = os.path.join(runFolder,'Events',runInfo['run number'], '%s_pythia8.log'  %runInfo['run tag'])
+        # logger.debug('Removing  %s' %logFile)
+        # if os.path.isfile(logFile):
+            # os.remove(logFile)
 
     return runInfo
 

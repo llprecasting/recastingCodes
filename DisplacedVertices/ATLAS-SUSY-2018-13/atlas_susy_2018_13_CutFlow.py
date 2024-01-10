@@ -133,15 +133,18 @@ def vertexAcc(llp,Rmax=np.inf,zmax=np.inf,Rmin=0.0,d0min=0.0,nmin=0,mDVmin=0):
     
 def getModelDict(inputFiles,model):
 
-    if model == 'wino':
-        LLP = 1000024
-        LSP = 1000022
-    elif model == 'stau':
-        LLP = 1000015
-        LSP = 1000039
+    if model == 'strong':
+        LLP = 1000023
+        LSP = 1000021
+    elif model == 'ewk':
+        LLP = 1000023
+        LSP = 1000025
     elif model == 'gluino':
         LLP = 1000021
         LSP = 1000022
+    else:
+        raise ValueError("Unreconized model %s" %model)
+
 
     modelInfoDict = {}
     f = inputFiles[0]
@@ -170,7 +173,7 @@ def getModelDict(inputFiles,model):
     return modelInfoDict
 
 # ### Define dictionary to store data
-def getCutFlow(inputFiles,normalize=False,model='gluino',sr='HighPT',nevts=-1):
+def getCutFlow(inputFiles,normalize=False,model='gluino',sr='HighPT',nevtsMax=-1):
 
     if len(inputFiles) > 1:
         print('Combining files:')
@@ -189,6 +192,8 @@ def getCutFlow(inputFiles,normalize=False,model='gluino',sr='HighPT',nevts=-1):
         f = ROOT.TFile(inputFile,'read')
         tree = f.Get("Delphes")
         nevts = tree.GetEntries()
+        if nevtsMax > 0:
+            nevts = min(nevtsMax,nevts)
         modelDict['Total MC Events'] += nevts        
         nevtsDict[inputFile] = nevts
         f.Close()
@@ -216,8 +221,7 @@ def getCutFlow(inputFiles,normalize=False,model='gluino',sr='HighPT',nevts=-1):
     for inputFile in inputFiles:
         f = ROOT.TFile(inputFile,'read')
         tree = f.Get("Delphes")
-        if nevts < 0:
-            nevts = tree.GetEntries()
+        nevts = nevtsDict[inputFile]
         if normalize:
             norm =nevtsDict[inputFile]/modelDict['Total MC Events']
         else:
@@ -284,7 +288,7 @@ def getCutFlow(inputFiles,normalize=False,model='gluino',sr='HighPT',nevts=-1):
 
     print('Acceptance for %s:' %sr)
     for k,v in cutFlowAcceptance.items():
-        print('%s : %1.1f\%' %(k,v[1]*1e2))
+        print('%s : %1.1f%%' %(k,v[1]*1e2))
     
     return
 
@@ -304,8 +308,8 @@ if __name__ == "__main__":
             default = None)
     ap.add_argument('-n', '--normalize', required=False,action='store_true',
             help='If set, the input files will be considered to refer to multiple samples of the same process and their weights will be normalized.')
-    ap.add_argument('-m', '--model', required=False,type=str,default='wino',
-            help='Defines which model should be considered for extracting model parameters (stau,wino,gluino).')
+    ap.add_argument('-m', '--model', required=False,type=str,default='strong',
+            help='Defines which model should be considered for extracting model parameters (strong,ewk,gluino).')
     ap.add_argument('-s', '--SR', required=False,type=str,default='HighPT',
             help='Defines which signal region should be considered for the cutflow (HighPT or Trackless).')
     ap.add_argument('-N', '--nevts', required=False,type=int,default=-1,

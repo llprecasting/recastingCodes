@@ -208,7 +208,8 @@ def getCutFlow(inputFiles,normalize=False,model='gluino',sr='HighPT',nevtsMax=-1
                 "$R_{DV} > 4$ mm" : 0.0,
                 "$d_0 > 2$ mm" : 0.0,
                 "$nTracks >= 5$" : 0.0,
-                "mDV > 10 GeV" : 0.0
+                "mDV > 10 GeV" : 0.0,
+                "final Acc*Eff" : 0.0
                 }
     
     progressbar = P.ProgressBar(widgets=["Reading %i Events: " %modelDict['Total MC Events'], 
@@ -269,6 +270,17 @@ def getCutFlow(inputFiles,normalize=False,model='gluino',sr='HighPT',nevtsMax=-1
             llpsSel = [llp for llp in llps if vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0,d0min=2.0,nmin=5,mDVmin=10.0)]
             if not llpsSel: continue
             cutFlowAcceptance["mDV > 10 GeV"] += ns
+
+            # Event efficiency
+            ev_eff = eventEff(jets,llps,sr=sr)
+            # Vertex acceptances:
+            v_acc = np.array([vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0,d0min=2.0,nmin=5,mDVmin=10.0) for llp in llps])
+            # Vertex efficiencies:
+            v_eff = np.array([vertexEff(llp) for llp in llps])
+
+            wvertex = 1.0-np.prod(1.0-v_acc*v_eff)
+
+            cutFlowAcceptance['final Acc*Eff'] += ns*ev_eff*wvertex
 
         f.Close()
     progressbar.finish()

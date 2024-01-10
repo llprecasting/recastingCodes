@@ -263,6 +263,7 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
             
             # Vertex efficiencies:
             v_eff = np.array([vertexEff(llp) for llp in llps])
+
             
             wvertex = 1.0-np.prod(1.0-v_acc*v_eff)
             
@@ -355,12 +356,15 @@ if __name__ == "__main__":
     inputFiles = args.inputFile
     outputFile = args.outputFile
     if outputFile is None:
-        outputFile = inputFiles[0].replace('delphes_events.root','atlas_2018_42.pcl')
+        outputFile = inputFiles[0].replace('delphes_events.root','atlas_2018_13.pcl')
 
     if os.path.splitext(outputFile)[1] != '.pcl':
         outputFile = os.path.splitext(outputFile)[0] + '.pcl'
 
     dataDict = getRecastData(inputFiles,args.normalize,args.model)
+    if args.verbose == 'debug':
+        for k,v in dataDict.items():
+            print(k,v)
 
     # #### Create pandas DataFrame
     df = pd.DataFrame.from_dict(dataDict)

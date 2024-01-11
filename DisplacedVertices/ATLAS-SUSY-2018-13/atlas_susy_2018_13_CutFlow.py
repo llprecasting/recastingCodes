@@ -138,7 +138,7 @@ def getModelDict(inputFiles,model):
         LSP = 1000021
     elif model == 'ewk':
         LLP = 1000023
-        LSP = 1000025
+        LSP = 1000024
     elif model == 'gluino':
         LLP = 1000021
         LSP = 1000022

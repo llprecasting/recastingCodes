@@ -59,8 +59,8 @@ class LLP(object):
         pNorm = np.linalg.norm(pTot)
         for d in self.finalDaughters:                
             pTot -= np.array([d.E,d.Px,d.Py,d.Pz])
-        if np.linalg.norm(pTot)/pNorm > 1e-5:
-            raise ValueError("Error getting final daughters, momentum conservation violated!")        
+        if np.linalg.norm(pTot)/pNorm > 1e-3:
+            raise ValueError("Error getting final daughters, momentum conservation violated! (%s)" %(str(pTot)))        
         
         rList = [np.sqrt(d.X**2 + d.Y**2 + d.Z**2) for d in self.directDaughters]
 

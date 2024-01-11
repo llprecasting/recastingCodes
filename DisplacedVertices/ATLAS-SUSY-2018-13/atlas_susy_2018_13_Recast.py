@@ -135,7 +135,7 @@ def getModelDict(inputFiles,model):
 
     if model == 'ewk':
         LLP = 1000023
-        LSP = 1000025
+        LSP = 1000024
     elif model == 'strong':
         LLP = 1000023
         LSP = 1000021

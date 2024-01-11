@@ -40,7 +40,7 @@ define l+ = e+ mu+
 define l- = e- mu-
 define vl = ve vm vt
 define vl~ = ve~ vm~ vt~
-import model MSSM_SLHA2
+import model ../../MSSM_SLHA2_mod
 define sq = ul cl t1 ur cr t2 dl sl b1 dr sr b2 ul~ cl~ t1~ ur~ cr~ t2\
 ~ dl~ sl~ b1~ dr~ sr~ b2~
 generate p p > go go  / sq

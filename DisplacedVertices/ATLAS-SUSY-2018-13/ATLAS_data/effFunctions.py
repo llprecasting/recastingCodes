@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
-from scipy.interpolate import interp1d,griddata,LinearNDInterpolator
+from scipy.interpolate import interp1d,LinearNDInterpolator
 import os,glob
 atlasDir = os.path.dirname(os.path.abspath(__file__))
 
@@ -22,22 +22,9 @@ for f in glob.glob(os.path.join(atlasDir,'./HEPData-ins2628398-v1-csv/event_effi
         Rmax = 1150
         
     pts = np.genfromtxt(f,names=True,skip_header=10,delimiter=',')
-    eff_F = interp1d(pts['Sumpt_GeV'],pts['Efficiency'],fill_value=0.0,bounds_error=False)
+    eff_F = interp1d(pts['Sumpt_GeV'],pts['Efficiency'],fill_value=(0.0,pts['Efficiency'][-1]),bounds_error=False)
     functions_event_eff[sr][(Rmin,Rmax)] = eff_F
 
-# inputFiles = {'HighPT' : {(1150,3870) : os.path.join(atlasDir,'./HEPData-ins2628398-v1-csv/event_efficiency_HighPt_R_1150_3870_mm.csv'),
-            #   (0,1150) : os.path.join(atlasDir,'./HEPData-ins2628398-v1-csv/event_efficiency_HighPt_R_1150_mm.csv'),
-            # (3870,np.inf) : os.path.join(atlasDir,'./HEPData-ins2628398-v1-csv/event_efficiency_HighPt_R_3870_mm.csv')},
-            # 'Trackless' : {(1150,3870) : os.path.join(atlasDir,'./HEPData-ins2628398-v1-csv/event_efficiency_Trackless_R_1150_3870_mm.csv'),
-            #   (0,1150) : os.path.join(atlasDir,'./HEPData-ins2628398-v1-csv/event_efficiency_Trackless_R_1150_mm.csv'),
-            # (3870,np.inf) : os.path.join(atlasDir,'./HEPData-ins2628398-v1-csv/event_efficiency_Trackless_R_3870_mm.csv')}}
-# event_eff_functions = {}
-# for sr in inputFilesEv:
-#     event_eff_functions[sr] = {}
-#     for Rint,f in inputFilesEv[sr].items():        
-#         pts = np.genfromtxt(f,names=True,skip_header=10,delimiter=',')
-#         eff_F = interp1d(pts['Sumpt_GeV'],pts['Efficiency'],fill_value=0.0,bounds_error=False)
-#         event_eff_functions[sr][Rint] = eff_F
 
 def eventEff(jets,llps,sr):
     

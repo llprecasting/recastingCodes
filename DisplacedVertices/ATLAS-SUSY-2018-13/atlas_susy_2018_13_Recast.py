@@ -24,7 +24,6 @@ ROOT.gInterpreter.Declare('#include "classes/SortableObject.h"')
 ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
-
 def getLLPs(llpList,daughters):
 
     llps = []
@@ -104,14 +103,14 @@ def eventAcc(jets,jetsDisp,sr):
     
     return passAcc
 
-def vertexAcc(llp):
+def vertexAcc(llp,Rmax=np.inf,zmax=np.inf,Rmin=0.0,d0min=0.0,nmin=0,mDVmin=0):
     
     passAcc = 1.0
     
-    if np.sqrt(llp.Xd**2 + llp.Yd**2) > 300.0 or abs(llp.Zd) > 300.0:
+    if np.sqrt(llp.Xd**2 + llp.Yd**2) > Rmax or abs(llp.Zd) > zmax:
         passAcc = 0.0
         
-    if np.sqrt(llp.Xd**2 + llp.Yd**2) < 4.0:
+    if np.sqrt(llp.Xd**2 + llp.Yd**2) < Rmin:
         passAcc = 0.0
     
     maxD0 = 0.0
@@ -120,13 +119,13 @@ def vertexAcc(llp):
             continue
         d0 = abs((d.Y*d.Px - d.X*d.Px)/d.PT)
         maxD0 = max(maxD0,d0)
-    if maxD0 < 2.0:
+    if maxD0 < d0min:
         passAcc = 0.0
             
-    if llp.nTracks < 5:
+    if llp.nTracks < nmin:
         passAcc = 0.0
         
-    if llp.mDV < 10.:
+    if llp.mDV < mDVmin:
         passAcc = 0.0
         
     return passAcc
@@ -134,10 +133,10 @@ def vertexAcc(llp):
 def getModelDict(inputFiles,model):
 
     if model == 'ewk':
-        LLP = 1000023
+        LLP = 1000022
         LSP = 1000024
     elif model == 'strong':
-        LLP = 1000023
+        LLP = 1000022
         LSP = 1000021
     elif model == 'gluino':
         LLP = 1000021
@@ -259,7 +258,9 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
             trackless_eff = eventEff(jets,llps,sr='Trackless')
 
             # Vertex acceptances:
-            v_acc = np.array([vertexAcc(llp) for llp in llps])
+            v_acc = np.array([vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0,
+                                        d0min=2.0,nmin=5,mDVmin=10.0)  for llp in llps])
+
             
             # Vertex efficiencies:
             v_eff = np.array([vertexEff(llp) for llp in llps])

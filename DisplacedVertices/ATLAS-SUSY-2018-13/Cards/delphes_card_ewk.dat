@@ -611,7 +611,7 @@ module LLPFilter LLPFilter {
   set massMin 50.0
   
   # Select neutralinos and charginos
-  add PdgCode {1000023}
+  add PdgCode {1000022}
   add PdgCode {1000024}
 }
 
@@ -809,7 +809,7 @@ module UniqueObjectFinder UniqueObjectFinder {
 
 module TreeWriter TreeWriter {
 # add Branch InputArray BranchName BranchClass
-  add Branch Delphes/allParticles Particle GenParticle
+#  add Branch Delphes/allParticles Particle GenParticle
 #  add Branch Delphes/partons Parton GenParticle  
   add Branch LLPFilter/daughters llpDaughters GenParticle
   add Branch LLPFilter/llpParticles llps GenParticle

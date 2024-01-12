@@ -4,6 +4,7 @@ import os,glob
 from typing import Any
 import numpy as np
 import glob
+import itertools
 
 
 class LLP(object):
@@ -110,3 +111,39 @@ class LLP(object):
     #     else:
     #         self._nTracks = len(self._selectedDecays)
     #     return self._nTracks
+
+
+class BinnedData(object):
+    """
+    Simple class to store and handle 2D binned data.
+    Similar to a 3D array.
+    """
+
+    def __init__(self,xbins,ybins):
+
+        self.xbins = np.array(sorted(xbins[:]))
+        self.ybins = np.array(sorted(ybins[:]))
+        self.values = np.zeros((len(self.xbins),len(self.ybins)))
+
+    def getIndex(self,x,y):
+        # First check if it is within range
+        if not (self.xbins[0] <= x <= self.xbins[-1]):
+            return None
+        if not (self.ybins[0] <= y <= self.ybins[-1]):
+            return None
+    
+        ix = np.digitize(x,self.xbins)-1
+        iy = np.digitize(y,self.ybins)-1
+        
+        return (ix,iy)
+    
+    
+    
+    def fill(self,x,y,weight):
+
+        ibin = self.getIndex(x,y)
+        if ibin is not None:
+            self.values[ibin[0],ibin[1]] += weight
+
+    
+        

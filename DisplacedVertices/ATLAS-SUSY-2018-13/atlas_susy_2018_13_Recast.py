@@ -8,9 +8,8 @@ import glob
 import pyslha
 import time
 import progressbar as P
-from helper import LLP,BinnedData
+from helper import LLP
 from ATLAS_data.effFunctions import eventEff,vertexEff
-from ATLAS_data.atlasBins import atlas_bins
 
 delphesDir = os.path.abspath("./DelphesLLP")
 os.environ['ROOT_INCLUDE_PATH'] = os.path.join(delphesDir,"external")
@@ -171,7 +170,6 @@ def getModelDict(inputFiles,model):
 
     return modelInfoDict
 
-
 # ### Define dictionary to store data
 def getRecastData(inputFiles,normalize=False,model='strong'):
 
@@ -182,7 +180,7 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
 
     modelDict = getModelDict(inputFiles,model)
     if not modelDict:
-        modelDict = {}        
+        modelDict = {}
 
     modelDict['Total MC Events'] = 0
 
@@ -196,12 +194,6 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
         nevtsDict[inputFile] = nevts
         f.Close()
 
-    
-    binnedData = {}
-    for sr in ['HighPT', 'Trackless']:
-        xbins = atlas_bins['HighPT']['nTracks']
-        ybins = atlas_bins['HighPT']['mDV']
-        binnedData[sr] = BinnedData(xbins,ybins)
 
     lumi = 139.0
     totalweightPB = 0.0
@@ -216,7 +208,6 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
                 }
     
     cutFlowTrackless = {k : v for k,v in cutFlowHighPT.items()}
-    cutFlows = {'HighPT' : cutFlowHighPT, 'Trackless' : cutFlowTrackless}
 
 
     progressbar = P.ProgressBar(widgets=["Reading %i Events: " %modelDict['Total MC Events'], 
@@ -250,48 +241,36 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
             jetsDisp = getDisplacedJets(jets,llps)
             
             # Event acceptance:
-            ev_acc = {}
-            ev_acc['HighPT'] = eventAcc(jets,jetsDisp,sr='HighPT')
-            ev_acc['Trackless'] = eventAcc(jets,jetsDisp,sr='Trackless')                        
+            highPT_acc = eventAcc(jets,jetsDisp,sr='HighPT')
+            trackless_acc = eventAcc(jets,jetsDisp,sr='Trackless')                        
 
 
             cutFlowHighPT["Total"] += ns
             cutFlowTrackless["Total"] += ns
-            if sum(ev_acc.values()) == 0.::
+            if (not highPT_acc) and (not trackless_acc):
                 continue
 
-            cutFlowHighPT["Jet selection"] += ns*ev_acc['HighPT']
-            cutFlowTrackless["Jet selection"] += ns*ev_acc['Trackless']
+            cutFlowHighPT["Jet selection"] += ns*highPT_acc
+            cutFlowTrackless["Jet selection"] += ns*trackless_acc
             
             # Event efficiency
-            ev_eff = {}
-            ev_eff['HighPT'] = eventEff(jets,llps,sr='HighPT')
-            ev_eff['Trackless'] = eventEff(jets,llps,sr='Trackless')
-
-            # Vertex efficiencies:
-            v_eff = np.array([vertexEff(llp) for llp in llps])            
+            highPT_eff = eventEff(jets,llps,sr='HighPT')
+            trackless_eff = eventEff(jets,llps,sr='Trackless')
 
             # Vertex acceptances:
-            nTrack_mDV_pairs = np.array[(llp.nTracks,llp.mDV) for llp in llps]
-            for sr in ['HighPT','Trackless']:
-                binData = binnedData[sr]
-                for nmin in binData.xbins:
-                    if max(nTrack_mDV_pairs[:,0]) < nmin:
-                        continue
-                    for mDVmin in binData.ybinx:
-                        if max(nTrack_mDV_pairs[:,1]) < mDVmin:
-                            continue
-                        
-                        v_acc = np.array([vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0,
-                                        d0min=2.0,nmin=nmin,mDVmin=mDVmin)  for llp in llps])
-                
-                        wvertex = 1.0-np.prod(1.0-v_acc*v_eff)
-                    binData.fill(nmin,mDVmin,ns*ev_acc[sr]*ev_eff[sr]*wvertex)
+            v_acc = np.array([vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0,
+                                        d0min=2.0,nmin=5,mDVmin=10.0)  for llp in llps])
 
             
-                    if nmin == 5 and mDVmin == 10.0:
-                        # Add to the total weight in each SR:
-                        cutFlow[sr]["DV selection"] += ns*ev_acc[sr]*ev_eff[sr]*wvertex
+            # Vertex efficiencies:
+            v_eff = np.array([vertexEff(llp) for llp in llps])
+
+            
+            wvertex = 1.0-np.prod(1.0-v_acc*v_eff)
+            
+            # Add to the total weight in each SR:
+            cutFlowHighPT["DV selection"] += ns*highPT_acc*highPT_eff*wvertex
+            cutFlowTrackless["DV selection"] += ns*trackless_acc*trackless_eff*wvertex
 
         f.Close()
     progressbar.finish()

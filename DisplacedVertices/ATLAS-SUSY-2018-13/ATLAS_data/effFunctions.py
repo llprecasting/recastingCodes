@@ -22,7 +22,8 @@ for f in glob.glob(os.path.join(atlasDir,'./HEPData-ins2628398-v1-csv/event_effi
         Rmax = 1150
         
     pts = np.genfromtxt(f,names=True,skip_header=10,delimiter=',')
-    eff_F = interp1d(pts['Sumpt_GeV'],pts['Efficiency'],fill_value=(0.0,pts['Efficiency'][-1]),bounds_error=False)
+    # eff_F = interp1d(pts['Sumpt_GeV'],pts['Efficiency'],fill_value=(0.0,pts['Efficiency'][-1]),bounds_error=False)
+    eff_F = interp1d(pts['Sumpt_GeV'],pts['Efficiency'],fill_value=(0.0,0.0),bounds_error=False)
     functions_event_eff[sr][(Rmin,Rmax)] = eff_F
 
 

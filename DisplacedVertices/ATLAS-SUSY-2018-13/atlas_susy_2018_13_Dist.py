@@ -8,8 +8,11 @@ import glob
 import pyslha
 import time
 import progressbar as P
-from helper import LLP
+from helper import LLP,BinnedData
 from ATLAS_data.effFunctions import eventEff,vertexEff
+from ATLAS_data.atlasBins import atlas_bins
+from atlas_susy_2018_13_Recast import getLLPs,getJets,getDisplacedJets,eventAcc,vertexAcc,getModelDict
+
 
 delphesDir = os.path.abspath("./DelphesLLP")
 os.environ['ROOT_INCLUDE_PATH'] = os.path.join(delphesDir,"external")
@@ -24,151 +27,6 @@ ROOT.gInterpreter.Declare('#include "classes/SortableObject.h"')
 ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
-def getLLPs(llpList,daughters):
-
-    llps = []
-    for ip in range(llpList.GetEntries()):
-        p = llpList.At(ip)        
-        # Get all daughters
-        llp_daughters = [daughters.At(d) for d in range(p.D1,p.D2+1)]
-        llps.append(LLP(p,llp_daughters))
-        
-    return llps
-
-def getJets(jets,pTmin=50.0,etaMax=5.0):
-    """
-    Select jets with pT > pTmin and |eta| < etaMax
-    """
-
-    jetsSel = []
-    for ijet in range(jets.GetEntries()):
-        jet = jets.At(ijet)
-        if jet.PT < pTmin:
-            continue
-        if abs(jet.Eta) > etaMax:
-            continue
-        jetsSel.append(jet)
-    
-    return jetsSel
-
-def getDisplacedJets(jets,llps,skipPIDs=[1000022]):
-    """
-    Select from the list of all jets, the displaced jets associated
-    with a LLP decay.
-    """
-
-    displacedJets = []
-    for jet in jets:
-        deltaRmin = 0.3
-        llpMatch = None
-        for llp in llps: 
-            for daughter in llp.directDaughters:
-                if abs(daughter.PID) in skipPIDs:
-                    continue
-                deltaR = np.sqrt((jet.Eta-daughter.Eta)**2 + (jet.Phi-daughter.Phi)**2)
-                if deltaR < deltaRmin:
-                    deltaRmin = deltaR
-                    llpMatch = llp # Store LLP parent
-        
-        jet.llp = llpMatch
-        if llpMatch is not None:
-            R = np.sqrt(llpMatch.Xd**2 + llpMatch.Yd**2 + llpMatch.Zd**2)
-            if R > 3870:
-                continue
-            displacedJets.append(jet)
-    
-    return displacedJets
-
-def eventAcc(jets,jetsDisp,sr):
-    passAcc = 0.0
-    if sr == 'HighPT':
-        # Apply HighPT jet selection    
-        njet250 = len([j for j in jets if j.PT > 250.0])
-        njet195 = len([j for j in jets if j.PT > 195.0])
-        njet116 = len([j for j in jets if j.PT > 116.0])
-        njet90 = len([j for j in jets if j.PT > 90.0])
-        if (njet250 >= 4) or (njet195 >= 5) or (njet116 >= 6) or (njet90 >= 7):
-            passAcc = 1.0
-    elif sr == 'Trackless':    
-        # Apply Trackless jet selection (only if HighPT has failed)    
-        njet137 = len([j for j in jets if j.PT > 137.0])
-        njet101 = len([j for j in jets if j.PT > 101.0])
-        njet83 = len([j for j in jets if j.PT > 83.0])
-        njet55 = len([j for j in jets if j.PT > 55.0])
-        njetDisp70 = len([j for j in jetsDisp if j.PT > 70.0])
-        njetDisp50 = len([j for j in jetsDisp if j.PT > 50.0])
-        if (njet137 >= 4) or (njet101 >= 5) or (njet83 >= 6) or (njet55 >= 7):
-            if (njetDisp70 >=1) or (njetDisp50 >= 2):
-                passAcc = 1.0
-    
-    return passAcc
-
-def vertexAcc(llp,Rmax=np.inf,zmax=np.inf,Rmin=0.0,d0min=0.0,nmin=0,mDVmin=0):
-    
-    passAcc = 1.0
-    
-    if np.sqrt(llp.Xd**2 + llp.Yd**2) > Rmax or abs(llp.Zd) > zmax:
-        passAcc = 0.0
-        
-    if np.sqrt(llp.Xd**2 + llp.Yd**2) < Rmin:
-        passAcc = 0.0
-    
-    maxD0 = 0.0
-    for d in llp.finalDaughters:
-        if d.Charge == 0: # Skip neutral
-            continue
-        d0 = abs((d.Y*d.Px - d.X*d.Px)/d.PT)
-        maxD0 = max(maxD0,d0)
-    if maxD0 < d0min:
-        passAcc = 0.0
-            
-    if llp.nTracks < nmin:
-        passAcc = 0.0
-        
-    if llp.mDV < mDVmin:
-        passAcc = 0.0
-        
-    return passAcc
-    
-def getModelDict(inputFiles,model):
-
-    if model == 'ewk':
-        LLP = 1000022
-        LSP = 1000024
-    elif model == 'strong':
-        LLP = 1000022
-        LSP = 1000021
-    elif model == 'gluino':
-        LLP = 1000021
-        LSP = 1000022
-    else:
-        raise ValueError("Unreconized model %s" %model)
-
-    modelInfoDict = {}
-    f = inputFiles[0]
-    if not os.path.isfile(f):
-        print('File %s not found' %f)
-        raise OSError()
-    parsDict = {}    
-    for banner in glob.glob(os.path.join(os.path.dirname(f),'*banner*txt')):
-        with open(banner,'r') as ff:
-            slhaData = ff.read().split('<slha>')[1].split('</slha>')[0]
-            slhaData = pyslha.readSLHA(slhaData)
-    parsDict = {}
-    parsDict['mLLP'] = slhaData.blocks['MASS'][LLP]
-    parsDict['mLSP'] = slhaData.blocks['MASS'][LSP]
-    parsDict['width'] = slhaData.decays[LLP].totalwidth
-    if parsDict['width']:
-        parsDict['tau_ns'] = (6.582e-25/parsDict['width'])*1e9
-    else:
-        parsDict['tau_ns'] = np.inf    
-
-    modelInfoDict.update(parsDict)
-    print('mLLP = ',parsDict['mLLP'])
-    print('width (GeV) = ',parsDict['width'])
-    print('tau (ns) = ',parsDict['tau_ns'])
-
-    return modelInfoDict
 
 # ### Define dictionary to store data
 def getRecastData(inputFiles,normalize=False,model='strong'):
@@ -180,7 +38,7 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
 
     modelDict = getModelDict(inputFiles,model)
     if not modelDict:
-        modelDict = {}
+        modelDict = {}        
 
     modelDict['Total MC Events'] = 0
 
@@ -194,6 +52,12 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
         nevtsDict[inputFile] = nevts
         f.Close()
 
+    
+    binnedData = {}
+    for sr in ['HighPT', 'Trackless']:
+        xbins = atlas_bins['HighPT']['nTracks']
+        ybins = atlas_bins['HighPT']['mDV']
+        binnedData[sr] = BinnedData(xbins,ybins)
 
     lumi = 139.0
     totalweightPB = 0.0
@@ -208,6 +72,7 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
                 }
     
     cutFlowTrackless = {k : v for k,v in cutFlowHighPT.items()}
+    cutFlows = {'HighPT' : cutFlowHighPT, 'Trackless' : cutFlowTrackless}
 
 
     progressbar = P.ProgressBar(widgets=["Reading %i Events: " %modelDict['Total MC Events'], 
@@ -241,36 +106,48 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
             jetsDisp = getDisplacedJets(jets,llps)
             
             # Event acceptance:
-            highPT_acc = eventAcc(jets,jetsDisp,sr='HighPT')
-            trackless_acc = eventAcc(jets,jetsDisp,sr='Trackless')                        
+            ev_acc = {}
+            ev_acc['HighPT'] = eventAcc(jets,jetsDisp,sr='HighPT')
+            ev_acc['Trackless'] = eventAcc(jets,jetsDisp,sr='Trackless')                        
 
 
             cutFlowHighPT["Total"] += ns
             cutFlowTrackless["Total"] += ns
-            if (not highPT_acc) and (not trackless_acc):
+            if sum(ev_acc.values()) == 0.::
                 continue
 
-            cutFlowHighPT["Jet selection"] += ns*highPT_acc
-            cutFlowTrackless["Jet selection"] += ns*trackless_acc
+            cutFlowHighPT["Jet selection"] += ns*ev_acc['HighPT']
+            cutFlowTrackless["Jet selection"] += ns*ev_acc['Trackless']
             
             # Event efficiency
-            highPT_eff = eventEff(jets,llps,sr='HighPT')
-            trackless_eff = eventEff(jets,llps,sr='Trackless')
+            ev_eff = {}
+            ev_eff['HighPT'] = eventEff(jets,llps,sr='HighPT')
+            ev_eff['Trackless'] = eventEff(jets,llps,sr='Trackless')
+
+            # Vertex efficiencies:
+            v_eff = np.array([vertexEff(llp) for llp in llps])            
 
             # Vertex acceptances:
-            v_acc = np.array([vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0,
-                                        d0min=2.0,nmin=5,mDVmin=10.0)  for llp in llps])
+            nTrack_mDV_pairs = np.array[(llp.nTracks,llp.mDV) for llp in llps]
+            for sr in ['HighPT','Trackless']:
+                binData = binnedData[sr]
+                for nmin in binData.xbins:
+                    if max(nTrack_mDV_pairs[:,0]) < nmin:
+                        continue
+                    for mDVmin in binData.ybinx:
+                        if max(nTrack_mDV_pairs[:,1]) < mDVmin:
+                            continue
+                        
+                        v_acc = np.array([vertexAcc(llp,Rmax=300.0,zmax=300.0,Rmin=4.0,
+                                        d0min=2.0,nmin=nmin,mDVmin=mDVmin)  for llp in llps])
+                
+                        wvertex = 1.0-np.prod(1.0-v_acc*v_eff)
+                    binData.fill(nmin,mDVmin,ns*ev_acc[sr]*ev_eff[sr]*wvertex)
 
             
-            # Vertex efficiencies:
-            v_eff = np.array([vertexEff(llp) for llp in llps])
-
-            
-            wvertex = 1.0-np.prod(1.0-v_acc*v_eff)
-            
-            # Add to the total weight in each SR:
-            cutFlowHighPT["DV selection"] += ns*highPT_acc*highPT_eff*wvertex
-            cutFlowTrackless["DV selection"] += ns*trackless_acc*trackless_eff*wvertex
+                    if nmin == 5 and mDVmin == 10.0:
+                        # Add to the total weight in each SR:
+                        cutFlow[sr]["DV selection"] += ns*ev_acc[sr]*ev_eff[sr]*wvertex
 
         f.Close()
     progressbar.finish()

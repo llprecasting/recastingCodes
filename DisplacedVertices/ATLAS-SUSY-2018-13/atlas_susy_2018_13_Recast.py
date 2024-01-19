@@ -294,12 +294,14 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
     dataDict['Luminosity (1/fb)'] = []
     dataDict['SR'] = []
     dataDict['$N_s$'] = []
+    dataDict['AccEff'] = []
     # Signal regions
     cutFlows = {'HighPT' : cutFlowHighPT, 'Trackless' : cutFlowTrackless}
     for sr,cutFlow in cutFlows.items():
         dataDict['Luminosity (1/fb)'].append(lumi)
         dataDict['SR'].append(sr)
         dataDict['$N_s$'].append(cutFlow["DV selection"][0])
+        dataDict['AccEff'].append(cutFlow["DV selection"][1])
         for cut in cutFlow:
             if cut not in dataDict:
                 dataDict[cut] = []

@@ -31,7 +31,7 @@ atlas_susy_2018_13_CombineData.py -f <list of pickle files> -o <output file>
  * Strong production: values correspond to Recast (ATLAS) acceptance and final acceptance times efficiency.
 
 
-|                              |              |              |           |             |
+|                              |               |               |               |               |
 |:-----------------------------|:--------------|:--------------|:--------------|:--------------|
 | $m_{\tilde g} (GeV)$         | 2000.0        | 2000.0        | 2400.0        | 2000.0        |
 | $m_{\tilde \chi_1^0} (GeV)$  | 850.0         | 50.0          | 200.0         | 1250.0        |
@@ -48,7 +48,7 @@ atlas_susy_2018_13_CombineData.py -f <list of pickle files> -o <output file>
 
  * Electroweak production: values correspond to Recast (ATLAS) acceptance and final acceptance times efficiency.
 
-|                              |              |              |           |              |
+|                              |               |               |               |               |
 |:-----------------------------|:--------------|:--------------|:--------------|:--------------|
 | $m_{\tilde \chi_1^0} (GeV)$  | 500.0         | 500.0         | 1300.0        | 1300.0        |
 | $\tau(\tilde \chi_1^0) (ns)$ | 0.1           | 1.0           | 0.1           | 1.0           |

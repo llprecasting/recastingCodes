@@ -22,8 +22,8 @@ def computeULs(inputFile,outputFile,kfactor=1.0,deltas=0.25):
     for _,row in recastData.iterrows():
         S95obs = atlasUL[row['SR']]['S95_obs']
         S95exp = atlasUL[row['SR']]['S95_exp']
-        robs.append(row['$N_s$']/S95obs)
-        rexp.append(row['$N_s$']/S95exp)
+        robs.append(row['$N_s$']*kfactor/S95obs)
+        rexp.append(row['$N_s$']*kfactor/S95exp)
 
     recastData['robs'] = robs
     recastData['rexp'] = rexp
@@ -84,8 +84,14 @@ def computeULs(inputFile,outputFile,kfactor=1.0,deltas=0.25):
             print('Error computing ulExp for model:\n',m,'\n')
             ulExp = None
         
-        recastData.loc[dfModel.index,'robs_comb'] = 1.0/ul
-        recastData.loc[dfModel.index,'rexp_comb'] = 1.0/ulExp
+        if ul is not None:
+            recastData.loc[dfModel.index,'robs_comb'] = 1.0/ul
+        else:
+            recastData.loc[dfModel.index,'robs_comb'] = 0.0
+        if ulExp is not None:
+            recastData.loc[dfModel.index,'rexp_comb'] = 1.0/ulExp
+        else:
+            recastData.loc[dfModel.index,'rexp_comb'] = 0.0
        
 
     # Store all data to the output file

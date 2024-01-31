@@ -24,14 +24,14 @@ ROOT.gInterpreter.Declare('#include "classes/SortableObject.h"')
 ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
-def getLLPs(llpList,daughters):
+def getLLPs(llpList,daughters,maxMomViolation=5e-2):
 
     llps = []
     for ip in range(llpList.GetEntries()):
         p = llpList.At(ip)        
         # Get all daughters
         llp_daughters = [daughters.At(d) for d in range(p.D1,p.D2+1)]
-        llps.append(LLP(p,llp_daughters))
+        llps.append(LLP(p,llp_daughters,maxMomViolation))
         
     return llps
 
@@ -178,10 +178,10 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
         for f in inputFiles:
             print(f)
 
-    modelDict = {}
-    if model is not None:
-        modelDict = getModelDict(inputFiles,model)
-    
+    modelDict = getModelDict(inputFiles,model)
+    if not modelDict:
+        modelDict = {}
+
     modelDict['Total MC Events'] = 0
 
     nevtsDict = {}
@@ -221,17 +221,18 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
         f = ROOT.TFile(inputFile,'read')
         tree = f.Get("Delphes")
         nevts = tree.GetEntries()
-        if normalize:
-            norm =nevtsDict[inputFile]/modelDict['Total MC Events']
-        else:
-            norm = 1.0/modelDict['Total MC Events']
+        # if normalize:
+        #     norm =nevtsDict[inputFile]/modelDict['Total MC Events']
+        # else:
+        #     norm = 1.0/modelDict['Total MC Events']
+        norm = 1.0
 
         for ievt in range(nevts):    
             
             ntotal += 1
             progressbar.update(ntotal)
             tree.GetEntry(ievt)   
-            weightPB = tree.Weight.At(0).Weight     
+            weightPB = tree.Weight.At(1).Weight     
             weightPB = weightPB*norm
             totalweightPB += weightPB
             ns = weightPB*1e3*lumi # number of signal events

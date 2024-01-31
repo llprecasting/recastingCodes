@@ -29,10 +29,10 @@ def getCutFlow(inputFiles,normalize=False,model='strong',sr='HighPT',nevtsMax=-1
         for f in inputFiles:
             print(f)
 
-    modelDict = {}
-    if model is not None:
-        modelDict = getModelDict(inputFiles,model)
-    
+    modelDict = getModelDict(inputFiles,model)
+    if not modelDict:
+        modelDict = {}
+
     modelDict['Total MC Events'] = 0
 
     nevtsDict = {}
@@ -80,17 +80,18 @@ def getCutFlow(inputFiles,normalize=False,model='strong',sr='HighPT',nevtsMax=-1
         f = ROOT.TFile(inputFile,'read')
         tree = f.Get("Delphes")
         nevts = nevtsDict[inputFile]
-        if normalize:
-            norm =nevtsDict[inputFile]/modelDict['Total MC Events']
-        else:
-            norm = 1.0/modelDict['Total MC Events']
+        # if normalize:
+        #     norm =nevtsDict[inputFile]/modelDict['Total MC Events']
+        # else:
+        #     norm = 1.0/modelDict['Total MC Events']
+        norm = 1.0
 
         for ievt in range(nevts):    
             
             ntotal += 1
             progressbar.update(ntotal)
             tree.GetEntry(ievt)   
-            weightPB = tree.Weight.At(0).Weight     
+            weightPB = tree.Weight.At(1).Weight     
             weightPB = weightPB*norm
             totalweightPB += weightPB
             ns = weightPB*1e3*lumi # number of signal events
@@ -155,7 +156,7 @@ def getCutFlow(inputFiles,normalize=False,model='strong',sr='HighPT',nevtsMax=-1
 
     print('Acceptance for %s:' %sr)
     for k,v in cutFlowAcceptance.items():
-        print('%s : %1.1f%%' %(k,v*1e2))
+        print('%s : %1.3f%%' %(k,v*1e2))
     
     return cutFlowAcceptance
 

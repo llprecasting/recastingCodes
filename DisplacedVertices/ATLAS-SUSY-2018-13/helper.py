@@ -13,7 +13,7 @@ class LLP(object):
     other useful methods
     """
 
-    def __init__(self, candidate, daughters) -> None:
+    def __init__(self, candidate, daughters, maxMomViolation=5e-2) -> None:
         self._candidate = candidate
         self.directDaughters = []
         self.finalDaughters = []
@@ -22,7 +22,9 @@ class LLP(object):
         self.mDV = None
 
         for d in daughters:
-            if d.M1 < 0 and d.Status == 1:
+            if d.M1 >= 0: # Direct daughters are identified by having a positive mother index
+                self.directDaughters.append(d)
+            if d.Status == 1: # Final daughters have Status = 1
                 self.finalDaughters.append(d)
                 if d.Charge == 0:
                     continue
@@ -34,8 +36,7 @@ class LLP(object):
                 if pTratio < 1.0:
                     continue
                 self._selectedDecays.append(d)
-            else:
-                self.directDaughters.append(d)
+            
 
         # Force the computation of mDV and nTracks
         pTot = np.zeros(4)
@@ -53,14 +54,14 @@ class LLP(object):
         pNorm = np.linalg.norm(pTot)
         for d in self.directDaughters:                
             pTot -= np.array([d.E,d.Px,d.Py,d.Pz])
-        if np.linalg.norm(pTot)/pNorm > 1e-5:
+        if np.linalg.norm(pTot)/pNorm > maxMomViolation/1e3: # Be more strict about direct daughters
             raise ValueError("Error getting direct daughters, momentum conservation violated!")
       
         pTot = np.array([self.E,self.Px,self.Py,self.Pz])
         pNorm = np.linalg.norm(pTot)
         for d in self.finalDaughters:                
             pTot -= np.array([d.E,d.Px,d.Py,d.Pz])
-        if np.linalg.norm(pTot)/pNorm > 1e-2:
+        if np.linalg.norm(pTot)/pNorm > maxMomViolation:
             raise ValueError("Error getting final daughters, momentum conservation violated! (%s)" %(str(pTot)))        
         
         rList = [np.sqrt(d.X**2 + d.Y**2 + d.Z**2) for d in self.directDaughters]

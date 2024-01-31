@@ -178,10 +178,10 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
         for f in inputFiles:
             print(f)
 
-    modelDict = getModelDict(inputFiles,model)
-    if not modelDict:
-        modelDict = {}
-
+    modelDict = {}
+    if model is not None:
+        modelDict = getModelDict(inputFiles,model)
+    
     modelDict['Total MC Events'] = 0
 
     nevtsDict = {}
@@ -333,7 +333,7 @@ if __name__ == "__main__":
             default = None)
     ap.add_argument('-n', '--normalize', required=False,action='store_true',
             help='If set, the input files will be considered to refer to multiple samples of the same process and their weights will be normalized.')
-    ap.add_argument('-m', '--model', required=False,type=str,default='strong',
+    ap.add_argument('-m', '--model', required=False,type=str,default=None,
             help='Defines which model should be considered for extracting model parameters (strong,ewk,gluino).')
 
     ap.add_argument('-v', '--verbose', default='info',

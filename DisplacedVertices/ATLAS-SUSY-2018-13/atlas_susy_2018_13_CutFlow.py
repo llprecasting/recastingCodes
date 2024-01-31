@@ -29,10 +29,10 @@ def getCutFlow(inputFiles,normalize=False,model='strong',sr='HighPT',nevtsMax=-1
         for f in inputFiles:
             print(f)
 
-    modelDict = getModelDict(inputFiles,model)
-    if not modelDict:
-        modelDict = {}
-
+    modelDict = {}
+    if model is not None:
+        modelDict = getModelDict(inputFiles,model)
+    
     modelDict['Total MC Events'] = 0
 
     nevtsDict = {}

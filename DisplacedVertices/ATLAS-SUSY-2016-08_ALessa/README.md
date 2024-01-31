@@ -67,8 +67,8 @@ For instance, the following validation plot can be generated running this [ipyth
 ### Cut-flow Comparison
 
 
-|                     | ATLAS  | Recasting  |   ATLAS | Recasting  |
-| -----------                    | ------ | ------ | - ---- | ----- |
+|             | ATLAS  | Recasting  |   ATLAS | Recasting  |
+| ----------- | ------ | ---------- | ------- | ---------- |
 |  **mGluino, mLSP, tau**             | **2000,100,1ns**  | **2000,100,1ns**  |   **2000,1800,1ns** | **2000,1800,1ns**  |
 | Initial Events                 |   32   |   32   |   32   |   32  |
 | Trigger-based data reduction   |   32   |        |   27   |       |

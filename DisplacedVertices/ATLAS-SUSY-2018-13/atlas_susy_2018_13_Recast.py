@@ -24,14 +24,24 @@ ROOT.gInterpreter.Declare('#include "classes/SortableObject.h"')
 ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
-def getLLPs(llpList,daughters,maxMomViolation=5e-2):
+def getLLPs(llpList,directDaughters,finalDaughters,maxMomViolation=1e-2):
 
     llps = []
     for ip in range(llpList.GetEntries()):
         p = llpList.At(ip)        
-        # Get all daughters
-        llp_daughters = [daughters.At(d) for d in range(p.D1,p.D2+1)]
-        llps.append(LLP(p,llp_daughters,maxMomViolation))
+        # Get direct daughters
+        llp_ddaughters = []        
+        for d in directDaughters:
+            if d.M1 == ip:
+                llp_ddaughters.append(d)
+        # Get final daughters
+        llp_fdaughters = []
+        for d in finalDaughters:
+            if d.M1 == ip:
+                llp_fdaughters.append(d)
+        
+        # Get final daughters
+        llps.append(LLP(p,llp_ddaughters,llp_fdaughters,maxMomViolation))
         
     return llps
 
@@ -237,7 +247,7 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
             totalweightPB += weightPB
             ns = weightPB*1e3*lumi # number of signal events
 
-            llps = getLLPs(tree.llps,tree.llpDaughters)
+            llps = getLLPs(tree.bsm,tree.bsmDirectDaughters,tree.bsmFinalDaughters)
             jets = getJets(tree.GenJet,pTmin=25.,etaMax=5.0)
             jetsDisp = getDisplacedJets(jets,llps)
             

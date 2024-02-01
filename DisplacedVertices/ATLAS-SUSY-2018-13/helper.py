@@ -13,29 +13,26 @@ class LLP(object):
     other useful methods
     """
 
-    def __init__(self, candidate, daughters, maxMomViolation=5e-2) -> None:
+    def __init__(self, candidate, direcdaughters, finaldaughters,
+                 maxMomViolation=5e-2) -> None:
         self._candidate = candidate
-        self.directDaughters = []
-        self.finalDaughters = []
+        self.directDaughters = direcdaughters[:]
+        self.finalDaughters = finaldaughters[:]
         self._selectedDecays = []
         self.nTracks = None
         self.mDV = None
 
-        for d in daughters:
-            if d.M1 >= 0: # Direct daughters are identified by having a positive mother index
-                self.directDaughters.append(d)
-            if d.Status == 1: # Final daughters have Status = 1
-                self.finalDaughters.append(d)
-                if d.Charge == 0:
-                    continue
-                if d.Status != 1:
-                    continue
-                if d.PT < 1.0:
-                    continue
-                pTratio = abs(d.PT/d.Charge)
-                if pTratio < 1.0:
-                    continue
-                self._selectedDecays.append(d)
+        for d in self.finalDaughters:
+            if d.Charge == 0:
+                continue
+            if d.Status != 1:
+                continue
+            if d.PT < 1.0:
+                continue
+            pTratio = abs(d.PT/d.Charge)
+            if pTratio < 1.0:
+                continue
+            self._selectedDecays.append(d)
             
 
         # Force the computation of mDV and nTracks
@@ -89,29 +86,6 @@ class LLP(object):
                 return self._candidate.__getattribute__(attr)
             except:
                 raise AttributeError("Could not get attribute %s" %attr)
-        
-    # @property
-    # def mDV(self):
-    #     if self._mDV is not None:
-    #         return self._mDV
-    #     else:
-    #         pTot = np.zeros(4)
-    #         for d in self._selectedDecays:
-    #             p = np.array([0.,d.Px,d.Py,d.Pz])
-    #             mpion = 0.140
-    #             p[0] = np.sqrt(mpion**2 + np.dot(p[1:],p[1:]))
-    #             pTot += p
-    #         mDV = np.sqrt(pTot[0]**2 - np.dot(pTot[1:],pTot[1:]))
-    #         self._mDV = mDV
-    #         return mDV
-        
-    # @property
-    # def nTracks(self):
-    #     if self._nTracks is not None:
-    #         return self._nTracks
-    #     else:
-    #         self._nTracks = len(self._selectedDecays)
-    #     return self._nTracks
 
 
 class BinnedData(object):

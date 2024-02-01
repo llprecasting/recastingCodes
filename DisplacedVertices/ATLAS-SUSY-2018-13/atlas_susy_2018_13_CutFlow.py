@@ -96,7 +96,7 @@ def getCutFlow(inputFiles,normalize=False,model='strong',sr='HighPT',nevtsMax=-1
             totalweightPB += weightPB
             ns = weightPB*1e3*lumi # number of signal events
 
-            llps = getLLPs(tree.llps,tree.llpDaughters)
+            llps = getLLPs(tree.bsm,tree.bsmDirectDaughters,tree.bsmFinalDaughters)
             jets = getJets(tree.GenJet,pTmin=25.,etaMax=5.0)
             jetsDisp = getDisplacedJets(jets,llps)
             

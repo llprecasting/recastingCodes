@@ -36,7 +36,7 @@ set ExecutionPath {
   MuonEfficiency
   MuonIsolation
 
-  LLPFilter
+  BSMFilter
   DMFilter
   DMMissingET
 
@@ -599,14 +599,15 @@ module Merger ScalarHT {
 
 
 #####################
-# LLP Filter
+# BSM Filter
 #####################
 
-module LLPFilter LLPFilter {
+module BSMFilter BSMFilter {
 
   set InputArray Delphes/allParticles
-  set OutputArray llpParticles
-  set DaughtersArray daughters  
+  set OutputArray bsmParticles
+  set FinalDaughtersArray finalDaughters  
+  set DirectDaughtersArray directDaughters  
   set PTMin 0.0
   set massMin 50.0
   
@@ -812,8 +813,9 @@ module TreeWriter TreeWriter {
 # add Branch InputArray BranchName BranchClass
 #  add Branch Delphes/allParticles Particle GenParticle
 #  add Branch Delphes/partons Parton GenParticle  
-  add Branch LLPFilter/daughters llpDaughters GenParticle
-  add Branch LLPFilter/llpParticles llps GenParticle
+  add Branch BSMFilter/finalDaughters bsmFinalDaughters GenParticle
+  add Branch BSMFilter/directDaughters bsmDirectDaughters GenParticle
+  add Branch BSMFilter/bsmParticles bsm GenParticle
   add Branch DMFilter/dmParticles dmParticles GenParticle
   add Branch DMMissingET/momentum DMMissingET MissingET  
 

@@ -43,8 +43,8 @@ define vl~ = ve~ vm~ vt~
 import model ../../MSSM_SLHA2_mod
 define sq = ul cl t1 ur cr t2 dl sl b1 dr sr b2 ul~ cl~ t1~ ur~ cr~ t2~ dl~ sl~ b1~ dr~ sr~ b2~
 define c1 = x1+ x1-
-generate p p > c1 n1
-add process p p > c1 n2
-add process p p > x1+ x1-
-add process p p > n2 n1
+generate p p > c1 n1 / sq
+add process p p > c1 n2 / sq
+add process p p > x1+ x1- / sq
+add process p p > n2 n1 / sq
 output ../../pp2C1N1

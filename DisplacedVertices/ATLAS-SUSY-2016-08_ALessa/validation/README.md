@@ -33,12 +33,12 @@ For instance, the following validation plot can be generated running this [ipyth
 
  * mgluino = 1.4 TeV, mLSP = 100 GeV:
 
-![Alt text](validation/validationPlot_mlsp100.png?raw=true "Validation Plot")
+![Alt text](validationPlot_mlsp100.png?raw=true "Validation Plot")
 
 
 * mgluino = 1.4 TeV, mLSP = 1300 GeV:
 
-![Alt text](validation/validationPlot_dm100.png?raw=true "Validation Plot")
+![Alt text](validationPlot_dm100.png?raw=true "Validation Plot")
 
 
 

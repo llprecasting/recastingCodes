@@ -63,7 +63,6 @@ For instance, running:
 ./atlas_susy_2016_08_Recast.py -f <root file>
 ```
 will produce a pickle file contaning a Pandas DataFrame with a simplified cutflow and the number of events in each signal region.
-For a more detailed cutflow, one should use:
 
 ## Validation ##
 

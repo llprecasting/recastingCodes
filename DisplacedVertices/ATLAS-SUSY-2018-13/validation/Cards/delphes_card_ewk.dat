@@ -615,6 +615,10 @@ module BSMFilter BSMFilter {
   add PdgCode {1000022}
   add PdgCode {1000023}  
   add PdgCode {1000024}
+  add PdgCode {-1000022}
+  add PdgCode {-1000023}  
+  add PdgCode {-1000024}
+  
 }
 
 

@@ -11,7 +11,7 @@ import progressbar as P
 from helper import LLP
 from ATLAS_data.effFunctions import eventEff,vertexEff
 
-delphesDir = os.path.abspath("../DelphesLLP")
+delphesDir = os.path.abspath("./DelphesLLP")
 os.environ['ROOT_INCLUDE_PATH'] = os.path.join(delphesDir,"external")
 
 import ROOT
@@ -61,33 +61,6 @@ def getJets(jets,pTmin=50.0,etaMax=5.0):
     
     return jetsSel
 
-def getDisplacedJets(jets,llps,skipPIDs=[1000022]):
-    """
-    Select from the list of all jets, the displaced jets associated
-    with a LLP decay.
-    """
-
-    displacedJets = []
-    for jet in jets:
-        deltaRmin = 0.3
-        llpMatch = None
-        for llp in llps: 
-            for daughter in llp.directDaughters:
-                if abs(daughter.PID) in skipPIDs:
-                    continue
-                deltaR = np.sqrt((jet.Eta-daughter.Eta)**2 + (jet.Phi-daughter.Phi)**2)
-                if deltaR < deltaRmin:
-                    deltaRmin = deltaR
-                    llpMatch = llp # Store LLP parent
-        
-        jet.llp = llpMatch
-        if llpMatch is not None:
-            R = np.sqrt(llpMatch.Xd**2 + llpMatch.Yd**2 + llpMatch.Zd**2)
-            if R > 3870:
-                continue
-            displacedJets.append(jet)
-    
-    return displacedJets
 
 def eventAcc(jets,met,metCut=200.0,
              maxJetChargedPT=np.inf,
@@ -354,8 +327,8 @@ if __name__ == "__main__":
     import sys
     LDPATH = subprocess.check_output('echo $LD_LIBRARY_PATH',shell=True,text=True)
     ROOTINC = subprocess.check_output('echo $ROOT_INCLUDE_PATH',shell=True,text=True)
-    pythiaDir = os.path.abspath('../MG5/HEPTools/pythia8/lib')
-    delphesDir = os.path.abspath('../DelphesLLP/external')
+    pythiaDir = os.path.abspath('./MG5/HEPTools/pythia8/lib')
+    delphesDir = os.path.abspath('./DelphesLLP/external')
     if pythiaDir not in LDPATH or delphesDir not in ROOTINC:
         print('Enviroment variables not properly set. Run source setenv.sh first.')
         sys.exit()

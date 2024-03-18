@@ -1,0 +1,60 @@
+#: table_doi: 10.17182/hepdata.78697.v2/t32
+#: name: Table 32
+#: description: Parameterized vertex level efficiencies as a function of number of particles associated to a truth decay vertex, and the vertex invariant mass for truth decays with $84$ mm $< R_{\mathrm{decay}} < 111$ mm. Selected particles are required to have nonzero electric charge, $p_{T}(|Q|=1) > 1$ GeV, and $d_0 > 2$ mm. The per-vertex efficiency is evaluated only for truth vertices that have at least 5 associated tracks, an invariant mass $> 10$ GeV, and are in the region $4$ mm $< R_{\mathrm{decay}} < 300$ mm, and $|Z_{\mathrm{decay}}| < 300$ mm. A truth vertex satisfies the vertex level efficiency if it can be matched to a reconstructed DV which passes the final vertex selection.
+#: data_file: data62.yaml
+#: data_license:   
+#: keyword reactions: 
+#: keyword observables: EFF
+#: keyword phrases: Proton-Proton Scattering | Supersymmetry | SUSY
+#: keyword cmenergies: 13000.0
+#: SQRT(S) [GeV],,,,,13000
+'m (Truth vertex) [GeV]','m (Truth vertex) [GeV] LOW','m (Truth vertex) [GeV] HIGH','Number of tracks (Truth vertex)','Number of tracks (Truth vertex) LOW','Number of tracks (Truth vertex) HIGH','Vertex selection efficiency'
+12.5,10,15,5.5,5,6,0.02209
+17.5,15,20,5.5,5,6,0.0227
+25.0,20,30,5.5,5,6,0.03417
+40.0,30,50,5.5,5,6,0.02653
+75.0,50,100,5.5,5,6,0.06122
+12.5,10,15,6.5,6,7,0.03759
+17.5,15,20,6.5,6,7,0.03088
+25.0,20,30,6.5,6,7,0.03767
+40.0,30,50,6.5,6,7,0.02207
+75.0,50,100,6.5,6,7,0.04331
+12.5,10,15,8.5,7,10,0.04217
+17.5,15,20,8.5,7,10,0.06129
+25.0,20,30,8.5,7,10,0.06257
+40.0,30,50,8.5,7,10,0.06395
+75.0,50,100,8.5,7,10,0.06502
+150.0,100,200,8.5,7,10,0.01994
+350.0,200,500,8.5,7,10,0.024
+12.5,10,15,12.5,10,15,0.03908
+17.5,15,20,12.5,10,15,0.08071
+25.0,20,30,12.5,10,15,0.1045
+40.0,30,50,12.5,10,15,0.1235
+75.0,50,100,12.5,10,15,0.1063
+150.0,100,200,12.5,10,15,0.06798
+350.0,200,500,12.5,10,15,0.05522
+2750.0,500,5000,12.5,10,15,0.005263
+12.5,10,15,17.5,15,20,0.0303
+17.5,15,20,17.5,15,20,0.04902
+25.0,20,30,17.5,15,20,0.1097
+40.0,30,50,17.5,15,20,0.1516
+75.0,50,100,17.5,15,20,0.1374
+150.0,100,200,17.5,15,20,0.1048
+350.0,200,500,17.5,15,20,0.09298
+2750.0,500,5000,17.5,15,20,0.05498
+17.5,15,20,25.0,20,30,0.02632
+25.0,20,30,25.0,20,30,0.075
+40.0,30,50,25.0,20,30,0.1139
+75.0,50,100,25.0,20,30,0.1593
+150.0,100,200,25.0,20,30,0.1582
+350.0,200,500,25.0,20,30,0.1416
+2750.0,500,5000,25.0,20,30,0.1159
+40.0,30,50,40.0,30,50,0.01515
+75.0,50,100,40.0,30,50,0.1503
+150.0,100,200,40.0,30,50,0.2051
+350.0,200,500,40.0,30,50,0.2178
+2750.0,500,5000,40.0,30,50,0.1802
+150.0,100,200,125.0,50,200,0.2258
+350.0,200,500,125.0,50,200,0.2783
+2750.0,500,5000,125.0,50,200,0.2701
+

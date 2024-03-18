@@ -1,0 +1,92 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t94
+#: name: Acceptance, R-hadron, compressed
+#: description: Acceptance for the R-hadron pair-production model with DeltaM(gluino, N1) = 30 GeV for various masses and lifetimes. The acceptance is defined as the fraction of events having at least one charged LLP satisfying pT > 120 GeV, |eta| < 1.8 and r_decay > 500 mm.
+#: data_file: tabaux3_accep_rhadron_compressed.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: Acc/Eff
+#: keyword phrases: Supersymmetry | SUSY
+#: Model,R-hadron / $\Delta m(\tilde{g},\tilde{\chi}_{1}^{0})$ = 30 GeV
+#: Lifetime,0.3 ns
+Mass [GeV],Acceptance
+400.0,0.003
+500.0,0.002
+600.0,0.002
+700.0,0.002
+800.0,0.001
+1000.0,0.001
+1200.0,0.001
+1400.0,0.001
+1600.0,0.0
+1800.0,0.001
+2000.0,--
+2200.0,--
+2400.0,--
+
+#: Model,R-hadron / $\Delta m(\tilde{g},\tilde{\chi}_{1}^{0})$ = 30 GeV
+#: Lifetime,1 ns
+Mass [GeV],Acceptance
+400.0,0.067
+500.0,0.065
+600.0,0.063
+700.0,0.059
+800.0,0.057
+1000.0,0.05
+1200.0,0.045
+1400.0,0.039
+1600.0,0.035
+1800.0,0.031
+2000.0,0.028
+2200.0,--
+2400.0,--
+
+#: Model,R-hadron / $\Delta m(\tilde{g},\tilde{\chi}_{1}^{0})$ = 30 GeV
+#: Lifetime,3 ns
+Mass [GeV],Acceptance
+400.0,0.241
+500.0,0.247
+600.0,0.247
+700.0,0.245
+800.0,0.244
+1000.0,0.236
+1200.0,0.227
+1400.0,0.222
+1600.0,0.204
+1800.0,0.198
+2000.0,0.182
+2200.0,0.177
+2400.0,0.17
+
+#: Model,R-hadron / $\Delta m(\tilde{g},\tilde{\chi}_{1}^{0})$ = 30 GeV
+#: Lifetime,10 ns
+Mass [GeV],Acceptance
+400.0,0.396
+500.0,0.416
+600.0,0.43
+700.0,0.437
+800.0,0.441
+1000.0,0.443
+1200.0,0.442
+1400.0,0.443
+1600.0,0.439
+1800.0,0.433
+2000.0,0.427
+2200.0,0.422
+2400.0,0.421
+
+#: Model,R-hadron / $\Delta m(\tilde{g},\tilde{\chi}_{1}^{0})$ = 30 GeV
+#: Lifetime,30 ns
+Mass [GeV],Acceptance
+400.0,0.455
+500.0,0.481
+600.0,0.501
+700.0,0.516
+800.0,0.531
+1000.0,0.544
+1200.0,0.546
+1400.0,0.545
+1600.0,0.548
+1800.0,0.551
+2000.0,0.551
+2200.0,0.545
+2400.0,0.548
+

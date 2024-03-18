@@ -1,0 +1,29 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t85
+#: name: Cross Section Limit, Stau 30ns
+#: description: The expected upper limits on cross-section for sleptons with lifetime (a) 1 ns, (b) 3 ns, (c) 10 ns, (d) 30 ns, and (e) stable.
+#: data_file: figaux29d_XSExclusion_dEdx_Multibin_Internal_slepton_30.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: CLs
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+#: keyword reactions: p p --> SLEPTON SLEPTON
+Stau Mass [TeV],Expected limit [pb],"exp,1-sigma +","exp,1-sigma -"
+0.2,0.0729,0.0255,-0.0198
+0.3,0.00577,0.00218,-0.00124
+0.4,0.00215,0.000973,-0.000449
+0.5,0.00122,0.000556,-0.000197
+0.6,0.000745,0.000301,-0.000159
+
+Stau Mass [TeV],Observed limit [pb]
+0.2,0.09
+0.3,0.00695
+0.4,0.0038
+0.5,0.00173
+0.6,0.000706
+
+Stau Mass [TeV],Signal Cross Section [pb]
+0.2,0.0303
+0.3,0.00625
+0.4,0.00186
+0.5,0.000674
+0.6,0.000276
+

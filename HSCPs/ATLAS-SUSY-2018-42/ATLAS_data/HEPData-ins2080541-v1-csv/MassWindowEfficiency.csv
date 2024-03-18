@@ -1,0 +1,11 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t92
+#: name: Mass Window Efficiency
+#: description: Signal selection efficiency by the mass window for SR-Inclusive_Low and SR-Inclusive_High bins.
+#: data_file: tabaux1_massWindow.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: Acc/Eff
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+Signal Region Bin,Window Efficiency w_mass
+SR-Inclusive_Low,0.60 +/- 0.04
+SR-Inclusive_High,(0.74 - 0.052 * (m/TeV)) +/- 0.04
+

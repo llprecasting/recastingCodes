@@ -1,0 +1,49 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t111
+#: name: Cut Flow, Chargino
+#: description: Passing events in event selection steps for the chargino pair-production model for various masses and lifetimes.
+#: data_file: tabaux20_cutflow_chargino.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: N
+#: keyword phrases: Supersymmetry | SUSY
+#: Model,Chargino $m(\tilde{\chi}_{1}^{\pm})$ = 1.3 TeV
+#: Lifetime,10 ns
+Selection,Events
+Total,20.8
+Event and jet Cleaning,20.6
+Trigger,11.2
+Primary vertex,11.2
+$E_{T}^{miss}>170$ GeV,7.9
+Track in PV,7.8
+$p_{T} > 50$ GeV,6.8
+Track quality requirements,5.8
+Track isolation,5.1
+$p_{T} > 120$ GeV,5.0
+Track momentum uncertainty,4.8
+$|\eta|<1.8$,4.39
+"$m_{T}({track},{p}_{{T}}^{{ miss}}) > 130$ GeV",3.8
+Electron veto,3.8
+Hadron/tau veto,3.8
+"$dE/dx\in[1.8,2.4] {MeV~cm^{2}/g}$",0.8
+$dE/dx>2.4 {MeV~cm^{2}/g}$,1.92
+
+#: Model,Chargino $m(\tilde{\chi}_{1}^{\pm})$ = 1.3 TeV
+#: Lifetime,10 ns
+Selection,Efficiency
+Total,1.0
+Event and jet Cleaning,0.995
+Trigger,0.539
+Primary vertex,0.539
+$E_{T}^{miss}>170$ GeV,0.381
+Track in PV,0.378
+$p_{T} > 50$ GeV,0.326
+Track quality requirements,0.279
+Track isolation,0.244
+$p_{T} > 120$ GeV,0.242
+Track momentum uncertainty,0.231
+$|\eta|<1.8$,0.211
+"$m_{T}({track},{p}_{{T}}^{{ miss}}) > 130$ GeV",0.183
+Electron veto,0.183
+Hadron/tau veto,0.183
+"$dE/dx\in[1.8,2.4] {MeV~cm^{2}/g}$",0.039
+$dE/dx>2.4 {MeV~cm^{2}/g}$,0.092
+

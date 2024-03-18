@@ -1,0 +1,109 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t96
+#: name: Acceptance, Stau
+#: description: Acceptance for the stau pair-production model for various masses and lifetimes. The acceptance is defined as the fraction of events having at least one charged LLP satisfying pT > 120 GeV, |\eta| < 1.8 and r_decay > 500 mm.
+#: data_file: tabaux5_accep_stau.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: Acc/Eff
+#: keyword phrases: Supersymmetry | SUSY
+#: Model,Stau
+#: Lifetime,0.3 ns
+Mass [GeV],Acceptance
+100.0,0.04
+200.0,0.036
+300.0,0.033
+400.0,0.025
+450.0,--
+500.0,0.023
+550.0,--
+600.0,0.019
+650.0,--
+700.0,0.016
+800.0,0.014
+900.0,0.011
+1000.0,0.01
+
+#: Model,Stau
+#: Lifetime,1 ns
+Mass [GeV],Acceptance
+100.0,--
+200.0,--
+300.0,--
+400.0,--
+450.0,0.295
+500.0,--
+550.0,0.283
+600.0,0.277
+650.0,0.276
+700.0,0.269
+800.0,0.253
+900.0,0.248
+1000.0,0.233
+
+#: Model,Stau
+#: Lifetime,3 ns
+Mass [GeV],Acceptance
+100.0,0.326
+200.0,0.571
+300.0,0.64
+400.0,0.662
+450.0,--
+500.0,0.675
+550.0,--
+600.0,0.676
+650.0,--
+700.0,0.679
+800.0,0.678
+900.0,0.669
+1000.0,0.665
+
+#: Model,Stau
+#: Lifetime,10 ns
+Mass [GeV],Acceptance
+100.0,0.371
+200.0,0.692
+300.0,0.801
+400.0,0.843
+450.0,0.863
+500.0,0.87
+550.0,0.877
+600.0,0.887
+650.0,0.894
+700.0,0.894
+800.0,0.906
+900.0,0.904
+1000.0,0.911
+
+#: Model,Stau
+#: Lifetime,30 ns
+Mass [GeV],Acceptance
+100.0,0.384
+200.0,0.723
+300.0,0.837
+400.0,0.885
+450.0,--
+500.0,0.915
+550.0,--
+600.0,0.935
+650.0,--
+700.0,0.946
+800.0,0.954
+900.0,0.962
+1000.0,0.965
+
+#: Model,Stau
+#: Lifetime,Stable
+Mass [GeV],Acceptance
+100.0,0.391
+200.0,0.737
+300.0,0.856
+400.0,0.901
+450.0,0.923
+500.0,0.935
+550.0,0.943
+600.0,0.952
+650.0,0.96
+700.0,0.962
+800.0,0.974
+900.0,0.978
+1000.0,0.983
+

@@ -1,0 +1,56 @@
+#: table_doi: 10.17182/hepdata.137762.v1/t72
+#: name: acceptance_trackless_ewk
+#: description: Acceptance cutflow for the Trackless SR for representative points in the electroweak pair production model. See additional resources for more information.
+#: data_file: acceptance_trackless_ewk.yaml
+#: keyword observables: ACC
+#: keyword reactions: P P --> NEUTRALINO2 NEUTRALINO1 X | P P --> CHARGINO1 NEUTRALINO1 X | P P --> CHARGINO1 CHARGINO1 X | P P --> CHARGINO1 NEUTRALINO2 X
+#: keyword cmenergies: 13000
+#: keyword phrases: SUSY | Supersymmetry | RPV | Proton-Proton Scattering
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],500
+#: $\tau$ [ns],0.1
+Selections,Acceptance
+Jet selection,0.495
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.495
+"$\ge 1$ DV, $L_{xy}\ge 4$ mm",0.465
+"$\ge 1$ DV, $\ge 1$ charged-particle with $|d_0| > 2$ mm",0.465
+"$\ge 1$ DV, $n_{\textit{selected decay products}} \geq 5$",0.465
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.465
+
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],500
+#: $\tau$ [ns],1.0
+Selections,Acceptance
+Jet selection,0.501
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.41
+"$\ge 1$ DV, $L_{xy}\ge 4$ mm",0.398
+"$\ge 1$ DV, $\ge 1$ charged-particle with $|d_0| > 2$ mm",0.398
+"$\ge 1$ DV, $n_{\textit{selected decay products}} \geq 5$",0.398
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.398
+
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],1300
+#: $\tau$ [ns],0.1
+Selections,Acceptance
+Jet selection,0.968
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.968
+"$\ge 1$ DV, $L_{xy}\ge 4$ mm",0.859
+"$\ge 1$ DV, $\ge 1$ charged-particle with $|d_0| > 2$ mm",0.859
+"$\ge 1$ DV, $n_{\textit{selected decay products}} \geq 5$",0.859
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.859
+
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],1300
+#: $\tau$ [ns],1.0
+Selections,Acceptance
+Jet selection,0.985
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.921
+"$\ge 1$ DV, $L_{xy}\ge 4$ mm",0.899
+"$\ge 1$ DV, $\ge 1$ charged-particle with $|d_0| > 2$ mm",0.899
+"$\ge 1$ DV, $n_{\textit{selected decay products}} \geq 5$",0.899
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.899
+

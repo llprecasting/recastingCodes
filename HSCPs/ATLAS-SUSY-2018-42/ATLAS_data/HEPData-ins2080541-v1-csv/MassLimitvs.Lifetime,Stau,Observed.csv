@@ -1,0 +1,23 @@
+#: table_doi: 10.17182/hepdata.127994.v1/t27
+#: name: Mass Limit vs. Lifetime, Stau, Observed
+#: description: (a) Lower limits on the chargino mass as a function of lifetime, and (b) the contours around the excluded mass-lifetime region for stau pair production.
+#: data_file: fig19b_limits_slepton_obs.yaml
+#: keyword cmenergies: 13000.0
+#: keyword observables: CLs
+#: keyword phrases: Supersymmetry | SUSY | Proton-Proton Scattering | Charged Long-lived Particles
+#: keyword reactions: p p --> SLEPTON SLEPTON
+Lifetime [ns],Observed Limit [GeV],"th,1-sigma +","th,1-sigma -"
+2.0,303,2,-2
+3.0,333,2,-3
+4.0,355,3,-2
+5.0,362,3,-3
+7.0,368,3,-4
+9.0,365,4,-4
+10.0,366,4,-4
+12.0,341,4,-3
+15.0,331,3,-3
+18.0,319,3,-3
+24.0,--,0,0
+27.0,--,0,0
+30.0,--,0,0
+

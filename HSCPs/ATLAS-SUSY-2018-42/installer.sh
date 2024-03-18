@@ -28,34 +28,23 @@ fi
 
 cd $homeDIR
 
-madgraph="MG5_aMC_v3.4.2.tar.gz"
-URL=https://launchpad.net/mg5amcnlo/3.0/3.4.x/+download/$madgraph
+
+madgraph="MG5_aMC_v3.5.3.tar.gz"
+URL=https://launchpad.net/mg5amcnlo/3.0/3.5.x/+download/$madgraph
 echo -n "Install MadGraph (y/n)? "
 read answer
 if echo "$answer" | grep -iq "^y" ;then
 	mkdir MG5;
 	echo "[installer] getting MadGraph5"; wget $URL 2>/dev/null || curl -O $URL; tar -zxf $madgraph -C MG5 --strip-components 1;
-	sed  "s|homeDIR|$homeDIR|g" mg5_configuration.txt > ./MG5/input/mg5_configuration.txt;	
+	cd $homeDIR
 	cd ./MG5/bin;
-	echo "[installer] installing HepMC under MadGraph5"
-	echo "install hepmc\nexit\n" > mad_install.txt
+	echo "[installer] installing HepMC, LHAPDF6 and Pythia8 under MadGraph5"
+    echo "install hepmc\ninstall lhapdf6\ninstall pythia8\nexit\n" > mad_install.txt;
 	./mg5_aMC -f mad_install.txt
-	cd ../;
-	"[installer] Trying to install lhapdf 6.5.3. under MadGrapg5";
-	sed -i "s/'version':       '6.3.0'/'version':       '6.5.3'/g" HEPTools/HEPToolsInstallers/HEPToolInstaller.py;
-	python3 ./HEPTools/HEPToolsInstallers/HEPToolInstaller.py lhapdf6;
-	if [ ! -f "./HEPTools/lhapdf6_py3/bin/lhapdf-config" ]; then	
-	    echo "LHAPDF6 installation failed. Try to install it manually";
-	    exit;
-	fi
-	cd bin;
-        echo "[installer] installing Pythia8 under MadGraph5";
-	echo "install pythia8\nexit\n" > mad_install.txt;
-	./mg5_aMC -f mad_install.txt;
-	rm mad_install.txt;
-	cd $homeDIR;
+	cd $homeDIR
+    rm $madgraph;
 	sed  "s|homeDIR|$homeDIR|g" mg5_configuration.txt > ./MG5/input/mg5_configuration.txt;
-        rm $madgraph;
+	rm $madgraph;
 fi
 
 
@@ -71,9 +60,10 @@ if echo "$answer" | grep -iq "^y" ;then
     echo "Delphes should be installed after hepmc, lhapdf6 and pythia8 were installed in MadGraph."
     exit
   fi
-  echo "[installer] Installing DelphesHSCP";    
-  tar -zxf DelphesHSCP.tar.gz;
-  cd DelphesHSCP;
+  echo "[installer] Installing DelphesLLP";
+  cp ../../Delphes_LLP/DelphesLLP.tar.gz ./
+  tar -zxf DelphesLLP.tar.gz;
+  cd DelphesLLP;
   export PYTHIA8=$pythiaDir;
   make HAS_PYTHIA8=true;
   rm -rf .git
@@ -83,5 +73,4 @@ fi
 echo "\n[installer] For running Delphes the following env variables should be set:\n\n export LD_LIBRARY_PATH=$homeDIR/MG5/HEPTools/pythia8/lib"
 echo "\nand for reading Delphes produced ROOT files:\n\n export ROOT_INCLUDE_PATH=$homeDIR/DelphesHSCP/external\n"
 echo "\n\n or run source setenv.sh\n\n"
-
-cd $homeDIR
+cd $currentDIR

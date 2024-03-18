@@ -16,7 +16,7 @@ can be obtained from their direct daughters production position.
 
 Below we show an example of how the BSMFilter can be used in the Delphes card:
 
-``
+```
 # BSM Filter
 #####################
 
@@ -34,7 +34,7 @@ module BSMFilter LLPFilter {
   add PdgCode {1000005}
   add PdgCode {-1000005}
 }
-``
+```
 
 When dealing with long-lived particles carrying color one must need the respective R-hadron associated with the LLP.
 For decaying particles/R-hadrons this information is stored in the *mothers* array.
@@ -53,7 +53,7 @@ In addition to the new module, new variables have been included in the Jet Class
  
  One example of how to use the new Jet features in the Delphes card is shown below:
  
- ``
+ ```
  #####################
 # MC truth jet finder
 #####################
@@ -75,6 +75,6 @@ module FastJetFinder GenJetFinder {
   set MaxTrackRDV 4.0
   
 }
-``
+```
 
 

@@ -143,10 +143,16 @@ def generateEvents(parser):
         logger.error('Run folder %s not found.' %runFolder)
         return False
 
-    if 'runcard' in pars and os.path.isfile(pars['runcard']):    
-        shutil.copyfile(pars['runcard'],os.path.join(runFolder,'Cards/run_card.dat'))
-    if 'paramcard' in pars and os.path.isfile(pars['paramcard']):
-        shutil.copyfile(pars['paramcard'],os.path.join(runFolder,'Cards/param_card.dat'))    
+    if 'runcard' in pars:
+        if os.path.isfile(pars['runcard']):    
+            shutil.copyfile(pars['runcard'],os.path.join(runFolder,'Cards/run_card.dat'))
+        else:
+            raise ValueError("Run card %s not found" %pars['runcard'])
+    if 'paramcard' in pars:
+        if os.path.isfile(pars['paramcard']):
+            shutil.copyfile(pars['paramcard'],os.path.join(runFolder,'Cards/param_card.dat'))    
+        else:
+            raise ValueError("Param card %s not found" %pars['paramcard'])
 
 
     # By default do not run Pythia or Delphes
@@ -225,10 +231,10 @@ def generateEvents(parser):
         logger.debug('Removing  %s' %hepmcFile)
         if os.path.isfile(hepmcFile):
             os.remove(hepmcFile)
-        logFile = os.path.join(runFolder,'Events',runInfo['run number'], '%s_pythia8.log'  %runInfo['run tag'])
-        logger.debug('Removing  %s' %logFile)
-        if os.path.isfile(logFile):
-            os.remove(logFile)
+        # logFile = os.path.join(runFolder,'Events',runInfo['run number'], '%s_pythia8.log'  %runInfo['run tag'])
+        # logger.debug('Removing  %s' %logFile)
+        # if os.path.isfile(logFile):
+            # os.remove(logFile)
 
     return runInfo
 
@@ -292,9 +298,9 @@ def main(parfile,verbose):
     ncpus = min(ncpus,len(parserList))
     pool = multiprocessing.Pool(processes=ncpus)
     if ncpus > 1:
-        logger.info('Running in parallel with %i processes' %ncpus)
+        logger.info('Running %i jobs in parallel with %i processes' %(len(parserList),ncpus))
     else:
-        logger.info('Running in series with a single process')
+        logger.info('Running %i jobs in series with a single process' %(len(parserList)))
 
     now = datetime.datetime.now()
     children = []
@@ -353,7 +359,7 @@ if __name__ == "__main__":
     LDPATH = subprocess.check_output('echo $LD_LIBRARY_PATH',shell=True,text=True)
     ROOTINC = subprocess.check_output('echo $ROOT_INCLUDE_PATH',shell=True,text=True)
     pythiaDir = os.path.abspath('./MG5/HEPTools/pythia8/lib')
-    delphesDir = os.path.abspath('./DelphesHSCP/external')
+    delphesDir = os.path.abspath('./DelphesLLP/external')
     if pythiaDir not in LDPATH or delphesDir not in ROOTINC:
         print('Enviroment variables not properly set. Run source setenv.sh first.')
         sys.exit()

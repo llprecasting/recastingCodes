@@ -148,7 +148,7 @@ notification_center = False
 
 #! Delphes Package
 #!  relative path start from main directory
-delphes_path = homeDIR/DelphesHSCP
+delphes_path = homeDIR/DelphesLLP
 
 #! MadAnalysis4 fortran-based package [for basic analysis]
 #!  relative path start from main directory

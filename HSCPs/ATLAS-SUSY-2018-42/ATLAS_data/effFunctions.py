@@ -9,7 +9,14 @@ inputFile = os.path.join(atlasDir,'./HEPData-ins2080541-v1-csv/MuonReconstructio
 gridPtsReco = np.genfromtxt(inputFile,names=True,skip_header=7,delimiter=',')
 muonEff_F = LinearNDInterpolator((gridPtsReco['beta'],gridPtsReco['eta']),gridPtsReco['Efficiency'],fill_value=0.0)
 
-def getMuonRecoEff(beta,eta,pid=None):
+
+inputFileR = os.path.join(atlasDir,'./HEPData-ins2080541-v1-csv/MuonReconstructionEfficiency,R-hadrondistribution.csv')
+gridPtsRecoR = np.genfromtxt(inputFileR,names=True,skip_header=7,delimiter=',')
+muonEff_F_Rhadron = LinearNDInterpolator((gridPtsRecoR['beta'],gridPtsRecoR['eta']),gridPtsRecoR['Efficiency'],fill_value=0.0)
+
+
+
+def getMuonRecoEff(beta,eta,useRhadron=False):
     """
     Return the interpolated muon reconstruction efficiency
     as a function of beta and eta. If the pid is 
@@ -21,8 +28,10 @@ def getMuonRecoEff(beta,eta,pid=None):
     """
     
     eta = abs(eta)
-    
-    eff = muonEff_F(beta,eta)
+    if useRhadron:
+        eff = muonEff_F_Rhadron(beta,eta)
+    else:    
+        eff = muonEff_F(beta,eta)
     
     return float(eff)
 

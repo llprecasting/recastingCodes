@@ -217,7 +217,7 @@ def getModelDict(inputFile,model,verbose=True):
     if model == 'chargino':
         LLP = 1000024
         LSP = 1000022
-    if model == 'stau':
+    elif model == 'stau':
         LLP = 1000015
         LSP = 1000022
     elif model == 'gluino':

@@ -2,6 +2,8 @@
 
 homeDIR="$( pwd )"
 
+echo "Installation will take place in $homeDIR"
+
 echo "[Checking system dependencies]"
 PKG_OK=$(dpkg-query -W -f='${Status}' autoconf 2>/dev/null | grep -c "ok installed")
 if test $PKG_OK = "0" ; then
@@ -57,7 +59,8 @@ if echo "$answer" | grep -iq "^y" ;then
     echo "Delphes should be installed after hepmc, lhapdf6 and pythia8 were installed in MadGraph."
     exit
   fi
-  echo "[installer] Installing DelphesLLP";    
+  echo "[installer] Installing DelphesLLP";
+  cp ../../Delphes_LLP/DelphesLLP.tar.gz ./
   tar -zxf DelphesLLP.tar.gz;
   cd DelphesLLP;
   export PYTHIA8=$pythiaDir;

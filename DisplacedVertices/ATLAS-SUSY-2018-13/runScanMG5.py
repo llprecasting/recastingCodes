@@ -298,9 +298,9 @@ def main(parfile,verbose):
     ncpus = min(ncpus,len(parserList))
     pool = multiprocessing.Pool(processes=ncpus)
     if ncpus > 1:
-        logger.info('Running in parallel with %i processes' %ncpus)
+        logger.info('Running %i jobs in parallel with %i processes' %(len(parserList),ncpus))
     else:
-        logger.info('Running in series with a single process')
+        logger.info('Running %i jobs in series with a single process' %(len(parserList)))
 
     now = datetime.datetime.now()
     children = []

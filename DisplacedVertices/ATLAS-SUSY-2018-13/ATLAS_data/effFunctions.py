@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
-from scipy.interpolate import interp1d,LinearNDInterpolator
+from scipy.interpolate import interp1d,LinearNDInterpolator,NearestNDInterpolator
 import os,glob
 atlasDir = os.path.dirname(os.path.abspath(__file__))
 
@@ -22,17 +22,19 @@ for f in glob.glob(os.path.join(atlasDir,'./HEPData-ins2628398-v1-csv/event_effi
         Rmax = 1150
         
     pts = np.genfromtxt(f,names=True,skip_header=10,delimiter=',')
-    # eff_F = interp1d(pts['Sumpt_GeV'],pts['Efficiency'],fill_value=(0.0,pts['Efficiency'][-1]),bounds_error=False)
+    eff_F_ext = interp1d(pts['Sumpt_GeV'],pts['Efficiency'],fill_value=(0.0,pts['Efficiency'][-1]),bounds_error=False)
     eff_F = interp1d(pts['Sumpt_GeV'],pts['Efficiency'],fill_value=(0.0,0.0),bounds_error=False)
-    functions_event_eff[sr][(Rmin,Rmax)] = eff_F
+    functions_event_eff[sr][(Rmin,Rmax)] = {'bounds' : eff_F, 'extrapolate' : eff_F_ext}
 
 
-def eventEff(jets,llps,sr):
+def eventEff(jets,llps,sr,extrapolate=False,r_max=None,jetPT=None):
     
-    jetPT = 0.0
-    for j in jets:
-        jetPT += j.PT
-    r_max = max([np.sqrt(llp.Xd**2 + llp.Yd**2) 
+    if jetPT is None:
+        jetPT = 0.0
+        for j in jets:
+            jetPT += j.PT
+    if r_max is None:
+        r_max = max([np.sqrt(llp.Xd**2 + llp.Yd**2) 
                  for llp in llps])
     
     # Select eff function
@@ -40,9 +42,12 @@ def eventEff(jets,llps,sr):
              if Rint[0] < r_max <= Rint[1]]
     if not eff_F:
         return 0.0
+    elif not extrapolate:
+        eff_F = eff_F[0]['bounds']
     else:
-        eff_F = eff_F[0]
-        return eff_F(jetPT/1e3) # jetPT in TeV!
+        eff_F = eff_F[0]['extrapolate']
+    
+    return eff_F(jetPT/1e3) # jetPT in TeV!
 
 
 functions_vertex_eff = {}
@@ -56,14 +61,18 @@ for f in glob.glob(os.path.join(atlasDir,'./HEPData-ins2628398-v1-csv/vertex_eff
         Rmax = 22
     pts = np.genfromtxt(f,names=True,skip_header=10,delimiter=',')
     eff_F = LinearNDInterpolator((pts['m_DV_GeV'],pts['n_tracks']),pts['Efficiency'],fill_value=0.0)
-    functions_vertex_eff[(Rmin,Rmax)] = eff_F
+    eff_F_ext = NearestNDInterpolator((pts['m_DV_GeV'],pts['n_tracks']),pts['Efficiency'])
+    functions_vertex_eff[(Rmin,Rmax)] = {'bounds' : eff_F, 'extrapolate' : eff_F_ext}
 
 
-def vertexEff(llp):
+def vertexEff(llp,extrapolate=False,r=None,mDV=None,n=None):
     
-    r = np.sqrt(llp.Xd**2 + llp.Yd**2)
-    mDV = llp.mDV
-    n = llp.nTracks
+    if r is None:
+        r = np.sqrt(llp.Xd**2 + llp.Yd**2)
+    if mDV is None:
+        mDV = llp.mDV
+    if n is None:
+        n = llp.nTracks
     
     # Select eff function
     eff_F = [f for Rint,f in functions_vertex_eff.items() if Rint[0] < r <= Rint[1]]
@@ -71,4 +80,7 @@ def vertexEff(llp):
         return 0.0
     else:
         eff_F = eff_F[0]
-        return eff_F(mDV,n)
+        eff = eff_F['bounds'](mDV,n)
+        if (not eff) and extrapolate:
+            eff = eff_F['extrapolate'](mDV,n)
+        return eff

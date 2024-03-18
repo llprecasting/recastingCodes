@@ -4,9 +4,11 @@ import pandas as pd
 import time,os,sys
 import pandas as pd
 import numpy as np
+import sys
+sys.path.append('../')
 from statisticalTools.simplifiedLikelihoods import Data,UpperLimitComputer
 
-def computeULs(inputFile,outputFile,kfactor=1.0,deltas=0.25):
+def computeULs(inputFile,outputFile,deltas=0.25):
 
     # ### Load Recast Data
     recastData = pd.read_pickle(inputFile)
@@ -22,12 +24,15 @@ def computeULs(inputFile,outputFile,kfactor=1.0,deltas=0.25):
     for _,row in recastData.iterrows():
         S95obs = atlasUL[row['SR']]['S95_obs']
         S95exp = atlasUL[row['SR']]['S95_exp']
-        robs.append(row['$N_s$']*kfactor/S95obs)
-        rexp.append(row['$N_s$']*kfactor/S95exp)
+        robs.append((row['$N_s$']/S95obs,row['$N_s$ Err']/S95obs))
+        rexp.append((row['$N_s$']/S95exp,row['$N_s$ Err']/S95exp))
 
-    recastData['robs'] = robs
-    recastData['rexp'] = rexp
-    recastData['kfactor'] = kfactor
+    robs = np.array(robs)
+    rexp = np.array(rexp)
+    recastData['robs'] = robs[:,0]
+    recastData['rexp'] = rexp[:,0]
+    recastData['robsErr'] = robs[:,1]
+    recastData['rexpErr'] = rexp[:,1]
 
 
     # Now compute combined UL assuming uncorrelated SRs
@@ -67,7 +72,7 @@ def computeULs(inputFile,outputFile,kfactor=1.0,deltas=0.25):
             if len(dataset) != 1:
                 print('Error finding single SR/model')
                 return None
-            ns.append(dataset['$N_s$'].tolist()[0]*kfactor)
+            ns.append(dataset['$N_s$'].tolist()[0])
         ns = np.array(ns)    
         data = Data(observed=nobs, backgrounds=nbg, covariance=covMatrix, 
                     nsignal=ns,deltas_rel=deltas)

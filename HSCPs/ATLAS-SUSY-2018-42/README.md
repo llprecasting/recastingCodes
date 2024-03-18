@@ -24,7 +24,12 @@ Executing:
 
 Will try to fetch the required packages and install them in the current folder.
 *Note that a modified version of Delphes should be installed using [../../Delphes_LLP/DelphesLLP.tar.gz](../../Delphes_LLP/DelphesLLP.tar.gz)*
+The LHAPDF, Pythia8 and Delphes directories must be included in the library and root include paths.
+This can be done running:
 
+```
+source setenv.sh
+```
 
 ## Running ##
 
@@ -75,6 +80,7 @@ The output is a Delphes ROOT file for each model point.
 The MadGraph, Pythia and Delphes cards for each scenario can be found in [./validation/Cards](./validation/Cards/).
 The recasting results and plotting scripts can be found in the folders: [chargino_results](./validation/chargino_results), [stau_results](./validation/stau_results) and [gluino_results](./validation/gluino_results).
 
+## Validation ##
 
 ### Wino Scenario
 

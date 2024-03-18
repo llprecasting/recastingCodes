@@ -4,15 +4,13 @@ import os
 import numpy as np
 import pandas as pd
 import time
-import sys
-sys.path.append('../')
 import progressbar as P
 from helper import getLLPs,getModelDict,splitModels
 from ATLAS_data.effFunctions import (getMuonRecoEff,getTriggerEff,getTrackEff,
                                      getSelectionEff,getTargetMass,getMassSelEff,
                                      massLong,massShort)
 
-delphesDir = os.path.abspath("../DelphesLLP")
+delphesDir = os.path.abspath("./DelphesLLP")
 os.environ['ROOT_INCLUDE_PATH'] = os.path.join(delphesDir,"external")
 
 import ROOT
@@ -302,8 +300,8 @@ if __name__ == "__main__":
     from datetime import datetime as dt
     LDPATH = subprocess.check_output('echo $LD_LIBRARY_PATH',shell=True,text=True)
     ROOTINC = subprocess.check_output('echo $ROOT_INCLUDE_PATH',shell=True,text=True)
-    pythiaDir = os.path.abspath('../MG5/HEPTools/pythia8/lib')
-    delphesDir = os.path.abspath('../DelphesLLP/external')
+    pythiaDir = os.path.abspath('./MG5/HEPTools/pythia8/lib')
+    delphesDir = os.path.abspath('./DelphesLLP/external')
     if pythiaDir not in LDPATH or delphesDir not in ROOTINC:
         print('Enviroment variables not properly set. Run source setenv.sh first.')
         sys.exit()

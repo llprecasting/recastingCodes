@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
 
-import os,glob
-from typing import Any
+import os
 import numpy as np
 import pandas as pd
-import glob
-import pyslha
 import time
 import progressbar as P
-from helper import LLP
+import sys
+sys.path.append('../')
+from helper import getLLPs,getJets,getDisplacedJets,getModelDict,splitModels
 from ATLAS_data.effFunctions import eventEff,vertexEff
 
-delphesDir = os.path.abspath("./DelphesLLP")
+delphesDir = os.path.abspath("../DelphesLLP")
 os.environ['ROOT_INCLUDE_PATH'] = os.path.join(delphesDir,"external")
 
 import ROOT
-import xml.etree.ElementTree as ET
-
 
 ROOT.gSystem.Load(os.path.join(delphesDir,"libDelphes.so"))
 
@@ -24,70 +21,7 @@ ROOT.gInterpreter.Declare('#include "classes/SortableObject.h"')
 ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
-def getLLPs(llpList,directDaughters,finalDaughters,maxMomViolation=1e-2):
 
-    llps = []
-    for ip in range(llpList.GetEntries()):
-        p = llpList.At(ip)        
-        # Get direct daughters
-        llp_ddaughters = []        
-        for d in directDaughters:
-            if d.M1 == ip:
-                llp_ddaughters.append(d)
-        # Get final daughters
-        llp_fdaughters = []
-        for d in finalDaughters:
-            if d.M1 == ip:
-                llp_fdaughters.append(d)
-        
-        # Get final daughters
-        llps.append(LLP(p,llp_ddaughters,llp_fdaughters,maxMomViolation))
-        
-    return llps
-
-def getJets(jets,pTmin=50.0,etaMax=5.0):
-    """
-    Select jets with pT > pTmin and |eta| < etaMax
-    """
-
-    jetsSel = []
-    for ijet in range(jets.GetEntries()):
-        jet = jets.At(ijet)
-        if jet.PT < pTmin:
-            continue
-        if abs(jet.Eta) > etaMax:
-            continue
-        jetsSel.append(jet)
-    
-    return jetsSel
-
-def getDisplacedJets(jets,llps,skipPIDs=[1000022]):
-    """
-    Select from the list of all jets, the displaced jets associated
-    with a LLP decay.
-    """
-
-    displacedJets = []
-    for jet in jets:
-        deltaRmin = 0.3
-        llpMatch = None
-        for llp in llps: 
-            for daughter in llp.directDaughters:
-                if abs(daughter.PID) in skipPIDs:
-                    continue
-                deltaR = np.sqrt((jet.Eta-daughter.Eta)**2 + (jet.Phi-daughter.Phi)**2)
-                if deltaR < deltaRmin:
-                    deltaRmin = deltaR
-                    llpMatch = llp # Store LLP parent
-        
-        jet.llp = llpMatch
-        if llpMatch is not None:
-            R = np.sqrt(llpMatch.Xd**2 + llpMatch.Yd**2 + llpMatch.Zd**2)
-            if R > 3870:
-                continue
-            displacedJets.append(jet)
-    
-    return displacedJets
 
 def eventAcc(jets,jetsDisp,sr):
     passAcc = 0.0
@@ -140,55 +74,15 @@ def vertexAcc(llp,Rmax=np.inf,zmax=np.inf,Rmin=0.0,d0min=0.0,nmin=0,mDVmin=0):
         
     return passAcc
     
-def getModelDict(inputFiles,model):
-
-    if model == 'ewk':
-        LLP = 1000022
-        LSP = 1000024
-    elif model == 'strong':
-        LLP = 1000022
-        LSP = 1000021
-    elif model == 'gluino':
-        LLP = 1000021
-        LSP = 1000022
-    else:
-        raise ValueError("Unreconized model %s" %model)
-
-    modelInfoDict = {}
-    f = inputFiles[0]
-    if not os.path.isfile(f):
-        print('File %s not found' %f)
-        raise OSError()
-    parsDict = {}    
-    for banner in glob.glob(os.path.join(os.path.dirname(f),'*banner*txt')):
-        with open(banner,'r') as ff:
-            slhaData = ff.read().split('<slha>')[1].split('</slha>')[0]
-            slhaData = pyslha.readSLHA(slhaData)
-    parsDict = {}
-    parsDict['mLLP'] = slhaData.blocks['MASS'][LLP]
-    parsDict['mLSP'] = slhaData.blocks['MASS'][LSP]
-    parsDict['width'] = slhaData.decays[LLP].totalwidth
-    if parsDict['width']:
-        parsDict['tau_ns'] = (6.582e-25/parsDict['width'])*1e9
-    else:
-        parsDict['tau_ns'] = np.inf    
-
-    modelInfoDict.update(parsDict)
-    print('mLLP = ',parsDict['mLLP'])
-    print('width (GeV) = ',parsDict['width'])
-    print('tau (ns) = ',parsDict['tau_ns'])
-
-    return modelInfoDict
-
-# ### Define dictionary to store data
-def getRecastData(inputFiles,normalize=False,model='strong'):
+def getRecastData(inputFiles,model='strong',modelDict=None,addweights=False):
 
     if len(inputFiles) > 1:
         print('Combining files:')
         for f in inputFiles:
             print(f)
 
-    modelDict = getModelDict(inputFiles,model)
+    if modelDict is None:
+        modelDict = getModelDict(inputFiles[0],model)
     if not modelDict:
         modelDict = {}
 
@@ -208,17 +102,9 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
     lumi = 139.0
     totalweightPB = 0.0
     # Keep track of yields for each dataset
-    cutFlowHighPT = { "Total" : 0.0,
-                "Jet selection" : 0.0,
-                # "$R_{xy},z <$ 300 mm" : 0.0,
-                # "$R_{DV} > 4$ mm" : 0.0,
-                # "$nTracks >= 5$" : 0.0,
-                # "mDV > 10 GeV" : 0.0
-                "DV selection" : 0.0
-                }
-    
-    cutFlowTrackless = {k : v for k,v in cutFlowHighPT.items()}
-
+    keys = ["Total", "Jet selection", "DV selection"]
+    cutFlowHighPT = { k : np.zeros(2) for k in keys}    
+    cutFlowTrackless = {k : np.zeros(2) for k in keys}
 
     progressbar = P.ProgressBar(widgets=["Reading %i Events: " %modelDict['Total MC Events'], 
                                 P.Percentage(),P.Bar(marker=P.RotatingMarker()), P.ETA()])
@@ -231,11 +117,14 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
         f = ROOT.TFile(inputFile,'read')
         tree = f.Get("Delphes")
         nevts = tree.GetEntries()
-        # if normalize:
-        #     norm =nevtsDict[inputFile]/modelDict['Total MC Events']
-        # else:
-        #     norm = 1.0/modelDict['Total MC Events']
-        norm = 1.0
+        # If addweights = Fakse: 
+        # assume multiple files correspond to equivalent samplings
+        # of the same distributions
+        # If addweights = True: directly add events
+        if not addweights:
+            norm =nevtsDict[inputFile]/modelDict['Total MC Events']
+        else:
+            norm = 1.0
 
         for ievt in range(nevts):    
             
@@ -247,7 +136,7 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
             totalweightPB += weightPB
             ns = weightPB*1e3*lumi # number of signal events
 
-            llps = getLLPs(tree.bsm,tree.bsmDirectDaughters,tree.bsmFinalDaughters)
+            llps = getLLPs(tree.bsm,tree.bsmDirectDaughters,tree.bsmFinalDaughters,maxMomViolation=6e-2)
             jets = getJets(tree.GenJet,pTmin=25.,etaMax=5.0)
             jetsDisp = getDisplacedJets(jets,llps)
             
@@ -256,13 +145,17 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
             trackless_acc = eventAcc(jets,jetsDisp,sr='Trackless')                        
 
 
-            cutFlowHighPT["Total"] += ns
-            cutFlowTrackless["Total"] += ns
+            cutFlowHighPT["Total"] += (ns,ns**2)
+            cutFlowTrackless["Total"] += (ns,ns**2)
+
             if (not highPT_acc) and (not trackless_acc):
                 continue
 
-            cutFlowHighPT["Jet selection"] += ns*highPT_acc
-            cutFlowTrackless["Jet selection"] += ns*trackless_acc
+            cutFlowHighPT["Jet selection"] += (ns*highPT_acc,(ns*highPT_acc)**2)
+            cutFlowTrackless["Jet selection"] += (ns*trackless_acc,(ns*trackless_acc)**2)
+
+            if len(llps) == 0:
+                continue
             
             # Event efficiency
             highPT_eff = eventEff(jets,llps,sr='HighPT')
@@ -280,8 +173,8 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
             wvertex = 1.0-np.prod(1.0-v_acc*v_eff)
             
             # Add to the total weight in each SR:
-            cutFlowHighPT["DV selection"] += ns*highPT_acc*highPT_eff*wvertex
-            cutFlowTrackless["DV selection"] += ns*trackless_acc*trackless_eff*wvertex
+            cutFlowHighPT["DV selection"] += (ns*highPT_acc*highPT_eff*wvertex,(ns*highPT_acc*highPT_eff*wvertex)**2)
+            cutFlowTrackless["DV selection"] += (ns*trackless_acc*trackless_eff*wvertex,(ns*trackless_acc*trackless_eff*wvertex)**2)
 
         f.Close()
     progressbar.finish()
@@ -289,15 +182,27 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
     modelDict['Total xsec (pb)'] = totalweightPB
     print('\nCross-section (pb) = %1.3e\n' %totalweightPB)
 
+
+    cutFlowDicts = {'HighPT' : cutFlowHighPT, 'Trackless' : cutFlowTrackless}
+    cutFlowErrDict = {}
+    for sr, cutFlow in cutFlowDicts.items():
+        cutFlowErrDict[sr] = {k : np.sqrt(v[1]) for k,v in cutFlow.items()}
+        cutFlowDicts[sr] = {k : v[0] for k,v in cutFlow.items()}
+
     # Compute normalized cutflow
-    for cutFlow in [cutFlowHighPT,cutFlowTrackless]:
+    for sr,cutFlow in cutFlowDicts.items():
+        cutFlowErr = cutFlowErrDict[sr]
         for key,val in cutFlow.items():
             if key == 'Total':
                 continue
             valRound = float('%1.3e' %val)
             valNorm = float('%1.3e' %(val/cutFlow['Total']))
             cutFlow[key] = (valRound,valNorm)
+            errRound = float('%1.3e' %cutFlowErr[key])
+            errNorm = float('%1.3e' %(cutFlowErr[key]/cutFlow['Total']))
+            cutFlowErr[key] = (errRound,errNorm)
         cutFlow['Total'] = (float('%1.3e' %cutFlow['Total']),1.0)
+        cutFlowErr['Total'] = (float('%1.3e' %cutFlowErr['Total']),0.0)
 
     
     # Create a dictionary for storing data
@@ -305,18 +210,23 @@ def getRecastData(inputFiles,normalize=False,model='strong'):
     dataDict['Luminosity (1/fb)'] = []
     dataDict['SR'] = []
     dataDict['$N_s$'] = []
+    dataDict['$N_s$ Err'] = []
     dataDict['AccEff'] = []
-    # Signal regions
-    cutFlows = {'HighPT' : cutFlowHighPT, 'Trackless' : cutFlowTrackless}
-    for sr,cutFlow in cutFlows.items():
+    dataDict['AccEffErr'] = []
+    for sr,cutFlow in cutFlowDicts.items():
+        cutFlowErr = cutFlowErrDict[sr]
         dataDict['Luminosity (1/fb)'].append(lumi)
         dataDict['SR'].append(sr)
         dataDict['$N_s$'].append(cutFlow["DV selection"][0])
+        dataDict['$N_s$ Err'].append(cutFlowErr["DV selection"][0])
         dataDict['AccEff'].append(cutFlow["DV selection"][1])
+        dataDict['AccEffErr'].append(cutFlowErr["DV selection"][1])
         for cut in cutFlow:
             if cut not in dataDict:
                 dataDict[cut] = []
+                dataDict[cut+' Error'] = []
             dataDict[cut].append(cutFlow[cut])
+            dataDict[cut+' Error'].append(cutFlowErr[cut])
 
     # Expand modelDict to match number of rows in dataDict:
     for key,val in modelDict.items():
@@ -342,11 +252,13 @@ if __name__ == "__main__":
             help='path to output file storing the DataFrame with the recasting data. '
                  + 'If not defined, will use the name of the first input file', 
             default = None)
-    ap.add_argument('-n', '--normalize', required=False,action='store_true',
-            help='If set, the input files will be considered to refer to multiple samples of the same process and their weights will be normalized.')
-    ap.add_argument('-m', '--model', required=False,type=str,default=None,
-            help='Defines which model should be considered for extracting model parameters (strong,ewk,gluino).')
-
+    ap.add_argument('-A', '--add', required=False,action='store_true',default=False,
+            help='If set, the input files will be considered to refer to samples of the orthogonal processes and their weights will be added.')    
+    ap.add_argument('-m', '--model', required=False,type=str,default='sbottom',
+            help='Defines which model should be considered for extracting model parameters (strong,ewk,gluino,sbottom).')
+    ap.add_argument('-U', '--update', required=False,action='store_true',
+            help='If the flag is set only the model points containing data newer than the dataframe will be read.')
+    
     ap.add_argument('-v', '--verbose', default='info',
             help='verbose level (debug, info, warning or error). Default is info')
 
@@ -354,10 +266,11 @@ if __name__ == "__main__":
     # First make sure the correct env variables have been set:
     import subprocess
     import sys
+    from datetime import datetime as dt
     LDPATH = subprocess.check_output('echo $LD_LIBRARY_PATH',shell=True,text=True)
     ROOTINC = subprocess.check_output('echo $ROOT_INCLUDE_PATH',shell=True,text=True)
-    pythiaDir = os.path.abspath('./MG5/HEPTools/pythia8/lib')
-    delphesDir = os.path.abspath('./DelphesLLP/external')
+    pythiaDir = os.path.abspath('../MG5/HEPTools/pythia8/lib')
+    delphesDir = os.path.abspath('../DelphesLLP/external')
     if pythiaDir not in LDPATH or delphesDir not in ROOTINC:
         print('Enviroment variables not properly set. Run source setenv.sh first.')
         sys.exit()
@@ -369,22 +282,46 @@ if __name__ == "__main__":
     args = ap.parse_args()
     inputFiles = args.inputFile
     outputFile = args.outputFile
-    if outputFile is None:
-        outputFile = inputFiles[0].replace('delphes_events.root','atlas_2018_13.pcl')
+    
+    # Split input files by distinct models and get recast data for
+    # the set of files from the same model:
+    for fileList,mDict in splitModels(inputFiles,args.model):
 
-    if os.path.splitext(outputFile)[1] != '.pcl':
-        outputFile = os.path.splitext(outputFile)[0] + '.pcl'
+        if outputFile is None:
+            outFile = fileList[0].replace('delphes_events.root','atlas_2018_13.pcl')
+        else:
+            outFile = outputFile[:]
 
-    dataDict = getRecastData(inputFiles,args.normalize,args.model)
-    if args.verbose == 'debug':
-        for k,v in dataDict.items():
-            print(k,v)
+        if os.path.splitext(outFile)[1] != '.pcl':
+            outFile = os.path.splitext(outFile)[0] + '.pcl'
 
-    # #### Create pandas DataFrame
-    df = pd.DataFrame.from_dict(dataDict)
+        skipModel = False
+        if args.update and os.path.isfile(outFile):
+            outFile_date = dt.fromtimestamp(os.path.getctime(outFile))
+            inputFiles_date = max([dt.fromtimestamp(os.path.getctime(f)) for f in fileList])
+            if inputFiles_date <= outFile_date:
+                skipModel = True
+        if skipModel:
+            print('\nSkipping',mDict,'\n')
+            # print('files=',fileList)
+            # sys.exit()
+            continue
 
-    # ### Save DataFrame to pickle file
-    print('Saving to',outputFile)
-    df.to_pickle(outputFile)
+        print('----------------------------------')
+        print('\t Model: %s (%i files)' %(mDict,len(fileList)))
+
+        dataDict = getRecastData(fileList,args.model,mDict,addweights=args.add)
+        if args.verbose == 'debug':
+            for k,v in dataDict.items():
+                print(k,v)
+
+        
+
+        # #### Create pandas DataFrame
+        df = pd.DataFrame.from_dict(dataDict)
+        # ### Save DataFrame to pickle file
+        print('Saving to',outFile)
+        df.to_pickle(outFile)
+        print('\n')
 
     print("\n\nDone in %3.2f min" %((time.time()-t0)/60.))

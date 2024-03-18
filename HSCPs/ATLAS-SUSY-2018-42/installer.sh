@@ -47,7 +47,6 @@ if echo "$answer" | grep -iq "^y" ;then
 	rm $madgraph;
 fi
 
-
 echo -n "Install Delphes (y/n)? "
 repo=https://github.com/delphes/delphes
 URL=http://cp3.irmp.ucl.ac.be/downloads/$delphes

@@ -26,7 +26,7 @@ ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
 # ### Define dictionary to store data
-def getCutFlow(inputFiles,model='sbottom',modelDict=None,addweights=False):
+def getCutFlow(inputFiles,model='wino',modelDict=None,addweights=False,pTcut=60.):
 
     if len(inputFiles) > 1:
         print('Combining files:')
@@ -96,6 +96,18 @@ def getCutFlow(inputFiles,model='sbottom',modelDict=None,addweights=False):
             metCalo = tree.MissingETCalo.At(0).MET
             llps = getLLPs(tree.bsm,tree.bsmDirectDaughters,tree.bsmFinalDaughters,tree.bsmMothers)
             hscpCandidates = getHSCPCandidates(llps)
+
+            # Apply pT cut on HSCP system to reproduce ATLAS selection
+            if pTcut > 0.0:
+                dmParticles = [tree.dmParticles.At(idm) for idm in range(tree.dmParticles.GetEntries())]
+                # For chargino -> LSP + pion the LSP+LSP pT is ≃ the gaugino system (C1N1 or C1C1) pT
+                gauginoPT = sum([p.Px for p in dmParticles])**2
+                gauginoPT += sum([p.Py for p in dmParticles])**2
+                gauginoPT = np.sqrt(gauginoPT)                
+                if gauginoPT < pTcut:
+                    continue
+
+
 
             cutFlow["Total"] += (ns,ns**2)
 
@@ -216,10 +228,10 @@ if __name__ == "__main__":
             default = None)    
     ap.add_argument('-A', '--add', required=False,action='store_true',default=False,
             help='If set, the input files will be considered to refer to samples of the orthogonal processes and their weights will be added.')
-    ap.add_argument('-m', '--model', required=False,type=str,default='sbottom',
+    ap.add_argument('-m', '--model', required=False,type=str,default='chargino',
             help='Defines which model should be considered for extracting model parameters (stau,wino,gluino).')
-
-
+    ap.add_argument('-pt', '--pTcut', required=False,default=-1.0,type=float,
+            help='Gen level cut on gaugino pT for computing partial cross-sections for the wino model.')
     ap.add_argument('-v', '--verbose', default='info',
             help='verbose level (debug, info, warning or error). Default is info')
 
@@ -246,7 +258,8 @@ if __name__ == "__main__":
     # Split input files by distinct models and get recast data for
     # the set of files from the same model:
     for fileList,mDict in splitModels(inputFiles,args.model):        
-        modelDict,cutFlow,cutFlowErr = getCutFlow(fileList,args.model,mDict,addweights=args.add)
+        modelDict,cutFlow,cutFlowErr = getCutFlow(fileList,args.model,mDict,
+                                                  addweights=args.add,pTcut=args.pTcut)
         dataDict = {key : [val] for key,val in modelDict.items()}
         for key,val in cutFlow.items():
             dataDict[key] = [(val,cutFlowErr[key])]

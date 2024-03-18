@@ -162,12 +162,10 @@ def generateEvents(parser):
     pythia8File = os.path.join(runFolder,'Cards/pythia8_card.dat')
     delphesFile = os.path.join(runFolder,'Cards/delphes_card.dat')
     if runDelphes and 'delphescard' in pars:
-        if os.path.isfile(pars['delphescard']):
-            shutil.copyfile(pars['delphescard'],delphesFile)
+        shutil.copyfile(pars['delphescard'],delphesFile)
 
     if runPythia and 'pythia8card' in pars:        
-        if os.path.isfile(pars['pythia8card']):
-            shutil.copyfile(pars['pythia8card'],pythia8File) 
+        shutil.copyfile(pars['pythia8card'],pythia8File) 
 
     cleanOutput = parser['options']['cleanOutput']
     

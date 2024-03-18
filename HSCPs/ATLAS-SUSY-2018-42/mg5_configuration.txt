@@ -229,7 +229,4 @@ lhapdf_py3 = homeDIR/MG5/HEPTools/lhapdf6_py3/bin/lhapdf-config
 #! (to generate PDF-independent fast-interpolation grids).
 # pineappl = pineappl
 
-# MG5 MAIN DIRECTORY
-mg5_path = homeDIR/MG5
-
 

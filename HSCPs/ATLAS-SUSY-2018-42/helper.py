@@ -214,12 +214,12 @@ def getDisplacedJets(jets,llps,skipPIDs=[1000022]):
 
 def getModelDict(inputFile,model,verbose=True):
 
-    if model == 'ewk':
-        LLP = 1000022
-        LSP = 1000024
-    elif model == 'strong':
-        LLP = 1000022
-        LSP = 1000021
+    if model == 'chargino':
+        LLP = 1000024
+        LSP = 1000022
+    if model == 'stau':
+        LLP = 1000015
+        LSP = 1000022
     elif model == 'gluino':
         LLP = 1000021
         LSP = 1000022
@@ -256,7 +256,7 @@ def getModelDict(inputFile,model,verbose=True):
 
     return modelInfoDict
 
-def splitModels(inputFiles,model='sbottom'):
+def splitModels(inputFiles,model='chargino'):
 
     # First extract the model for each file
     fileModels = {}

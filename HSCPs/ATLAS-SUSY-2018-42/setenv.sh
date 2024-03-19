@@ -2,7 +2,6 @@
 
 currentDIR="$( pwd )"
 delphesDIR=$currentDIR/DelphesLLP
-echo $delphesDIR
 pythiaDIR=$currentDIR/MG5/HEPTools/pythia8
 lhapdfDIR=$currentDIR/MG5/HEPTools/lhapdf6_py3
 #Make sure pythia can be found by Delphes

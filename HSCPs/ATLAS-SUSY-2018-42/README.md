@@ -84,12 +84,35 @@ The recasting results and plotting scripts can be found in the folders: [chargin
 
 ### Wino Scenario
 
+A comparison between the official ATLAS 95\% C.L. exclusion curve for the wino scenario and the one obtained using this recasting code is shown below:
 
+
+![Alt text](validation/chargino_results/chargino_fig17a.png?raw=true "Chargino Validation Plot")
+
+Validation of the acceptances and efficiencies for all the benchmark points can be found in [this notebook](./validation/chargino_results/validation_CharginoTables.ipynb)
 
 ### Stau Scenario
 
+A comparison between the official ATLAS 95\% C.L. exclusion curve for the stau scenario and the one obtained using this recasting code is shown below:
+
+
+![Alt text](validation/stau_results/stau_fig17b.png?raw=true "Stau Validation Plot")
+
+Validation of the acceptances and efficiencies for all the benchmark points can be found in [this notebook](./validation/stau_results/validation_StauTables.ipynb)
+
 
 ### Gluino Scenario
+
+
+A comparison between the official ATLAS 95\% C.L. exclusion curve for the gluino scenario and the one obtained using this recasting code is shown below:
+
+
+![Alt text](validation/stau_results/gluino_fig16a.png?raw=true "Gluino Validation Plot")
+
+![Alt text](validation/stau_results/gluino_fig16b.png?raw=true "Gluino Validation Plot")
+
+
+Validation of the acceptances and efficiencies for all the benchmark points can be found in [this notebook](./validation/stau_results/validation_GluinoTables.ipynb)
 
 
 [^1]: A modified version of Delphes needs to be installed, which includes a module for filtering LLPs

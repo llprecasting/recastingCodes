@@ -67,6 +67,7 @@ if echo "$answer" | grep -iq "^y" ;then
   make HAS_PYTHIA8=true;
   rm -rf .git
   cd $homeDIR;
+  rm DelphesLLP.tar.gz;
 fi
 
 echo "\n[installer] For running Delphes the following env variables should be set:\n\n export LD_LIBRARY_PATH=$homeDIR/MG5/HEPTools/pythia8/lib"

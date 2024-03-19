@@ -16,7 +16,7 @@ The following pre-requisites must be installed before compiling the main code:
   * [Pythia8](https://pythia.org/)
   * [HepMC](http://hepmc.web.cern.ch/hepmc/)
 
-Executing:
+Running:
 
 ```
 ./installer.sh

@@ -98,9 +98,56 @@ The recasting results and plotting scripts can be found in the folders: [chargin
 
 ### Electroweak Scenario
 
+ Below we show the cut-flow comparison for electroweak production: values correspond to Recast (ATLAS) acceptance and final acceptance times efficiency.
 
+|                              |               |               |               |               |
+|:-----------------------------|:--------------|:--------------|:--------------|:--------------|
+| $m_{\tilde \chi_1^0} (GeV)$  | 500.0         | 500.0         | 1300.0        | 1300.0        |
+| $\tau(\tilde \chi_1^0) (ns)$ | 0.1           | 1.0           | 0.1           | 1.0           |
+| Total                        | 1.0           | 1.0           | 1.0           | 1.0           |
+| Jet selection                | 0.502 (0.495) | 0.513 (0.501) | 0.984 (0.968) | 0.986 (0.985) |
+| $R_{xy},z <$ 300 mm          | 0.502 (0.495) | 0.416 (0.410) | 0.984 (0.968) | 0.924 (0.921) |
+| $R_{DV} > 4$ mm              | 0.465 (0.465) | 0.403 (0.398) | 0.865 (0.859) | 0.905 (0.899) |
+| $d_0 > 2$ mm                 | 0.464 (0.465) | 0.402 (0.398) | 0.863 (0.859) | 0.905 (0.899) |
+| $nTracks >= 5$               | 0.464 (0.465) | 0.402 (0.398) | 0.863 (0.859) | 0.905 (0.899) |
+| mDV > 10 GeV                 | 0.464 (0.465) | 0.402 (0.398) | 0.863 (0.859) | 0.905 (0.899) |
+| final Acc*Eff                | 0.288 (0.311) | 0.142 (0.143) | 0.104 (0.122) | 0.080 (0.083) |
+
+
+A comparison between the official ATLAS 95\% C.L. exclusion curve for the wino scenario and the one obtained using this recasting code is shown below:
+
+
+![Alt text](validation/chargino_results/chargino_fig17a.png?raw=true "Chargino Validation Plot")
+
+Validation of the acceptances and efficiencies for all the benchmark points can be found in [this notebook](./validation/chargino_results/validation_CharginoTables.ipynb)
 
 ### Strong Scenario
+
+
+ Below we show the cut-flow comparison for strong production: values correspond to Recast (ATLAS) acceptance and final acceptance times efficiency.
+
+
+|                              |               |               |               |               |
+|:-----------------------------|:--------------|:--------------|:--------------|:--------------|
+| $m_{\tilde g} (GeV)$         | 2000.0        | 2000.0        | 2400.0        | 2000.0        |
+| $m_{\tilde \chi_1^0} (GeV)$  | 850.0         | 50.0          | 200.0         | 1250.0        |
+| $\tau(\tilde \chi_1^0) (ns)$ | 0.01          | 0.1           | 1.0           | 10.0          |
+| Total                        | 1.0           | 1.0           | 1.0           | 1.0           |
+| Jet selection                | 0.999 (0.999) | 0.967 (0.966) | 0.985 (0.972) | 0.999 (0.961) |
+| $R_{xy},z <$ 300 mm          | 0.999 (0.999) | 0.788 (0.787) | 0.442 (0.447) | 0.311 (0.317) |
+| $R_{DV} > 4$ mm              | 0.298 (0.296) | 0.772 (0.770) | 0.434 (0.438) | 0.304 (0.309) |
+| $d_0 > 2$ mm                 | 0.296 (0.296) | 0.767 (0.756) | 0.433 (0.437) | 0.304 (0.309) |
+| $nTracks >= 5$               | 0.296 (0.296) | 0.766 (0.755) | 0.433 (0.437) | 0.304 (0.309) |
+| mDV > 10 GeV                 | 0.296 (0.296) | 0.760 (0.747) | 0.433 (0.437) | 0.304 (0.309) |
+| final Acc*Eff                | 0.274 (0.278) | 0.140 (0.144) | 0.112 (0.115) | 0.090 (0.092) |
+
+
+A comparison between the official ATLAS 95\% C.L. exclusion curve for the stau scenario and the one obtained using this recasting code is shown below:
+
+
+![Alt text](validation/stau_results/stau_fig17b.png?raw=true "Stau Validation Plot")
+
+Validation of the acceptances and efficiencies for all the benchmark points can be found in [this notebook](./validation/stau_results/validation_StauTables.ipynb)
 
 
 [^1]: A modified version of Delphes needs to be installed, which includes a module for filtering LLPs

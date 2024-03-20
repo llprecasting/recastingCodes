@@ -43,4 +43,5 @@ define vl~ = ve~ vm~ vt~
 import model MSSM_SLHA2
 define sq = ul cl t1 ur cr t2 dl sl dr sr b2 ul~ cl~ t1~ ur~ cr~ t2~ dl~ sl~ dr~ sr~ b2~ go
 generate p p > go go / sq
-output ../../pp2Gluino0j
+add process p p > go go j / sq
+output ../../pp2Gluino

@@ -717,6 +717,9 @@ module PdgCodeFilter DMFilter {
 
   add PdgCode {1000022}    
   add PdgCode {-1000022}
+  add PdgCode {1000039}    
+  add PdgCode {-1000039}
+
   
 }
 

@@ -107,12 +107,10 @@ Validation of the acceptances and efficiencies for all the benchmark points can 
 A comparison between the official ATLAS 95\% C.L. exclusion curve for the gluino scenario and the one obtained using this recasting code is shown below:
 
 
-![Alt text](validation/stau_results/gluino_fig16a.png?raw=true "Gluino Validation Plot")
-
-![Alt text](validation/stau_results/gluino_fig16b.png?raw=true "Gluino Validation Plot")
+![Alt text](validation/gluino_results/gluino_fig16b.png?raw=true "Gluino Validation Plot")
 
 
-Validation of the acceptances and efficiencies for all the benchmark points can be found in [this notebook](./validation/stau_results/validation_GluinoTables.ipynb)
+Validation of the acceptances and efficiencies for all the benchmark points can be found in [this notebook](./validation/gluino_results/validation_GluinoTables.ipynb)
 
 
 [^1]: A modified version of Delphes needs to be installed, which includes a module for filtering LLPs

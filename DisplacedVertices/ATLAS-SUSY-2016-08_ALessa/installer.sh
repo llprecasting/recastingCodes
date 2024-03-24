@@ -2,6 +2,30 @@
 
 homeDIR="$( pwd )"
 
+echo "Installation will take place in $homeDIR"
+
+echo "[Checking system dependencies]"
+PKG_OK=$(dpkg-query -W -f='${Status}' autoconf 2>/dev/null | grep -c "ok installed")
+if test $PKG_OK = "0" ; then
+  echo "autoconf not found. Install it with sudo apt-get install autoconf."
+  exit
+fi
+PKG_OK=$(dpkg-query -W -f='${Status}' libtool 2>/dev/null | grep -c "ok installed")
+if test $PKG_OK = "0" ; then
+  echo "libtool not found. Install it with sudo apt-get install libtool."
+  exit
+fi
+PKG_OK=$(dpkg-query -W -f='${Status}' gzip 2>/dev/null | grep -c "ok installed")
+if test $PKG_OK = "0" ; then
+  echo "gzip not found. Install it with sudo apt-get install gzip."
+  exit
+fi
+PKG_OK=$(dpkg-query -W -f='${Status}' bzr 2>/dev/null | grep -c "ok installed")
+if test $PKG_OK = "0" ; then
+  echo "bzr not found. Install it with sudo apt-get install bzr."
+  exit
+fi
+
 cd $homeDIR
 
 
@@ -35,13 +59,15 @@ if echo "$answer" | grep -iq "^y" ;then
     echo "Delphes should be installed after hepmc, lhapdf6 and pythia8 were installed in MadGraph."
     exit
   fi
-  echo "[installer] Installing DelphesLLP";    
+  echo "[installer] Installing DelphesLLP";
+  cp ../../Delphes_LLP/DelphesLLP.tar.gz ./
   tar -zxf DelphesLLP.tar.gz;
   cd DelphesLLP;
   export PYTHIA8=$pythiaDir;
   make HAS_PYTHIA8=true;
   rm -rf .git
   cd $homeDIR;
+  rm DelphesLLP.tar.gz;
 fi
 
 echo "\n[installer] For running Delphes the following env variables should be set:\n\n export LD_LIBRARY_PATH=$homeDIR/MG5/HEPTools/pythia8/lib"

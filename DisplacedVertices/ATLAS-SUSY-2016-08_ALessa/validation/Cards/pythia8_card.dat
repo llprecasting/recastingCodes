@@ -91,4 +91,5 @@ RHadrons:probGluinoball = 0.1
 
 Tune:pp = 21 ! A14 tune with NNPDF2.3LO
 
-
+ParticleDecays:limitTau = on
+ParticleDecays:tauMax = 15000  ! All particles with (lab) lifetime smaller than 15m are decayed

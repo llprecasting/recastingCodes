@@ -148,7 +148,7 @@ notification_center = False
 
 #! Delphes Package
 #!  relative path start from main directory
-delphes_path = /home/lessa/recastingCodesLLP/DisplacedVertices/ATLAS-SUSY-2016-08_ALessa//DelphesLLP
+delphes_path = homeDIR/DelphesLLP
 
 #! MadAnalysis4 fortran-based package [for basic analysis]
 #!  relative path start from main directory
@@ -170,15 +170,11 @@ delphes_path = /home/lessa/recastingCodesLLP/DisplacedVertices/ATLAS-SUSY-2016-0
 #! lhapdf-config --can be specify differently depending of your python version
 #!  If None: try to find one available on the system
 # lhapdf_py2 = lhapdf-config
-lhapdf_py3 = /home/lessa/recastingCodesLLP/DisplacedVertices/ATLAS-SUSY-2016-08_ALessa/MG5/HEPTools/lhapdf6_py3/bin/lhapdf-config
+lhapdf_py3 = homeDIR/MG5/HEPTools/lhapdf6_py3/bin/lhapdf-config  
 
 #! fastjet-config
 #!  If None: try to find one available on the system
 # fastjet = fastjet-config
-
-#! eMELA-config 
-#!  If None: try to find one available on the system
-# eMELA = eMELA-config
 
 #! MCatNLO-utilities 
 #!  relative path starting from main directory

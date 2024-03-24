@@ -162,12 +162,10 @@ def generateEvents(parser):
     pythia8File = os.path.join(runFolder,'Cards/pythia8_card.dat')
     delphesFile = os.path.join(runFolder,'Cards/delphes_card.dat')
     if runDelphes and 'delphescard' in pars:
-        if os.path.isfile(pars['delphescard']):
-            shutil.copyfile(pars['delphescard'],delphesFile)
+        shutil.copyfile(pars['delphescard'],delphesFile)
 
     if runPythia and 'pythia8card' in pars:        
-        if os.path.isfile(pars['pythia8card']):
-            shutil.copyfile(pars['pythia8card'],pythia8File) 
+        shutil.copyfile(pars['pythia8card'],pythia8File) 
 
     cleanOutput = parser['options']['cleanOutput']
     
@@ -298,9 +296,9 @@ def main(parfile,verbose):
     ncpus = min(ncpus,len(parserList))
     pool = multiprocessing.Pool(processes=ncpus)
     if ncpus > 1:
-        logger.info('Running in parallel with %i processes' %ncpus)
+        logger.info('Running %i jobs in parallel with %i processes' %(len(parserList),ncpus))
     else:
-        logger.info('Running in series with a single process')
+        logger.info('Running %i jobs in series with a single process' %(len(parserList)))
 
     now = datetime.datetime.now()
     children = []

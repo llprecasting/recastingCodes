@@ -443,7 +443,6 @@ module Merger Calorimeter {
 # add InputArray InputArray
   add InputArray ECal/ecalTowers
   add InputArray HCal/hcalTowers
-  add InputArray MuonMomentumSmearing/muons
   set OutputArray towers
 }
 
@@ -877,6 +876,5 @@ module TreeWriter TreeWriter {
   add Branch GenMissingET/momentum GenMissingET MissingET
   add Branch MissingETCalo/momentum MissingETCalo MissingET
   add Branch MissingET/momentum MissingET MissingET  
-
+  
 }
-

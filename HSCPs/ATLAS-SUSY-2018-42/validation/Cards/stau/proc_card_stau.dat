@@ -43,5 +43,5 @@ define vl~ = ve~ vm~ vt~
 import model MSSM_SLHA2
 define sta = ta1+ ta1- ta2+ ta2-
 generate p p > sta sta
-add process p p > sta sta j
+#add process p p > sta sta j
 output ../../pp2Stau

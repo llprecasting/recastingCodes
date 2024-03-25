@@ -73,8 +73,17 @@ module ParticlePropagator ParticlePropagator {
 
   # radius of the magnetic field coverage, in m
   set Radius 1.15
+  
+  # set max radius to include LLP decays within the calorimeter
+  # (relevant when computing ETmiss and ETmiss,calo)
+  set RadiusMax 3.9
+  
   # half-length of the magnetic field coverage, in m
   set HalfLength 3.51
+
+  # set max length to include LLP decays within the calorimeter
+  # (relevant when computing ETmiss and ETmiss,calo)  
+  set HalfLengthMax 6.0
 
   # magnetic field
   set Bz 2.0

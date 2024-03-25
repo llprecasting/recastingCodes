@@ -7,6 +7,9 @@ This repository holds the main code for recasting the 13 TeV ATLAS heavy stable 
 search ([ATLAS-SUSY-2018-42](http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-42/))
 based on the recasting details provided [here](http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-42/hepdata_info.pdf).
 
+
+**Note that the recasting is only possible for the inclusive (discovery) signal regions, hence the sensitivity of the recast is smaller than the ATLAS limit setting signal regions. As a result the excluded regions for the benchmarks scenarios are smaller than the official ATLAS results**
+
 ## Pre-Requisites and Installation ##
 
 The following pre-requisites must be installed before compiling the main code:

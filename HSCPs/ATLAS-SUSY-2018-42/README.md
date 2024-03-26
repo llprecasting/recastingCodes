@@ -87,10 +87,34 @@ The recasting results and plotting scripts can be found in the folders: [chargin
 
 ### Wino Scenario
 
+A comparison between the official ATLAS cut-flow for the wino scenario with mass 1.3 TeV and lifetime 10 ns is shown below:
+
+|                                                | Recast (ATLAS) |
+|:-----------------------------------------------|:---------------|
+| m(chargino) (GeV)                              | 1300.0         |
+| tau (ns)                                       | 10             |
+| Total                                          | 1.000 (1.000)  |
+| Event and jet Cleaning                         | ----- (0.995)  |
+| Trigger                                        | 0.557 (0.539)  |
+| Primary vertex                                 | ----- (0.539)  |
+| $E_{T}^{miss}>170$ GeV                         | 0.383 (0.381)  |
+| Track in PV                                    | ----- (0.378)  |
+| $p_{T} > 50$ GeV                               | ----- (0.326)  |
+| Track quality requirements                     | ----- (0.279)  |
+| Track isolation                                | ----- (0.244)  |
+| $p_{T} > 120$ GeV                              | 0.264 (0.242)  |
+| Track momentum uncertainty                     | ----- (0.231)  |
+| $\eta < 1.8$                                   | 0.245 (0.211)  |
+| $m_{T}({track},{p}_{{T}}^{{ miss}}) > 130$ GeV | ----- (0.183)  |
+| Electron veto                                  | ----- (0.183)  |
+| Hadron/tau veto                                | ----- (0.183)  |
+| (SR-Low - no mass Window)                      | 0.034 (0.039)  |
+| (SR-High - no mass Window)                     | 0.091 (0.092)  |
+
 A comparison between the official ATLAS 95\% C.L. exclusion curve for the wino scenario and the one obtained using this recasting code is shown below:
 
 
-![Alt text](validation/chargino_results/chargino_fig17a.png?raw=true "Chargino Validation Plot")
+<img src="validation/chargino_results/chargino_fig17a.png" width="500" height="350">
 
 Validation of the acceptances and efficiencies for all the benchmark points can be found in [this notebook](./validation/chargino_results/validation_CharginoTables.ipynb)
 
@@ -98,8 +122,7 @@ Validation of the acceptances and efficiencies for all the benchmark points can 
 
 A comparison between the official ATLAS 95\% C.L. exclusion curve for the stau scenario and the one obtained using this recasting code is shown below:
 
-
-![Alt text](validation/stau_results/stau_fig17b.png?raw=true "Stau Validation Plot")
+<img src="validation/stau_results/stau_fig17b.png" width="500" height="350">
 
 Validation of the acceptances and efficiencies for all the benchmark points can be found in [this notebook](./validation/stau_results/validation_StauTables.ipynb)
 
@@ -110,7 +133,8 @@ Validation of the acceptances and efficiencies for all the benchmark points can 
 A comparison between the official ATLAS 95\% C.L. exclusion curve for the gluino scenario and the one obtained using this recasting code is shown below:
 
 
-![Alt text](validation/gluino_results/gluino_fig16b.png?raw=true "Gluino Validation Plot")
+<img src="validation/gluino_results/gluino_fig16b.png" width="500" height="350">
+
 
 
 Validation of the acceptances and efficiencies for all the benchmark points can be found in [this notebook](./validation/gluino_results/validation_GluinoTables.ipynb)

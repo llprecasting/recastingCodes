@@ -92,24 +92,26 @@ For instance, the following validation plot can be generated running this [ipyth
 ### Cut-flow Comparison
 
 
-|             | ATLAS  | Recasting  |   ATLAS | Recasting  |
-| ----------- | ------ | ---------- | ------- | ---------- |
-|  **mGluino, mLSP, tau**             | **2000,100,1ns**  | **2000,100,1ns**  |   **2000,1800,1ns** | **2000,1800,1ns**  |
-| Initial Events                 |   32   |   32   |   32   |   32  |
-| Trigger-based data reduction   |   32   |        |   27   |       |
-| Event cleaning                 |   32   |        |   27   |       |
-| Good Runs List   |   32   |   --   |   27   |   --  |
-| Primary vertex   |   32   |   --   |   27   |   --  |
-| NCB veto   |   32   |   --   |   26   |   --  |
-| MET trigger   |   31   |   --   |   24   |   --  |
-| MET filter (MET > 200 GeV for recast)   |   31   |   30.4   |   17   |   15  |
-| Offline MET (event selection eff. for recast)   |   29   |   26.8   |   7   |  9.3  |
-|  |
-| DV fiducial acceptance   |   28   |   --   |   6   |   --  |
-| DV fit quality   |   27   |   --   |   6   |   --  |
-| DV displacement   |   27   |   --   |   6   |   --  |
-| Material veto   |   22   |   --   |   5   |   --  |
-| Disabled module veto   |   22   |   --   |   5   |   --  |
-| DV track multplicity   |   15   |   --   |   3   |   --  |
-| DV mass (vertex level eff. for recast)   |   14   |   14.4   |   2   |   3.6  | 
+|                                               | Recast (ATLAS) | Recast (ATLAS) |
+|:----------------------------------------------|:---------------|:---------------|
+| m(gluino) (GeV)                               | 2000.0         | 2000.0         |
+| m(neutralino) (GeV)                           | 100.0          | 1800.0         |
+| tau (ns)                                      | 1.0            | 1.0            |
+| Initial Events                                | 32.00 (32.00)  | 32.00 (32.00)  |
+| Trigger-based data reduction                  | ----- (32.00)  | ----- (27.00)  |
+| Event cleaning                                | ----- (32.00)  | ----- (27.00)  |
+| Good Runs List                                | ----- (32.00)  | ----- (27.00)  |
+| Primary vertex                                | ----- (32.00)  | ----- (27.00)  |
+| NCB veto                                      | ----- (32.00)  | ----- (26.00)  |
+| MET trigger                                   | ----- (31.00)  | ----- (24.00)  |
+| MET filter (MET > 200 GeV for recast)         | 30.39 (31.00)  | 15.96 (17.00)  |
+| Offline MET (event selection eff. for recast) | 30.27 (29.00)  | 15.69 (7.00)   |
+| DV fiducial acceptance                        | ----- (28.00)  | ----- (6.00)   |
+| DV fit quality                                | ----- (27.00)  | ----- (6.00)   |
+| DV displacement                               | ----- (27.00)  | ----- (6.00)   |
+| Material veto                                 | ----- (22.00)  | ----- (5.00)   |
+| Disabled module veto                          | ----- (22.00)  | ----- (5.00)   |
+| DV track multplicity                          | ----- (15.00)  | ----- (3.00)   |
+| DV mass (vertex level eff. for recast)        | 12.96 (14.00)  | 2.91 (2.00)    |
+
 

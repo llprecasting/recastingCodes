@@ -8,7 +8,8 @@ search ([ATLAS-SUSY-2018-42](http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPER
 based on the recasting details provided [here](http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-42/hepdata_info.pdf).
 
 
-**Note that the recasting is only possible for the inclusive (discovery) signal regions, hence the sensitivity of the recast is smaller than the ATLAS limit setting signal regions. As a result the excluded regions for the benchmarks scenarios are smaller than the official ATLAS results**
+**Note that the recasting is only possible for the inclusive (discovery) signal regions, hence the sensitivity of the recast is smaller than the ATLAS limit setting signal regions. As a result the excluded regions for the benchmarks scenarios are smaller than the official ATLAS results.
+In addition, the ATLAS efficiencies do not fully reproduce the official results for the stable regime (see comment [here](http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-42/hepdata_info.pdf))**.
 
 ## Pre-Requisites and Installation ##
 
@@ -41,6 +42,7 @@ Note that the Delphes card must define the PDG codes for the LLPs in the LLPFilt
 
 
 The event yields and recasting info can then be obtained running:
+
 
 ```
 ./atlas_susy_2018_42_Recast.py -f <input ROOT file> -o <output file> -m <model>

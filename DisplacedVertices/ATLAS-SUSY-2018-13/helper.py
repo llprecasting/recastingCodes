@@ -5,7 +5,6 @@ import numpy as np
 import os
 import glob
 import pyslha
-from particleChargesPythia import particleCharges,colorCharges
 
 class LLP(object):
     """
@@ -114,38 +113,7 @@ class LLP(object):
         return "%s (%s)" %(self.PID,self.Status)
     
     def __repr__(self) -> str:
-        return str(self)
-    
-    def getCharge(self) -> float:
-        """
-        Try to get the LLP charge using its PDG code.
-        If it is a colored particle, check the charge of its mother (R-hadron).
-        """
-
-        pdg = abs(self.PID)
-        if pdg not in particleCharges:
-            print('PDG %i not found in ParticleData' %pdg)
-            return None
-        if pdg not in colorCharges:
-            print('PDG %i not found in ParticleData' %pdg)
-            return None
-        
-        # If LLP is color neutral returns its charge
-        if colorCharges[pdg] == 0:
-            return particleCharges[pdg]/3.0
-
-        # Loop over mothers until a color neutral state is found
-        for mom in self.mothers:
-            pdg = abs(mom.PID)
-            if pdg not in particleCharges:
-                continue
-            if pdg not in colorCharges:
-                continue
-            if colorCharges[pdg] == 0:
-                return particleCharges[pdg]/3.0
-
-        print('Error getting charge for %i' %pdg)
-        return None        
+        return str(self)   
 
 def getLLPs(llpList,directDaughters,finalDaughters,mothers=[],maxMomViolation=5e-2,trackEff=1.0):
 

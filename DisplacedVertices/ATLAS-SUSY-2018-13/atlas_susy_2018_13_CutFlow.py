@@ -55,17 +55,6 @@ def getCutFlow(inputFiles,model='sbottom',sr='HighPT',nevtsMax=-1,modelDict=None
     totalweightPB = 0.0
     # Keep track of yields for each dataset
     cutFlow = {}
-    if model == 'strong':
-        cutFlow['$m_{\\tilde g} (GeV)$'] = modelDict['mLSP']
-        cutFlow['$m_{\\tilde \chi_1^0} (GeV)$'] = modelDict['mLLP']
-        cutFlow['$\\tau(\\tilde \chi_1^0) (ns)$'] = modelDict['tau_ns']
-    elif model == 'ewk':
-        cutFlow['$m_{\\tilde \chi_1^0} (GeV)$'] = modelDict['mLLP']
-        cutFlow['$\\tau(\\tilde \chi_1^0) (ns)$'] = modelDict['tau_ns']
-    elif model == 'bb':
-        cutFlow['$m_{\\tilde b_1} (GeV)$'] = modelDict['mLLP']
-        cutFlow['$\\tau(\\tilde b_1) (ns)$'] = modelDict['tau_ns']
-
     keys = ["Total", "Jet selection", "$R_{xy},z <$ 300 mm", 
             "$R_{DV} > 4$ mm", "$d_0 > 2$ mm", 
             "$nTracks >= 5$", "$mDV > 10$ GeV", "final Acc*Eff"]
@@ -153,6 +142,7 @@ def getCutFlow(inputFiles,model='sbottom',sr='HighPT',nevtsMax=-1,modelDict=None
     modelDict['Total xsec (pb)'] = totalweightPB
     print('\nCross-section (pb) = %1.3e\n' %totalweightPB)
 
+    
     cutFlowErr = {k : np.sqrt(v[1]) for k,v in cutFlow.items()}
     cutFlow = {k : v[0]  for k,v in cutFlow.items()}
 

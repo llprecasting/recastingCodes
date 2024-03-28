@@ -113,8 +113,6 @@ def runMG5(parser):
     :return: Dictionary with run info. False if failed.
     """
 
-    
-    t0 = time.time()
     pars = parser["MadGraphPars"]
     if not 'runFolder' in pars:
         logger.error('Run folder not defined.')
@@ -175,13 +173,13 @@ def runMG5(parser):
 
     ncore = parser['options']['ncore']
     
-    logger.info("Generating MG5 events with command file %s" %commandsFile)
+    logger.debug("Generating MG5 events with command file %s" %commandsFile)
     run = subprocess.Popen('./bin/generate_events --multicore --nb_core=%i < %s' %(ncore,commandsFile),
                            shell=True,stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE,cwd=runFolder)
       
     output,errorMsg= run.communicate()
-    runInfo = {'time (s)' : time.time()-t0}
+    runInfo = {}
     runInfo.update(pars)
 
     logger.debug('MG5 event error:\n %s \n' %errorMsg)
@@ -228,7 +226,7 @@ def runDelphesPythia8(parser,runInfo):
         f.write('Beams:LHEF = %s\n' %lheFile)
         f.write('Main:numberOfEvents   = %i\n' %nevts)
 
-    logger.info("Running DelphesPythia8 with config files %s and %s" %(pythia_tmp,delphescard))
+    logger.debug("Running DelphesPythia8 with config files %s and %s" %(pythia_tmp,delphescard))
     run = subprocess.Popen('./DelphesPythia8 %s %s %s' %(delphescard,pythia_tmp,rootFile),shell=True,
                                 stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,
                                 cwd=delphesDir)
@@ -260,6 +258,7 @@ def generateEvents(parser):
     :return: Dictionary with run info. False if failed.
     """
 
+    t0 = time.time()
     if parser["options"]["runMadGraph"]:
         runInfo = runMG5(parser)
         if parser["options"]["runPythiaDelphes"]:
@@ -267,7 +266,9 @@ def generateEvents(parser):
     elif parser["options"]["runPythiaDelphes"]:
         logger.error("Pythia and Delphes can only run if runMadGraph = True")
         return {}
-
+    
+    runInfo.update({'time (s)' : time.time()-t0})
+    
     return runInfo
 
 def moveFolders(runInfo):

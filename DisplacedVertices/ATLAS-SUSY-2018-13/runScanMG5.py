@@ -96,21 +96,21 @@ def getInfoFromOutput(outputStr):
             runTag = runTag.replace(':','').replace('=','').strip()
         elif 'cross-section' in l.lower():
             xsec = eval(l.lower().split(':')[1].split('+-')[0])
-        elif 'events'in l.lower():
+        elif 'nb of events'in l.lower():
             nevts = eval(l.lower().split(':')[1])
 
     runInfo = {'run number' : runNumb, 'run tag' : runTag, 
                'cross-section (pb)' : xsec, 'Number of events' : int(nevts)}
     return runInfo
 
-def generateEvents(parser):
+def runMG5(parser):
     
     """
     Runs the madgraph event generation.
     
     :param parser: Dictionary with parser sections.
     
-    :return: True if successful. Otherwise False.
+    :return: Dictionary with run info. False if failed.
     """
 
     
@@ -153,45 +153,18 @@ def generateEvents(parser):
             shutil.copyfile(pars['paramcard'],os.path.join(runFolder,'Cards/param_card.dat'))    
         else:
             raise ValueError("Param card %s not found" %pars['paramcard'])
-
-
-    # By default do not run Pythia or Delphes
-    runPythia = parser['options']['runPythia']
-    runDelphes = parser['options']['runDelphes']
-
-    pythia8File = os.path.join(runFolder,'Cards/pythia8_card.dat')
-    delphesFile = os.path.join(runFolder,'Cards/delphes_card.dat')
-    if runDelphes and 'delphescard' in pars:
-        if os.path.isfile(pars['delphescard']):
-            shutil.copyfile(pars['delphescard'],delphesFile)
-
-    if runPythia and 'pythia8card' in pars:        
-        if os.path.isfile(pars['pythia8card']):
-            shutil.copyfile(pars['pythia8card'],pythia8File) 
-
-    cleanOutput = parser['options']['cleanOutput']
     
     #Generate commands file:       
     commandsFile = tempfile.mkstemp(suffix='.txt', prefix='MG5_commands_', dir=runFolder)
     os.close(commandsFile[0])
     commandsFileF = open(commandsFile[1],'w')
-    if runPythia:
-        commandsFileF.write('shower=Pythia8\n')
-    else:
-        commandsFileF.write('shower=OFF\n')
-    if runDelphes:
-        commandsFileF.write('detector=Delphes\n')
-    else:
-        commandsFileF.write('detector=OFF\n')
-
+    commandsFileF.write('shower=OFF\n')
+    commandsFileF.write('detector=OFF\n')
     commandsFileF.write('done\n')
     comms = parser["MadGraphSet"]
     # Set the MadGraph parameters defined in the ini file
     for key,val in comms.items():
         commandsFileF.write('set %s %s\n' %(key,val))
-    # If cleanOutput = True, do not store the HepMC file (faster run):
-    if cleanOutput:
-        commandsFileF.write('set HEPMCoutput:file hepmcremove\n')
 
     #Done setting up options
     commandsFileF.write('done\n')
@@ -210,31 +183,90 @@ def generateEvents(parser):
     output,errorMsg= run.communicate()
     runInfo = {'time (s)' : time.time()-t0}
     runInfo.update(pars)
-    # Try to get info from output
-    try:
-        runInfo.update(getInfoFromOutput(output))
-    except:
-        pass
 
     logger.debug('MG5 event error:\n %s \n' %errorMsg)
-    logger.debug('MG5 event output:\n %s \n' %output)
-      
+    logger.debug('MG5 event output:\n %s \n' %output)    
+    # Get info from output
+    runInfo.update(getInfoFromOutput(output))
+
     os.remove(commandsFile)
 
+    return runInfo
+
+def runDelphesPythia8(parser,runInfo):
+    """
+    Runs the Pythia8 and Delphes directly (bypassing hepmc generation)
+    on the LHE file.
     
-    if cleanOutput and runInfo and 'run number' in runInfo:
-        lheFile = os.path.join(runFolder,'Events',runInfo['run number'],'unweighted_events.lhe.gz')
+    :param parser: Dictionary with parser sections.
+    :param runInfo: Dictionary with MadGraph run information.
+    
+    :return: Dictionary with run info. False if failed.
+    """
+
+    cleanOutput = parser['options']['cleanOutput']
+
+    pars = parser["DelphesPars"]
+    delphesDir = os.path.abspath(pars['delphesDir'])
+    delphescard = os.path.abspath(pars['delphescard'])
+    pythiaCard = os.path.abspath(pars['pythia8card'])
+    
+    runFolder = parser['MadGraphPars']['runFolder']
+    nevts = parser["MadGraphSet"]["nevents"]
+    lheFile = os.path.join(runFolder,'Events',runInfo['run number'],'unweighted_events.lhe.gz')
+    rootFile = os.path.join(runFolder,'Events',runInfo['run number'], '%s_delphes_events.root'  %runInfo['run tag'])
+
+    #Generate pythia card with additional info
+    pythia_tmp = tempfile.mkstemp(suffix='.dat', prefix='pythia_card_', dir=delphesDir)
+    os.close(pythia_tmp[0])
+    pythia_tmp = pythia_tmp[1]
+    shutil.copyfile(pythiaCard,pythia_tmp)
+    with open(pythia_tmp,'a') as f:
+        f.write('\n\n')
+        f.write('### Added lines:\n')
+        f.write('Beams:frameType = 4\n')
+        f.write('Beams:LHEF = %s\n' %lheFile)
+        f.write('Main:numberOfEvents   = %i\n' %nevts)
+
+    logger.info("Running DelphesPythia8 with config files %s and %s" %(pythia_tmp,delphescard))
+    run = subprocess.Popen('./DelphesPythia8 %s %s %s' %(delphescard,pythia_tmp,rootFile),shell=True,
+                                stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,
+                                cwd=delphesDir)
+    output,errorMsg = run.communicate()
+
+    runInfo.update({'DelphesOutput' : output, 'DelphesError' : errorMsg})
+
+    os.remove(pythia_tmp)
+
+    #Generate pythia log file
+    pythia_log = rootFile.replace('_delphes_events.root','_pythia_delphes.log')
+    with open(pythia_log,'w') as f:
+        f.write(output)
+
+    if cleanOutput:
         logger.debug('Removing  %s' %lheFile)
         if os.path.isfile(lheFile):
             os.remove(lheFile)
-        hepmcFile = os.path.join(runFolder,'Events',runInfo['run number'], '%s_pythia8_events.hepmc.gz'  %runInfo['run tag'])
-        logger.debug('Removing  %s' %hepmcFile)
-        if os.path.isfile(hepmcFile):
-            os.remove(hepmcFile)
-        # logFile = os.path.join(runFolder,'Events',runInfo['run number'], '%s_pythia8.log'  %runInfo['run tag'])
-        # logger.debug('Removing  %s' %logFile)
-        # if os.path.isfile(logFile):
-            # os.remove(logFile)
+        
+
+    return runInfo
+
+def generateEvents(parser):
+    """
+    Run MadGraph5 to generate LHE events and then DelphesPythia8.
+
+    :param parser: Dictionary with parser sections.
+    
+    :return: Dictionary with run info. False if failed.
+    """
+
+    if parser["options"]["runMadGraph"]:
+        runInfo = runMG5(parser)
+        if parser["options"]["runPythiaDelphes"]:
+            runInfo = runDelphesPythia8(parser,runInfo)
+    elif parser["options"]["runPythiaDelphes"]:
+        logger.error("Pythia and Delphes can only run if runMadGraph = True")
+        return {}
 
     return runInfo
 

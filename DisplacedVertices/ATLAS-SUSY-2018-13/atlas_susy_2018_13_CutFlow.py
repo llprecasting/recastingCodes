@@ -86,7 +86,7 @@ def getCutFlow(inputFiles,model='sbottom',sr='HighPT',nevtsMax=-1,modelDict=None
             ntotal += 1
             progressbar.update(ntotal)
             tree.GetEntry(ievt)   
-            weightPB = tree.Weight.At(1).Weight     
+            weightPB = tree.Event.At(0).Weight/nevts   
             weightPB = weightPB*norm
             totalweightPB += weightPB
             ns = weightPB*1e3*lumi # number of signal events

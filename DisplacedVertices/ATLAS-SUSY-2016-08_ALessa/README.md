@@ -15,6 +15,7 @@ The following pre-requisites must be installed before compiling the main code:
 
   * [MadGraph5](https://launchpad.net/mg5amcnlo) with [Pythia8](https://pythia.org/) installed
   * [Modified Delphes](./DelphesLLP.tar.gz)
+  * [Pythia8](https://pythia.org/)
   
 ## Installation ##
 
@@ -24,7 +25,7 @@ Running:
 ./installer.sh
 ```
 
-Should install most of the relevant (non-Mathematica) packages.
+Should install most of the relevant packages.
 The LHAPDF, Pythia8 and Delphes directories must be included in the library and root include paths.
 This can be done running:
 
@@ -57,6 +58,11 @@ options:
                         verbose level (debug, info, warning or error). Default is info
 
 ```
+where model is used to fetch the relevant model parameters depending on the scenario (ewk or strong production).
+This information is used only for conveniently storing the model parameters (such as the proper lifetime) along with the recasting info.
+The user can easily modify the [helper.py](./helper.py) code for other models.
+
+
 
 The basic required input is a Delphes ROOT file.
 For instance, running:
@@ -64,17 +70,38 @@ For instance, running:
 ```
 ./atlas_susy_2016_08_Recast.py -f <root file>
 ```
-will produce a pickle file contaning a Pandas DataFrame with a simplified cutflow and the number of events in each signal region.
+will produce a pickle file containing a Pandas DataFrame with a simplified cutflow and the number of events in each signal region.
+
+For combining results from multiple model points into a single DataFrame, run:
+
+```
+./atlas_susy_2016_08_CombineData.py -f <pickle file1> <pickle file2> ... -o <output file>
+```
+
+Finally, for computing upper limits:
+
+```
+./atlas_susy_2016_08_UpperLimits.py -f <pickle file>  -o <output file>
+```
+
 
 ## Validation ##
 
 
-The validation of the signal efficiencies (efficiency times acceptance)
-for direct production of staus can be found in the [validation folder](validation).
-The output (.eff files) was generated using the SLHA files and pythia8.cfg and parameters.ini files stored in the folder.
-For instance, the following validation plot can be generated running this [ipython notebook](validation/validation-mlsp100.ipynb):
+The validation of the recasting code was done using the long-lived gluino benchmarks considered by ATLAS.
 
- * mgluino = 1.4 TeV, mLSP = 100 GeV:
+The scan over the parameter space can be conveniently done running:
+
+```
+./runScanMG5.py -p <parameters file>
+```
+where basic required input is defined [parameter file](./validation/scan_parameters_gluino.ini) specifying the input cards model parameters.
+The output is a Delphes ROOT file for each model point.
+
+The MadGraph, Pythia and Delphes cards can be found in [./validation/Cards](./validation/Cards/).
+The recasting results and plotting scripts can be found in the [validation folder](./validation/).
+
+* mgluino = 1.4 TeV, mLSP = 100 GeV:
 
 ![Alt text](validation/validationPlot_mlsp100.png?raw=true "Validation Plot")
 

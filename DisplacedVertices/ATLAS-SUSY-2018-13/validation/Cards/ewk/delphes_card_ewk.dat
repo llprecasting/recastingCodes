@@ -821,27 +821,7 @@ module TreeWriter TreeWriter {
 #  add Branch Delphes/stableParticles StableParticle GenParticle
   add Branch LLPFilter/finalDaughters bsmFinalDaughters GenParticle
   add Branch LLPFilter/directDaughters bsmDirectDaughters GenParticle
-  add Branch LLPFilter/mothers bsmMothers GenParticle  
   add Branch LLPFilter/bsmParticles bsm GenParticle
-  add Branch DMFilter/dmParticles dmParticles GenParticle
-  add Branch DMMissingET/momentum DMMissingET MissingET  
-
-#  add Branch TrackMerger/tracks Track Track
-#  add Branch Calorimeter/towers Tower Tower
-
-#  add Branch HCal/eflowTracks EFlowTrack Track
-#  add Branch ECal/eflowPhotons EFlowPhoton Tower
-#  add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
-
   add Branch GenJetFinder/jets GenJet Jet
-#  add Branch GenMissingET/momentum GenMissingET MissingET
-
-  add Branch UniqueObjectFinder/jets Jet Jet
-  add Branch UniqueObjectFinder/electrons Electron Electron
-  add Branch UniqueObjectFinder/photons Photon Photon
-  add Branch UniqueObjectFinder/muons Muon Muon
-#  add Branch MissingET/momentum MissingET MissingET
-#  add Branch MissingETCalo/momentum MissingETCalo MissingET
-  add Branch ScalarHT/energy ScalarHT ScalarHT
 }
 

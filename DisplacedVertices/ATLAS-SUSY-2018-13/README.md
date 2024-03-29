@@ -8,6 +8,7 @@ and multiple jets ([ATLAS-SUSY-2018-13](https://atlas.web.cern.ch/Atlas/GROUPS/P
 using the efficiency grids  for event and vertex reconstruction selection provided [here](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-13/hepdata_info.pdf).
 
 
+**Note: the recasting does not reproduce well the results for the strong benchmark for lifetimes smaller than 0.01 ns.**
 
 ## Pre-Requisites ##
 
@@ -118,12 +119,15 @@ The results combine both signal regions (High PT and Trackless) assuming they ar
 
 ### Strong Scenario
 
-A comparison between the official ATLAS exclusion curve and the one
-obtained by this recasting code is shown below:
+A comparison between the official ATLAS exclusion curves and the ones
+obtained by this recasting code are shown below:
 
 <img src="validation/strong_results/strong_Fig12.png" width="400" height="270">
 
-The results above consider only the best signal region (High PT).
+<img src="validation/strong_results/strong_Fig8a.png" width="400" height="270">
+
+The results combine both signal regions (High PT and Trackless) assuming they are fully uncorrelated.
+
 
 
 [^1]: A modified version of Delphes needs to be installed, which includes a module for filtering LLPs

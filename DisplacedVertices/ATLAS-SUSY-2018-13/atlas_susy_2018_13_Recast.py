@@ -283,7 +283,7 @@ if __name__ == "__main__":
 
     print('Running over %i cores' %ncpus)
     pool = multiprocessing.Pool(processes=ncpus)
-    children = []
+    children = {}
     # Split input files by distinct models and get recast data for
     # the set of files from the same model:
     for fileList,mDict in splitModels(inputFiles,args.model):
@@ -312,12 +312,12 @@ if __name__ == "__main__":
         print('\t Model: %s (%i files)' %(mDict,len(fileList)))
 
         p = pool.apply_async(getRecastData, args=(fileList,args.model,mDict,args.add,))
-        children.append(p)
+        children[outFile] = p
 
 
     # Wait for jobs to finish:
-    dataDictList = [p.get() for p in children]
-    for dataDict in dataDictList:
+    dataDictList = {outFile : p.get() for outFile,p in children.items()}
+    for outFile,dataDict in dataDictList.items():
         if args.verbose == 'debug':
             for k,v in dataDict.items():
                 print(k,v)

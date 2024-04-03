@@ -4,8 +4,8 @@ import os
 import numpy as np
 import pandas as pd
 import time
-import progressbar as P
 import sys
+import multiprocessing
 sys.path.append('../')
 from helper import getLLPs,getJets,getDisplacedJets,getModelDict,splitModels
 from ATLAS_data.effFunctions import eventEff,vertexEff
@@ -76,10 +76,10 @@ def vertexAcc(llp,Rmax=np.inf,zmax=np.inf,Rmin=0.0,d0min=0.0,nmin=0,mDVmin=0):
     
 def getRecastData(inputFiles,model='strong',modelDict=None,addweights=False):
 
-    if len(inputFiles) > 1:
-        print('Combining files:')
-        for f in inputFiles:
-            print(f)
+    # if len(inputFiles) > 1:
+    #     print('Combining files:')
+    #     for f in inputFiles:
+    #         print(f)
 
     if modelDict is None:
         modelDict = getModelDict(inputFiles[0],model)
@@ -106,10 +106,6 @@ def getRecastData(inputFiles,model='strong',modelDict=None,addweights=False):
     cutFlowHighPT = { k : np.zeros(2) for k in keys}    
     cutFlowTrackless = {k : np.zeros(2) for k in keys}
 
-    progressbar = P.ProgressBar(widgets=["Reading %i Events: " %modelDict['Total MC Events'], 
-                                P.Percentage(),P.Bar(marker=P.RotatingMarker()), P.ETA()])
-    progressbar.maxval = modelDict['Total MC Events']
-    progressbar.start()
 
     ntotal = 0
     totalweightPB = 0.0
@@ -129,7 +125,6 @@ def getRecastData(inputFiles,model='strong',modelDict=None,addweights=False):
         for ievt in range(nevts):    
             
             ntotal += 1
-            progressbar.update(ntotal)
             tree.GetEntry(ievt)   
             weightPB = tree.Event.At(0).Weight/nevts
             weightPB = weightPB*norm
@@ -177,10 +172,9 @@ def getRecastData(inputFiles,model='strong',modelDict=None,addweights=False):
             cutFlowTrackless["DV selection"] += (ns*trackless_acc*trackless_eff*wvertex,(ns*trackless_acc*trackless_eff*wvertex)**2)
 
         f.Close()
-    progressbar.finish()
 
     modelDict['Total xsec (pb)'] = totalweightPB
-    print('\nCross-section (pb) = %1.3e\n' %totalweightPB)
+    # print('\nCross-section (pb) = %1.3e\n' %totalweightPB)
 
 
     cutFlowDicts = {'HighPT' : cutFlowHighPT, 'Trackless' : cutFlowTrackless}
@@ -258,7 +252,10 @@ if __name__ == "__main__":
             help='Defines which model should be considered for extracting model parameters (strong,ewk,gluino,sbottom,n2n1).')
     ap.add_argument('-U', '--update', required=False,action='store_true',
             help='If the flag is set only the model points containing data newer than the dataframe will be read.')
-    
+
+    ap.add_argument('-n', '--ncpus', default=1,type=int,
+            help='Number of CPUs to run in parallel')
+
     ap.add_argument('-v', '--verbose', default='info',
             help='verbose level (debug, info, warning or error). Default is info')
 
@@ -282,7 +279,11 @@ if __name__ == "__main__":
     args = ap.parse_args()
     inputFiles = args.inputFile
     outputFile = args.outputFile
-    
+    ncpus = args.ncpus
+
+    print('Running over %i cores' %ncpus)
+    pool = multiprocessing.Pool(processes=ncpus)
+    children = []
     # Split input files by distinct models and get recast data for
     # the set of files from the same model:
     for fileList,mDict in splitModels(inputFiles,args.model):
@@ -310,12 +311,16 @@ if __name__ == "__main__":
         print('----------------------------------')
         print('\t Model: %s (%i files)' %(mDict,len(fileList)))
 
-        dataDict = getRecastData(fileList,args.model,mDict,addweights=args.add)
+        p = pool.apply_async(getRecastData, args=(fileList,args.model,mDict,args.add,))
+        children.append(p)
+
+
+    # Wait for jobs to finish:
+    dataDictList = [p.get() for p in children]
+    for dataDict in dataDictList:
         if args.verbose == 'debug':
             for k,v in dataDict.items():
                 print(k,v)
-
-        
 
         # #### Create pandas DataFrame
         df = pd.DataFrame.from_dict(dataDict)

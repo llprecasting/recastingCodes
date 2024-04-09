@@ -1,0 +1,54 @@
+! 1) Settings used in the main program.
+Main:numberOfEvents = 10000       ! number of events to generate
+Main:timesAllowErrors = 3          ! how many aborts before run stops
+
+! 2) Settings related to output in init(), next() and stat().
+Init:showChangedSettings = on      ! list changed settings
+Init:showChangedParticleData = off ! list changed particle data
+Next:numberCount = 5000             ! print message every n events
+Next:numberShowInfo = 1            ! print event information n times
+Next:numberShowProcess = 1         ! print process record n times
+Next:numberShowEvent = 0           ! print event record n times
+
+
+
+// Specify merging parameters.
+Merging:doKTMerging       = on   ! switch on kT merging
+Merging:ktType            = 1
+!Merging:doMGMerging       = on  
+Merging:TMS               = @@tms@@  ! merging scale, here in kT, a quarter of SUSY particle mass
+Merging:Process           = pp>{x1-,-1000024}{n2,1000023}   ! process in MadGraph notation
+Merging:nJetMax           = 2    ! maximal number of additional jets
+Merging:mayRemoveDecayProducts = on
+
+
+! 3) Settings for the event generation process in the Pythia8 library.
+PartonLevel:MPI = off              ! no multiparton interactions
+PartonLevel:ISR = on              ! no initial-state radiation
+PartonLevel:FSR = on              ! no final-state radiation
+HadronLevel:Hadronize = on        ! no hadronization
+
+
+Tune:pp = 21
+
+
+
+
+// Subruns are used to select which LHE file to read when.
+// Subrun info should always go at the end of the input file.
+// Here Main:subrun = iMerge of pythia.readFile(...) in main80.cc.
+Beams:frameType           = 4   ! use LHEF input for incoming beams
+LHEFInputs:nSubruns       = 3
+//--------------------------------------------------------------------
+Main:subrun               = 0   ! input for first subrun, + 0 jets
+Beams:LHEF                = 0_unweighted_events.lhe.gz
+//--------------------------------------------------------------------
+Main:subrun               = 1   ! input for second subrun, + 1 jet
+Beams:LHEF                = 1_unweighted_events.lhe.gz
+//--------------------------------------------------------------------
+Main:subrun               = 2   ! input for third subrun, + 2 jets
+Beams:LHEF                = 2_unweighted_events.lhe.gz
+!--------------------------------------------------------------------
+
+
+

@@ -1,0 +1,44 @@
+#: table_doi: 10.17182/hepdata.137762.v1/t73
+#: name: acceptance_trackless_ewk_hf
+#: description: Acceptance cutflow for the Trackless SR for representative points in the electroweak pair production model with heavy-flavor quarks final state. See additional resources for more information.
+#: data_file: acceptance_trackless_ewk_hf.yaml
+#: keyword observables: ACC
+#: keyword reactions: P P --> NEUTRALINO2 NEUTRALINO1 X | P P --> CHARGINO1 NEUTRALINO1 X | P P --> CHARGINO1 CHARGINO1 X | P P --> CHARGINO1 NEUTRALINO2 X
+#: keyword cmenergies: 13000
+#: keyword phrases: SUSY | Supersymmetry | RPV | Proton-Proton Scattering
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],700
+#: $\tau$ [ns],0.032
+Selections,Acceptance
+Jet selection,0.698
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.698
+"$\ge 1$ DV, $L_{xy}\ge 4$ mm",0.484
+"$\ge 1$ DV, $\ge 1$ charged-particle with $|d_0| > 2$ mm",0.484
+"$\ge 1$ DV, $n_{\textit{selected decay products}} \geq 5$",0.484
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.484
+
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],700
+#: $\tau$ [ns],0.1
+Selections,Acceptance
+Jet selection,0.741
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.741
+"$\ge 1$ DV, $L_{xy}\ge 4$ mm",0.681
+"$\ge 1$ DV, $\ge 1$ charged-particle with $|d_0| > 2$ mm",0.681
+"$\ge 1$ DV, $n_{\textit{selected decay products}} \geq 5$",0.681
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.681
+
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],700
+#: $\tau$ [ns],1.0
+Selections,Acceptance
+Jet selection,0.747
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.647
+"$\ge 1$ DV, $L_{xy}\ge 4$ mm",0.629
+"$\ge 1$ DV, $\ge 1$ charged-particle with $|d_0| > 2$ mm",0.629
+"$\ge 1$ DV, $n_{\textit{selected decay products}} \geq 5$",0.629
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.629
+

@@ -1,0 +1,72 @@
+#: table_doi: 10.17182/hepdata.137762.v1/t94
+#: name: cutflow_trackless_ewk
+#: description: Cutflow (acceptance x efficiency) for the Trackless SR for representative points in the electroweak pair production model. See additional resources for more information.
+#: data_file: cutflow_trackless_ewk.yaml
+#: keyword observables: ACC | EFF
+#: keyword reactions: P P --> NEUTRALINO2 NEUTRALINO1 X | P P --> CHARGINO1 NEUTRALINO1 X | P P --> CHARGINO1 CHARGINO1 X | P P --> CHARGINO1 NEUTRALINO2 X
+#: keyword cmenergies: 13000
+#: keyword phrases: SUSY | Supersymmetry | RPV | Proton-Proton Scattering
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],500
+#: $\tau$ [ns],0.1
+Selections,Full Sim $A\times\epsilon$
+Multijet trigger,0.899
+Filter,0.86
+Jet Selection,0.406
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.402
+"$\ge 1$ DV, $\text{min}(|\vec{R}_\text{DV} - \vec{R}_\text{CV}|)>4$ mm",0.395
+"$\ge 1$ DV, $\chi^2/n_\textrm{DoF}<5$",0.393
+"$\ge 1$ DV, pass material map veto",0.35
+"$\ge 1$ DV, $n^\text{DV}_\text{Tracks} \geq 5$",0.313
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.311
+"$\ge 1$ DV, $n_{\text{Selected tracks}}^{\text{DV}}\geq 2$",0.311
+
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],500
+#: $\tau$ [ns],1.0
+Selections,Full Sim $A\times\epsilon$
+Multijet trigger,0.869
+Filter,0.867
+Jet Selection,0.399
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.348
+"$\ge 1$ DV, $\text{min}(|\vec{R}_\text{DV} - \vec{R}_\text{CV}|)>4$ mm",0.345
+"$\ge 1$ DV, $\chi^2/n_\textrm{DoF}<5$",0.335
+"$\ge 1$ DV, pass material map veto",0.234
+"$\ge 1$ DV, $n^\text{DV}_\text{Tracks} \geq 5$",0.145
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.143
+"$\ge 1$ DV, $n_{\text{Selected tracks}}^{\text{DV}}\geq 2$",0.143
+
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],1300
+#: $\tau$ [ns],0.1
+Selections,Full Sim $A\times\epsilon$
+Multijet trigger,0.999
+Filter,0.939
+Jet Selection,0.154
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.153
+"$\ge 1$ DV, $\text{min}(|\vec{R}_\text{DV} - \vec{R}_\text{CV}|)>4$ mm",0.149
+"$\ge 1$ DV, $\chi^2/n_\textrm{DoF}<5$",0.149
+"$\ge 1$ DV, pass material map veto",0.135
+"$\ge 1$ DV, $n^\text{DV}_\text{Tracks} \geq 5$",0.123
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.122
+"$\ge 1$ DV, $n_{\text{Selected tracks}}^{\text{DV}}\geq 2$",0.122
+
+#: Luminosity [fb$^{-1}$],139
+#: Energy [TeV],13
+#: $m(\tilde{\chi}^0_1)$ [GeV],1300
+#: $\tau$ [ns],1.0
+Selections,Full Sim $A\times\epsilon$
+Multijet trigger,0.999
+Filter,0.997
+Jet Selection,0.172
+"$\ge 1$ DV, $R_{xy}$ < 300 mm and $|z|$ < 300 mm",0.162
+"$\ge 1$ DV, $\text{min}(|\vec{R}_\text{DV} - \vec{R}_\text{CV}|)>4$ mm",0.161
+"$\ge 1$ DV, $\chi^2/n_\textrm{DoF}<5$",0.157
+"$\ge 1$ DV, pass material map veto",0.117
+"$\ge 1$ DV, $n^\text{DV}_\text{Tracks} \geq 5$",0.083
+"$\ge 1$ DV, $m_{DV}\ge 10$ GeV",0.083
+"$\ge 1$ DV, $n_{\text{Selected tracks}}^{\text{DV}}\geq 2$",0.083
+

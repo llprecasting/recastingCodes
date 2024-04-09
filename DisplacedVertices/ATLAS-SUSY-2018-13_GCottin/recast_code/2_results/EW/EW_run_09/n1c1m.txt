@@ -1,0 +1,941 @@
+
+ *------------------------------------------------------------------------------------* 
+ |                                                                                    | 
+ |  *------------------------------------------------------------------------------*  | 
+ |  |                                                                              |  | 
+ |  |                                                                              |  | 
+ |  |   PPP   Y   Y  TTTTT  H   H  III    A      Welcome to the Lund Monte Carlo!  |  | 
+ |  |   P  P   Y Y     T    H   H   I    A A     This is PYTHIA version 8.308      |  | 
+ |  |   PPP     Y      T    HHHHH   I   AAAAA    Last date of change: 16 Nov 2022  |  | 
+ |  |   P       Y      T    H   H   I   A   A                                      |  | 
+ |  |   P       Y      T    H   H  III  A   A    Now is 15 Mar 2024 at 20:08:52    |  | 
+ |  |                                                                              |  | 
+ |  |   Program documentation and an archive of historic versions is found on:     |  | 
+ |  |                                                                              |  | 
+ |  |                               https://pythia.org/                            |  | 
+ |  |                                                                              |  | 
+ |  |   PYTHIA is authored by a collaboration consisting of:                       |  | 
+ |  |                                                                              |  | 
+ |  |   Christian Bierlich, Nishita Desai, Leif Gellersen, Ilkka Helenius, Philip  |  | 
+ |  |   Ilten, Leif Lonnblad, Stephen Mrenna, Stefan Prestel, Christian Preuss,    |  | 
+ |  |   Torbjorn Sjostrand, Peter Skands, Marius Utheim and Rob Verheyen.          |  | 
+ |  |                                                                              |  | 
+ |  |   The complete list of authors, including contact information and            |  | 
+ |  |   affiliations, can be found on https://pythia.org/.                         |  | 
+ |  |   Problems or bugs should be reported on email at authors@pythia.org.        |  | 
+ |  |                                                                              |  | 
+ |  |   The main program reference is C. Bierlich et al,                           |  | 
+ |  |   'A comprehensive guide to the physics and usage of Pythia 8.3',            |  | 
+ |  |   SciPost Phys. Codebases 8-r8.3 (2022) [arXiv:2203.11601 [hep-ph]]          |  | 
+ |  |                                                                              |  | 
+ |  |   PYTHIA is released under the GNU General Public Licence version 2 or later.|  | 
+ |  |   Please respect the MCnet Guidelines for Event Generator Authors and Users. |  | 
+ |  |                                                                              |  | 
+ |  |   Disclaimer: this program comes without any guarantees.                     |  | 
+ |  |   Beware of errors and use common sense when interpreting results.           |  | 
+ |  |                                                                              |  | 
+ |  |   Copyright (C) 2022 Torbjorn Sjostrand                                      |  | 
+ |  |                                                                              |  | 
+ |  |                                                                              |  | 
+ |  *------------------------------------------------------------------------------*  | 
+ |                                                                                    | 
+ *------------------------------------------------------------------------------------* 
+
+
+ *------------------ MEPS Merging Initialization  ------------------*
+ |                                                                  |
+ | CKKW-L merge                                                     |
+ |     pp>{x1-,-1000024}{n1,1000022}  with up to  2 additional jets |
+ | Merging scale is defined in kT, with value ktMS = 175.000 GeV
+ |                                                                  |
+ *-------------- END MEPS Merging Initialization  ------------------*
+
+ *-----------------------  SusyLesHouches SUSY/BSM Interface  ------------------------*
+ | Last Change 12 Apr 2017 - P. Skands
+ | Parsing: /home/feitung/research/MG5_aMC/pp2n1c1m_0/Events/run_09/unweighted_events.lhe.gz
+ | (SLHA::readFile) line 338 - storing non-SLHA(2) block: fralpha
+ | (SLHA::readFile) line 777 - storing QNUMBERS for id = 1000022   n1
+ | (SLHA::readFile) line 785 - storing QNUMBERS for id = 1000023   n2
+ | (SLHA::readFile) line 793 - storing QNUMBERS for id = 1000025   n3
+ | (SLHA::readFile) line 801 - storing QNUMBERS for id = 1000035   n4
+ | (SLHA::readFile) line 809 - storing QNUMBERS for id = 1000024   x1+
+ | (SLHA::readFile) line 817 - storing QNUMBERS for id = 1000037   x2+
+ | (SLHA::readFile) line 825 - storing QNUMBERS for id = 1000021   go
+ | (SLHA::readFile) line 833 - storing QNUMBERS for id = 35   h2
+ | (SLHA::readFile) line 841 - storing QNUMBERS for id = 36   h3
+ | (SLHA::readFile) line 849 - storing QNUMBERS for id = 37   h+
+ | (SLHA::readFile) line 857 - storing QNUMBERS for id = 1000012   sve
+ | (SLHA::readFile) line 865 - storing QNUMBERS for id = 1000014   svm
+ | (SLHA::readFile) line 873 - storing QNUMBERS for id = 1000016   svt
+ | (SLHA::readFile) line 881 - storing QNUMBERS for id = 1000011   el-
+ | (SLHA::readFile) line 889 - storing QNUMBERS for id = 1000013   mul-
+ | (SLHA::readFile) line 897 - storing QNUMBERS for id = 1000015   ta1-
+ | (SLHA::readFile) line 905 - storing QNUMBERS for id = 2000011   er-
+ | (SLHA::readFile) line 913 - storing QNUMBERS for id = 2000013   mur-
+ | (SLHA::readFile) line 921 - storing QNUMBERS for id = 2000015   ta2-
+ | (SLHA::readFile) line 929 - storing QNUMBERS for id = 1000002   ul
+ | (SLHA::readFile) line 937 - storing QNUMBERS for id = 1000004   cl
+ | (SLHA::readFile) line 945 - storing QNUMBERS for id = 1000006   t1
+ | (SLHA::readFile) line 953 - storing QNUMBERS for id = 2000002   ur
+ | (SLHA::readFile) line 961 - storing QNUMBERS for id = 2000004   cr
+ | (SLHA::readFile) line 969 - storing QNUMBERS for id = 2000006   t2
+ | (SLHA::readFile) line 977 - storing QNUMBERS for id = 1000001   dl
+ | (SLHA::readFile) line 985 - storing QNUMBERS for id = 1000003   sl
+ | (SLHA::readFile) line 993 - storing QNUMBERS for id = 1000005   b1
+ | (SLHA::readFile) line 1001 - storing QNUMBERS for id = 2000001   dr
+ | (SLHA::readFile) line 1009 - storing QNUMBERS for id = 2000003   sr
+ | (SLHA::readFile) line 1017 - storing QNUMBERS for id = 2000005   b2
+ *------------------------------------------------------------------------------------*
+ | (SLHA::checkSpectrum) Warning: MODSEL(1) undefined. Assuming = 0
+ | (SLHA::checkSpectrum) Warning: MINPAR not found
+ | (SLHA::checkSpectrum) Warning: GAUGE not found
+ | (SLHA::checkSpectrum) Warning: ALPHA not found
+ *------------------------------------------------------------------------------------*
+ | 
+ |   Spectrum Calculator was:   unknown   version: unknown
+ |   Read <slha> spectrum from: /home/feitung/research/MG5_aMC/pp2n1c1m_0/Events/run_09/unweighted_events.lhe.gz
+ | 
+ |  ~g                  m
+ |     1000021  4.500e+09
+ | 
+ |  ~d                  m   |~dL|   |~sL|   |~bL|   |~dR|   |~sR|   |~bR|
+ |     1000001  4.500e+09   1.000   0.000   0.000   0.000   0.000   0.000  
+ |     1000003  4.500e+09   0.000   1.000   0.000   0.000   0.000   0.000  
+ |     1000005  4.500e+09   0.000   0.000   0.939   0.000   0.000   0.345  
+ |     2000001  4.500e+09   0.000   0.000   0.000   1.000   0.000   0.000  
+ |     2000003  4.500e+09   0.000   0.000   0.000   0.000   1.000   0.000  
+ |     2000005  4.500e+09   0.000   0.000   0.345   0.000   0.000   0.939  
+ | 
+ |  ~u                  m   |~uL|   |~cL|   |~tL|   |~uR|   |~cR|   |~tR|
+ |     1000002  4.500e+09   1.000   0.000   0.000   0.000   0.000   0.000  
+ |     1000004  4.500e+09   0.000   1.000   0.000   0.000   0.000   0.000  
+ |     1000006  4.500e+09   0.000   0.000   0.554   0.000   0.000   0.833  
+ |     2000002  4.500e+09   0.000   0.000   0.000   1.000   0.000   0.000  
+ |     2000004  4.500e+09   0.000   0.000   0.000   0.000   1.000   0.000  
+ |     2000006  4.500e+09   0.000   0.000   0.833   0.000   0.000   0.554  
+ | 
+ |  ~e                  m   |~eL|  |~muL| |~tauL|   |~eR|  |~muR| |~tauR|
+ |     1000011  4.500e+09   1.000   0.000   0.000   0.000   0.000   0.000  
+ |     1000013  4.500e+09   0.000   1.000   0.000   0.000   0.000   0.000  
+ |     1000015  4.500e+09   0.000   0.000   0.282   0.000   0.000   0.959  
+ |     2000011  4.500e+09   0.000   0.000   0.000   1.000   0.000   0.000  
+ |     2000013  4.500e+09   0.000   0.000   0.000   0.000   1.000   0.000  
+ |     2000015  4.500e+09   0.000   0.000   0.959   0.000   0.000   0.282  
+ | 
+ |  ~nu                 m  |~nu_e| |~nu_mu||~nu_tau|
+ |     1000012  4.500e+09    1.000    0.000    0.000  
+ |     1000014  4.500e+09    0.000    1.000    0.000  
+ |     1000016  4.500e+09    0.000    0.000    1.000  
+ | 
+ |  ~chi0               m    |~B|  |~W_3|  |~H_1|  |~H_2|
+ |     1000022    700.000   0.000   0.000   0.707   0.707  
+ |     1000023   -701.000   0.000   0.000   0.707   0.707  
+ |     1000025  4.500e+09   1.000   0.000   0.000   0.000  
+ |     1000035  4.500e+09   0.000   1.000   0.000   0.000  
+ | 
+ |  ~chi+               m   U: |~W|    |~H|  ;  V: |~W|    |~H|
+ |     1000024    701.000     0.000   1.000  ;    0.000   1.000  
+ |     1000037  4.500e+09     1.000   0.000  ;    1.000   0.000  
+ | 
+ |  Higgs               m
+ |          25    125.100
+ |          35  4.500e+09
+ |          36  4.500e+09
+ |          37  4.500e+09
+ |
+ |     alpha       absent
+ |
+ |  Hmix 
+ |     mu        3.577e+02 (DRbar running value at Q = 0.000e+00 GeV)
+ |     tan(beta) 9.749e+00 (DRbar running value at Q = 0.000e+00 GeV)
+ |     v           absent
+ |     mA       1.664e+05 (DRbar running value at Q = 0.000 GeV)
+ | 
+ | 
+ *------------------------------------------------------------------------------------*
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000022 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000023 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000025 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000035 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000024 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000037 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000021 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 35 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 36 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 37 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000012 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000014 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000016 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000011 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000013 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000015 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000011 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000013 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000015 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000002 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000004 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000006 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000002 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000004 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000006 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000001 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000003 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000005 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000001 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000003 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000005 (already exists)
+ PYTHIA Info from SLHAinterface::initSLHA: importing MASS entries for id = {35,36,37,1000001,1000002,1000003,1000004,1000005,1000006,1000011,1000012,1000013,1000014,1000015,1000016,1000021,1000022,1000023,1000024,1000025,1000035,1000037,2000001,2000002,2000003,2000004,2000005,2000006,2000011,2000013,2000015}
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring MASS entries for id = {1,2,3,4,5,11,12,13,14,15,16,21,22,23,24} (m0 < SLHA:minMassSM)
+ PYTHIA Info from SLHAinterface::initSLHA: importing DECAY tables for id = {1000022,1000023,1000024}
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring DECAY tables for id = {23,24,1,2,3,4,5,11,12,13,14,15,16,21,22} (m0 < SLHA:minMassSM)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring empty DECAY tables for id = {6,35,36,37,1000001,1000002,1000003,1000004,1000005,1000006,1000011,1000012,1000013,1000014,1000015,1000016,1000021,1000025,1000035,1000037,2000001,2000002,2000003,2000004,2000005,2000006,2000011,2000013,2000015} (total width provided but no Branching Ratios)
+ PYTHIA Warning in CoupSUSY::initSUSY: Block GAUGE not found or incomplete; using sin(thetaW) at mZ  
+ PYTHIA Info from CoupSUSY::initSUSY: Block ALPHA not found; using alpha = beta.
+
+ *-------  PYTHIA Process Initialization  --------------------------*
+ |                                                                  |
+ | We collide p+ with p+ at a CM energy of 1.300e+04 GeV            |
+ |                                                                  |
+ |------------------------------------------------------------------|
+ |                                                    |             |
+ | Subprocess                                    Code |   Estimated |
+ |                                                    |    max (mb) |
+ |                                                    |             |
+ |------------------------------------------------------------------|
+ |                                                    |             |
+ | Les Houches User Process(es)                  9999 |   1.000e-09 |
+ |                                                                  |
+ *-------  End PYTHIA Process Initialization -----------------------*
+
+ *-------  PYTHIA Flag + Mode + Parm + Word + FVec + MVec + PVec + WVec Settings (changes only)  ------------------* 
+ |                                                                                                                 | 
+ | Name                                          |                      Now |      Default         Min         Max | 
+ |                                               |                          |                                      | 
+ | BeamRemnants:primordialKThard                 |                  1.88000 |      1.80000         0.0             | 
+ | Beams:frameType                               |                        4 |            1           1           5 | 
+ | Beams:LHEF                                    | /home/feitung/research/MG5_aMC/pp2n1c1m_0/Events/run_09/unweighted_events.lhe.gz |         void | 
+ | ColourReconnection:range                      |                  1.71000 |      1.80000         0.0    10.00000 | 
+ | HiggsA3:coup2d                                |                  9.74862 |      1.00000                         | 
+ | HiggsA3:coup2H2Z                              |                      0.0 |      1.00000                         | 
+ | HiggsA3:coup2l                                |                  0.10258 |      1.00000                         | 
+ | HiggsA3:coup2u                                |                  0.10258 |      1.00000                         | 
+ | HiggsH1:coup2d                                |                 -9.74862 |      1.00000                         | 
+ | HiggsH1:coup2Hchg                             |                 -0.19879 |          0.0                         | 
+ | HiggsH1:coup2l                                |                  0.10258 |      1.00000                         | 
+ | HiggsH1:coup2u                                |                  0.10258 |      1.00000                         | 
+ | HiggsH1:coup2W                                |                      0.0 |      1.00000                         | 
+ | HiggsH1:coup2Z                                |                      0.0 |      1.00000                         | 
+ | HiggsH2:coup2A3A3                             |                 -0.95878 |      1.00000                         | 
+ | HiggsH2:coup2d                                |                  1.00000 |      1.00000                         | 
+ | HiggsH2:coup2H1H1                             |                 -0.87635 |      1.00000                         | 
+ | HiggsH2:coup2Hchg                             |                  0.57882 |          0.0                         | 
+ | HiggsHchg:tanBeta                             |                  9.74862 |      5.00000                         | 
+ | Init:showChangedParticleData                  |                      off |           on                         | 
+ | LHEFInputs:nSubruns                           |                        3 |            0           0             | 
+ | Main:numberOfEvents                           |                    10000 |         1000           0             | 
+ | Main:subrun                                   |                        0 |         -999           0             | 
+ | Main:timesAllowErrors                         |                        3 |           10           0             | 
+ | Merging:doKTMerging                           |                       on |          off                         | 
+ | Merging:mayRemoveDecayProducts                |                       on |          off                         | 
+ | Merging:nJetMax                               |                        2 |            0           0             | 
+ | Merging:Process                               | pp>{x1-,-1000024}{n1,1000022} |         void                    | 
+ | Merging:TMS                                   |                175.00000 |          0.0                         | 
+ | MultipartonInteractions:alphaSvalue           |                  0.12600 |      0.13000   0.0600000     0.25000 | 
+ | MultipartonInteractions:pT0Ref                |                  2.09000 |      2.28000     0.50000    10.00000 | 
+ | Next:numberCount                              |                     5000 |         1000           0             | 
+ | Next:numberShowEvent                          |                        0 |            1           0             | 
+ | PartonLevel:MPI                               |                      off |           on                         | 
+ | SigmaProcess:alphaSvalue                      |                  0.14000 |      0.13000   0.0600000     0.25000 | 
+ | SpaceShower:alphaSvalue                       |                  0.12700 |      0.13650   0.0600000     0.25000 | 
+ | SpaceShower:pT0Ref                            |                  1.56000 |      2.00000     0.50000    10.00000 | 
+ | SpaceShower:pTdampFudge                       |                  1.05000 |      1.00000     0.25000     4.00000 | 
+ | SpaceShower:pTmaxFudge                        |                  0.91000 |      1.00000     0.25000     2.00000 | 
+ | TimeShower:alphaSvalue                        |                  0.12700 |      0.13650   0.0600000     0.25000 | 
+ | Tune:pp                                       |                       21 |           14          -1          34 | 
+ | UncertaintyBands:doVariations                 |                       on |          off                         | 
+ | UncertaintyBands:List                         |                          | alphaShi fsr:muRfac=0.5 isr:muRfac=0.5 | 
+ |                                               |                          |   alphaSlo fsr:muRfac=2.0 isr:muRfac=2.0 | 
+ |                                               |                          |   hardHi fsr:cNS=2.0 isr:cNS=2.0     | 
+ |                                               |                          |  hardLo fsr:cNS=-2.0 isr:cNS=-2.0    | 
+ |                                                                                                                 | 
+ *-------  End PYTHIA Flag + Mode + Parm + Word + FVec + MVec + PVec + WVec Settings  -----------------------------* 
+
+ --------  LHA event information and listing  ---------------------------------------------------------------------- 
+
+    process =        1    weight =   5.1520e-04     scale =   7.2196e+02 (GeV) 
+                        alpha_em =   7.8165e-03    alpha_strong =   9.6808e-02
+
+    Participating Particles 
+    no        id stat     mothers     colours      p_x        p_y        p_z         e          m        tau    spin 
+     1        -2   -1     0     0     0   501     -0.000      0.000    592.712    592.712      0.000   0.000   1.000
+     2         1   -1     0     0   501     0      0.000     -0.000   -884.398    884.398      0.000   0.000  -1.000
+     3   1000022    1     1     2     0     0   -170.236     29.125   -207.496    750.256    700.000  81.873   1.000
+     4  -1000024    1     1     2     0     0    170.236    -29.125    -84.190    726.855    701.000   7.739   1.000
+
+ --------  End LHA event information and listing  ------------------------------------------------------------------ 
+
+ --------  PYTHIA Info Listing  ---------------------------------------- 
+ 
+ Beam A: id =   2212, pz =  6.500e+03, e =  6.500e+03, m =  9.383e-01.
+ Beam B: id =   2212, pz = -6.500e+03, e =  6.500e+03, m =  9.383e-01.
+
+ In 1: id =   -2, x =  9.119e-02, pdf =  0.000e+00 at Q2 =  5.212e+05.
+ In 2: id =    1, x =  1.361e-01, pdf =  0.000e+00 at same Q2.
+
+ Process Les Houches User Process(es) with code 9999 is 2 -> 2.
+ Subprocess user process 1 with code 1 is 2 -> 2.
+ It has sHat =  2.097e+06,    tHat = -6.453e+05,    uHat = -4.700e+05,
+       pTHat =  1.727e+02,   m3Hat =  7.000e+02,   m4Hat =  7.010e+02,
+    thetaHat =  1.908e+00,  phiHat =  2.972e+00.
+     alphaEM =  7.817e-03,  alphaS =  9.681e-02    at Q2 =  5.212e+05.
+
+ Impact parameter b =  0.000e+00 gives enhancement factor =  1.000e+00.
+ Max pT scale for MPI =  7.220e+02, ISR =  7.220e+02, FSR =  7.220e+02.
+ Number of MPI =     1, ISR =     5, FSRproc =    14, FSRreson =    59.
+
+ --------  End PYTHIA Info Listing  ------------------------------------
+
+ --------  PYTHIA Event Listing  (hard process-modified)  --------------------------------------------------------------------------
+ 
+    no         id  name            status     mothers   daughters     colours      p_x        p_y        p_z         e          m 
+     0         90  (system)           -11     0     0     0     0     0     0      0.000      0.000      0.000  13000.000  13000.000
+     1       2212  (p+)               -12     0     0     3     0     0     0      0.000      0.000   6500.000   6500.000      0.938
+     2       2212  (p+)               -12     0     0     4     0     0     0      0.000      0.000  -6500.000   6500.000      0.938
+     3         -2  (ubar)             -21     1     0     5     6     0   501     -0.000      0.000    592.712    592.712      0.000
+     4          1  (d)                -21     2     0     5     6   501     0      0.000     -0.000   -884.398    884.398      0.000
+     5    1000022  (~chi_10)          -22     3     4     7     9     0     0   -170.236     29.125   -207.496    750.256    700.000
+     6   -1000024  (~chi_1-)          -22     3     4    14    16     0     0    170.236    -29.125    -84.190    726.855    701.000
+     7          3  s                   23     5     0     0     0   503     0    -63.973     48.860     30.608     86.122      0.500
+     8          5  b                   23     5     0     0     0   502     0     13.873    205.440     80.552    221.156      4.800
+     9          6  (t)                -22     5     0    10    11   504     0   -120.136   -225.175   -318.655    442.978    171.906
+    10         24  (W+)               -22     9     0    12    13     0     0    -93.737    -70.174   -101.717    175.009     81.060
+    11          5  b                   23     9     0     0     0   504     0    -26.400   -155.002   -216.938    267.970      4.800
+    12         -3  sbar                23    10     0     0     0     0   508    -38.894    -18.935    -88.881     98.850      0.500
+    13          4  c                   23    10     0     0     0   508     0    -54.843    -51.239    -12.837     76.159      1.500
+    14          5  b                   23     6     0     0     0   507     0    376.737     -9.255    142.306    402.852      4.800
+    15          5  b                   23     6     0     0     0   505     0    -96.647     35.293   -139.500    173.406      4.800
+    16          3  s                   23     6     0     0     0   506     0   -109.853    -55.164    -86.996    150.596      0.500
+                                   Charge sum: -1.000           Momentum sum:     -0.000      0.000   -291.686   1477.110   1448.024
+
+ --------  End PYTHIA Event Listing  -----------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#                         FastJet release 3.4.0
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#	                                                                      
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#                                                                       
+# FastJet is provided without warranty under the GNU GPL v2 or higher.  
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+ PYTHIA Warning in StringFragmentation::fragmentToJunction: bad convergence junction rest frame  
+ PYTHIA Warning in SimpleTimeShower::findMEcorr: ME weight above PS one  
+ PYTHIA Warning in HadronWidths::pickMasses: angular momentum and running widths not used  
+ PYTHIA Error in StringFragmentation::fragment: stuck in joining  
+ PYTHIA Error in Pythia::next: hadronLevel failed; try again  
+ PYTHIA Error in StringFragmentation::fragmentToJunction: caught in junction flavour loop  
+ PYTHIA Warning in TauDecays::decay: unknown correlated tau production, assuming from unpolarized photon  
+
+ Pythia::next(): 5000 events have been generated 
+ PYTHIA Warning in SimpleTimeShower::pTnext: negative dipole mass.  
+
+ *-------  PYTHIA Event and Cross Section Statistics  -------------------------------------------------------------*
+ |                                                                                                                 |
+ | Subprocess                                    Code |            Number of events       |      sigma +- delta    |
+ |                                                    |       Tried   Selected   Accepted |     (estimated) (mb)   |
+ |                                                    |                                   |                        |
+ |-----------------------------------------------------------------------------------------------------------------|
+ |                                                    |                                   |                        |
+ | Les Houches User Process(es)                  9999 |       10000      10000       8880 |   4.575e-13  0.000e+00 |
+ |    ... whereof user classification code          1 |       10000      10000       8880 |                        | 
+ |                                                    |                                   |                        |
+ | sum                                                |       10000      10000       8880 |   4.575e-13  0.000e+00 |
+ |                                                                                                                 |
+ *-------  End PYTHIA Event and Cross Section Statistics ----------------------------------------------------------*
+
+ *-------  PYTHIA Error and Warning Messages Statistics  ----------------------------------------------------------* 
+ |                                                                                                                 | 
+ |  times   message                                                                                                | 
+ |                                                                                                                 | 
+ |      7   Error in Pythia::next: hadronLevel failed; try again                                                   | 
+ |      5   Error in StringFragmentation::fragment: stuck in joining                                               | 
+ |      2   Error in StringFragmentation::fragmentToJunction: caught in junction flavour loop                      | 
+ |      1   Info from CoupSUSY::initSUSY:                                                                          | 
+ |      1   Info from SLHAinterface::initSLHA: importing DECAY tables                                              | 
+ |      1   Info from SLHAinterface::initSLHA: importing MASS entries                                              | 
+ |      1   Warning in CoupSUSY::initSUSY: Block GAUGE not found or incomplete; using sin(thetaW) at mZ            | 
+ |      1   Warning in HadronWidths::pickMasses: angular momentum and running widths not used                      | 
+ |      1   Warning in SLHAinterface::initSLHA: ignoring DECAY tables                                              | 
+ |      1   Warning in SLHAinterface::initSLHA: ignoring MASS entries                                              | 
+ |     31   Warning in SLHAinterface::initSLHA: ignoring QNUMBERS                                                  | 
+ |      1   Warning in SLHAinterface::initSLHA: ignoring empty DECAY tables                                        | 
+ |     12   Warning in SimpleTimeShower::findMEcorr: ME weight above PS one                                        | 
+ |      1   Warning in SimpleTimeShower::pTnext: negative dipole mass.                                             | 
+ |    137   Warning in StringFragmentation::fragmentToJunction: bad convergence junction rest frame                | 
+ |      1   Warning in TauDecays::decay: unknown correlated tau production, assuming from unpolarized photon       | 
+ |                                                                                                                 | 
+ *-------  End PYTHIA Error and Warning Messages Statistics  ------------------------------------------------------* 
+ PYTHIA Info from Pythia::init: be aware that successive calls to init() do not clear previous settings.  
+
+ *------------------ MEPS Merging Initialization  ------------------*
+ |                                                                  |
+ | CKKW-L merge                                                     |
+ |     pp>{x1-,-1000024}{n1,1000022}  with up to  2 additional jets |
+ | Merging scale is defined in kT, with value ktMS = 1.750e+02 GeV
+ |                                                                  |
+ *-------------- END MEPS Merging Initialization  ------------------*
+
+ *-----------------------  SusyLesHouches SUSY/BSM Interface  ------------------------*
+ | Last Change 12 Apr 2017 - P. Skands
+ | Parsing: /home/feitung/research/MG5_aMC/pp2n1c1m_1/Events/run_09/unweighted_events.lhe.gz
+ | (SLHA::readFile) line 338 - storing non-SLHA(2) block: fralpha
+ | (SLHA::readFile) line 777 - storing QNUMBERS for id = 1000022   n1
+ | (SLHA::readFile) line 785 - storing QNUMBERS for id = 1000023   n2
+ | (SLHA::readFile) line 793 - storing QNUMBERS for id = 1000025   n3
+ | (SLHA::readFile) line 801 - storing QNUMBERS for id = 1000035   n4
+ | (SLHA::readFile) line 809 - storing QNUMBERS for id = 1000024   x1+
+ | (SLHA::readFile) line 817 - storing QNUMBERS for id = 1000037   x2+
+ | (SLHA::readFile) line 825 - storing QNUMBERS for id = 1000021   go
+ | (SLHA::readFile) line 833 - storing QNUMBERS for id = 35   h2
+ | (SLHA::readFile) line 841 - storing QNUMBERS for id = 36   h3
+ | (SLHA::readFile) line 849 - storing QNUMBERS for id = 37   h+
+ | (SLHA::readFile) line 857 - storing QNUMBERS for id = 1000012   sve
+ | (SLHA::readFile) line 865 - storing QNUMBERS for id = 1000014   svm
+ | (SLHA::readFile) line 873 - storing QNUMBERS for id = 1000016   svt
+ | (SLHA::readFile) line 881 - storing QNUMBERS for id = 1000011   el-
+ | (SLHA::readFile) line 889 - storing QNUMBERS for id = 1000013   mul-
+ | (SLHA::readFile) line 897 - storing QNUMBERS for id = 1000015   ta1-
+ | (SLHA::readFile) line 905 - storing QNUMBERS for id = 2000011   er-
+ | (SLHA::readFile) line 913 - storing QNUMBERS for id = 2000013   mur-
+ | (SLHA::readFile) line 921 - storing QNUMBERS for id = 2000015   ta2-
+ | (SLHA::readFile) line 929 - storing QNUMBERS for id = 1000002   ul
+ | (SLHA::readFile) line 937 - storing QNUMBERS for id = 1000004   cl
+ | (SLHA::readFile) line 945 - storing QNUMBERS for id = 1000006   t1
+ | (SLHA::readFile) line 953 - storing QNUMBERS for id = 2000002   ur
+ | (SLHA::readFile) line 961 - storing QNUMBERS for id = 2000004   cr
+ | (SLHA::readFile) line 969 - storing QNUMBERS for id = 2000006   t2
+ | (SLHA::readFile) line 977 - storing QNUMBERS for id = 1000001   dl
+ | (SLHA::readFile) line 985 - storing QNUMBERS for id = 1000003   sl
+ | (SLHA::readFile) line 993 - storing QNUMBERS for id = 1000005   b1
+ | (SLHA::readFile) line 1001 - storing QNUMBERS for id = 2000001   dr
+ | (SLHA::readFile) line 1009 - storing QNUMBERS for id = 2000003   sr
+ | (SLHA::readFile) line 1017 - storing QNUMBERS for id = 2000005   b2
+ *------------------------------------------------------------------------------------*
+ | (SLHA::checkSpectrum) Warning: MODSEL(1) undefined. Assuming = 0
+ | (SLHA::checkSpectrum) Warning: MINPAR not found
+ | (SLHA::checkSpectrum) Warning: GAUGE not found
+ | (SLHA::checkSpectrum) Warning: ALPHA not found
+ *------------------------------------------------------------------------------------*
+ | 
+ |   Spectrum Calculator was:   unknown   version: unknown
+ |   Read <slha> spectrum from: /home/feitung/research/MG5_aMC/pp2n1c1m_1/Events/run_09/unweighted_events.lhe.gz
+ | 
+ |  ~g                  m
+ |     1000021  4.500e+09
+ | 
+ |  ~d                  m   |~dL|   |~sL|   |~bL|   |~dR|   |~sR|   |~bR|
+ |     1000001  4.500e+09   1.000   0.000   0.000   0.000   0.000   0.000  
+ |     1000003  4.500e+09   0.000   1.000   0.000   0.000   0.000   0.000  
+ |     1000005  4.500e+09   0.000   0.000   0.939   0.000   0.000   0.345  
+ |     2000001  4.500e+09   0.000   0.000   0.000   1.000   0.000   0.000  
+ |     2000003  4.500e+09   0.000   0.000   0.000   0.000   1.000   0.000  
+ |     2000005  4.500e+09   0.000   0.000   0.345   0.000   0.000   0.939  
+ | 
+ |  ~u                  m   |~uL|   |~cL|   |~tL|   |~uR|   |~cR|   |~tR|
+ |     1000002  4.500e+09   1.000   0.000   0.000   0.000   0.000   0.000  
+ |     1000004  4.500e+09   0.000   1.000   0.000   0.000   0.000   0.000  
+ |     1000006  4.500e+09   0.000   0.000   0.554   0.000   0.000   0.833  
+ |     2000002  4.500e+09   0.000   0.000   0.000   1.000   0.000   0.000  
+ |     2000004  4.500e+09   0.000   0.000   0.000   0.000   1.000   0.000  
+ |     2000006  4.500e+09   0.000   0.000   0.833   0.000   0.000   0.554  
+ | 
+ |  ~e                  m   |~eL|  |~muL| |~tauL|   |~eR|  |~muR| |~tauR|
+ |     1000011  4.500e+09   1.000   0.000   0.000   0.000   0.000   0.000  
+ |     1000013  4.500e+09   0.000   1.000   0.000   0.000   0.000   0.000  
+ |     1000015  4.500e+09   0.000   0.000   0.282   0.000   0.000   0.959  
+ |     2000011  4.500e+09   0.000   0.000   0.000   1.000   0.000   0.000  
+ |     2000013  4.500e+09   0.000   0.000   0.000   0.000   1.000   0.000  
+ |     2000015  4.500e+09   0.000   0.000   0.959   0.000   0.000   0.282  
+ | 
+ |  ~nu                 m  |~nu_e| |~nu_mu||~nu_tau|
+ |     1000012  4.500e+09    1.000    0.000    0.000  
+ |     1000014  4.500e+09    0.000    1.000    0.000  
+ |     1000016  4.500e+09    0.000    0.000    1.000  
+ | 
+ |  ~chi0               m    |~B|  |~W_3|  |~H_1|  |~H_2|
+ |     1000022    700.000   0.000   0.000   0.707   0.707  
+ |     1000023   -701.000   0.000   0.000   0.707   0.707  
+ |     1000025  4.500e+09   1.000   0.000   0.000   0.000  
+ |     1000035  4.500e+09   0.000   1.000   0.000   0.000  
+ | 
+ |  ~chi+               m   U: |~W|    |~H|  ;  V: |~W|    |~H|
+ |     1000024    701.000     0.000   1.000  ;    0.000   1.000  
+ |     1000037  4.500e+09     1.000   0.000  ;    1.000   0.000  
+ | 
+ |  Higgs               m
+ |          25    125.100
+ |          35  4.500e+09
+ |          36  4.500e+09
+ |          37  4.500e+09
+ |
+ |     alpha       absent
+ |
+ |  Hmix 
+ |     mu        3.577e+02 (DRbar running value at Q = 0.000e+00 GeV)
+ |     tan(beta) 9.749e+00 (DRbar running value at Q = 0.000e+00 GeV)
+ |     v           absent
+ |     mA       1.664e+05 (DRbar running value at Q = 0.000 GeV)
+ | 
+ | 
+ *------------------------------------------------------------------------------------*
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000022 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000023 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000025 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000035 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000024 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000037 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000021 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 35 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 36 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 37 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000012 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000014 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000016 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000011 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000013 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000015 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000011 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000013 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000015 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000002 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000004 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000006 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000002 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000004 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000006 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000001 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000003 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000005 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000001 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000003 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000005 (already exists)
+ PYTHIA Info from SLHAinterface::initSLHA: importing MASS entries for id = {35,36,37,1000001,1000002,1000003,1000004,1000005,1000006,1000011,1000012,1000013,1000014,1000015,1000016,1000021,1000022,1000023,1000024,1000025,1000035,1000037,2000001,2000002,2000003,2000004,2000005,2000006,2000011,2000013,2000015}
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring MASS entries for id = {1,2,3,4,5,11,12,13,14,15,16,21,22,23,24} (m0 < SLHA:minMassSM)
+ PYTHIA Info from SLHAinterface::initSLHA: importing DECAY tables for id = {1000022,1000023,1000024}
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring DECAY tables for id = {23,24,1,2,3,4,5,11,12,13,14,15,16,21,22} (m0 < SLHA:minMassSM)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring empty DECAY tables for id = {6,35,36,37,1000001,1000002,1000003,1000004,1000005,1000006,1000011,1000012,1000013,1000014,1000015,1000016,1000021,1000025,1000035,1000037,2000001,2000002,2000003,2000004,2000005,2000006,2000011,2000013,2000015} (total width provided but no Branching Ratios)
+ PYTHIA Info from CoupSUSY::initSUSY: Block ALPHA not found; using alpha = beta.
+
+ *-------  PYTHIA Process Initialization  --------------------------*
+ |                                                                  |
+ | We collide p+ with p+ at a CM energy of 1.300e+04 GeV            |
+ |                                                                  |
+ |------------------------------------------------------------------|
+ |                                                    |             |
+ | Subprocess                                    Code |   Estimated |
+ |                                                    |    max (mb) |
+ |                                                    |             |
+ |------------------------------------------------------------------|
+ |                                                    |             |
+ | Les Houches User Process(es)                  9999 |   1.000e-09 |
+ |                                                                  |
+ *-------  End PYTHIA Process Initialization -----------------------*
+
+ *-------  PYTHIA Flag + Mode + Parm + Word + FVec + MVec + PVec + WVec Settings (changes only)  ------------------* 
+ |                                                                                                                 | 
+ | Name                                          |                      Now |      Default         Min         Max | 
+ |                                               |                          |                                      | 
+ | BeamRemnants:primordialKThard                 |                  1.88000 |      1.80000         0.0             | 
+ | Beams:frameType                               |                        4 |            1           1           5 | 
+ | Beams:LHEF                                    | /home/feitung/research/MG5_aMC/pp2n1c1m_1/Events/run_09/unweighted_events.lhe.gz |         void | 
+ | ColourReconnection:range                      |                  1.71000 |      1.80000         0.0    10.00000 | 
+ | HiggsA3:coup2d                                |                  9.74862 |      1.00000                         | 
+ | HiggsA3:coup2H2Z                              |                      0.0 |      1.00000                         | 
+ | HiggsA3:coup2l                                |                  0.10258 |      1.00000                         | 
+ | HiggsA3:coup2u                                |                  0.10258 |      1.00000                         | 
+ | HiggsH1:coup2d                                |                 -9.74862 |      1.00000                         | 
+ | HiggsH1:coup2Hchg                             |                 -0.19879 |          0.0                         | 
+ | HiggsH1:coup2l                                |                  0.10258 |      1.00000                         | 
+ | HiggsH1:coup2u                                |                  0.10258 |      1.00000                         | 
+ | HiggsH1:coup2W                                |                      0.0 |      1.00000                         | 
+ | HiggsH1:coup2Z                                |                      0.0 |      1.00000                         | 
+ | HiggsH2:coup2A3A3                             |                 -0.95878 |      1.00000                         | 
+ | HiggsH2:coup2d                                |                  1.00000 |      1.00000                         | 
+ | HiggsH2:coup2H1H1                             |                 -0.87635 |      1.00000                         | 
+ | HiggsH2:coup2Hchg                             |                  0.57882 |          0.0                         | 
+ | HiggsHchg:tanBeta                             |                  9.74862 |      5.00000                         | 
+ | Init:showChangedParticleData                  |                      off |           on                         | 
+ | LHEFInputs:nSubruns                           |                        3 |            0           0             | 
+ | Main:numberOfEvents                           |                    10000 |         1000           0             | 
+ | Main:subrun                                   |                        1 |         -999           0             | 
+ | Main:timesAllowErrors                         |                        3 |           10           0             | 
+ | Merging:doKTMerging                           |                       on |          off                         | 
+ | Merging:mayRemoveDecayProducts                |                       on |          off                         | 
+ | Merging:nJetMax                               |                        2 |            0           0             | 
+ | Merging:Process                               | pp>{x1-,-1000024}{n1,1000022} |         void                    | 
+ | Merging:TMS                                   |                175.00000 |          0.0                         | 
+ | MultipartonInteractions:alphaSvalue           |                  0.12600 |      0.13000   0.0600000     0.25000 | 
+ | MultipartonInteractions:pT0Ref                |                  2.09000 |      2.28000     0.50000    10.00000 | 
+ | Next:numberCount                              |                     5000 |         1000           0             | 
+ | Next:numberShowEvent                          |                        0 |            1           0             | 
+ | PartonLevel:MPI                               |                      off |           on                         | 
+ | SigmaProcess:alphaSvalue                      |                  0.14000 |      0.13000   0.0600000     0.25000 | 
+ | SpaceShower:alphaSvalue                       |                  0.12700 |      0.13650   0.0600000     0.25000 | 
+ | SpaceShower:pT0Ref                            |                  1.56000 |      2.00000     0.50000    10.00000 | 
+ | SpaceShower:pTdampFudge                       |                  1.05000 |      1.00000     0.25000     4.00000 | 
+ | SpaceShower:pTmaxFudge                        |                  0.91000 |      1.00000     0.25000     2.00000 | 
+ | TimeShower:alphaSvalue                        |                  0.12700 |      0.13650   0.0600000     0.25000 | 
+ | Tune:pp                                       |                       21 |           14          -1          34 | 
+ | UncertaintyBands:doVariations                 |                       on |          off                         | 
+ | UncertaintyBands:List                         |                          | alphaShi fsr:muRfac=0.5 isr:muRfac=0.5 | 
+ |                                               |                          |   alphaSlo fsr:muRfac=2.0 isr:muRfac=2.0 | 
+ |                                               |                          |   hardHi fsr:cNS=2.0 isr:cNS=2.0     | 
+ |                                               |                          |  hardLo fsr:cNS=-2.0 isr:cNS=-2.0    | 
+ |                                                                                                                 | 
+ *-------  End PYTHIA Flag + Mode + Parm + Word + FVec + MVec + PVec + WVec Settings  -----------------------------* 
+
+ Pythia::next(): 10000 events have been generated 
+ PYTHIA Warning in PartonLevel::wzDecayShowers: found undecayed resonance id = 1000022
+
+ Pythia::next(): 15000 events have been generated 
+
+ *-------  PYTHIA Event and Cross Section Statistics  -------------------------------------------------------------*
+ |                                                                                                                 |
+ | Subprocess                                    Code |            Number of events       |      sigma +- delta    |
+ |                                                    |       Tried   Selected   Accepted |     (estimated) (mb)   |
+ |                                                    |                                   |                        |
+ |-----------------------------------------------------------------------------------------------------------------|
+ |                                                    |                                   |                        |
+ | Les Houches User Process(es)                  9999 |       10000      10000       8516 |   6.024e-14  0.000e+00 |
+ |    ... whereof user classification code          1 |       10000      10000       8516 |                        | 
+ |                                                    |                                   |                        |
+ | sum                                                |       10000      10000       8516 |   6.024e-14  0.000e+00 |
+ |                                                                                                                 |
+ *-------  End PYTHIA Event and Cross Section Statistics ----------------------------------------------------------*
+
+ *-------  PYTHIA Error and Warning Messages Statistics  ----------------------------------------------------------* 
+ |                                                                                                                 | 
+ |  times   message                                                                                                | 
+ |                                                                                                                 | 
+ |     13   Error in Pythia::next: hadronLevel failed; try again                                                   | 
+ |      8   Error in StringFragmentation::fragment: stuck in joining                                               | 
+ |      5   Error in StringFragmentation::fragmentToJunction: caught in junction flavour loop                      | 
+ |      2   Info from CoupSUSY::initSUSY:                                                                          | 
+ |      1   Info from Pythia::init: be aware that successive calls to init() do not clear previous settings.       | 
+ |      2   Info from SLHAinterface::initSLHA: importing DECAY tables                                              | 
+ |      2   Info from SLHAinterface::initSLHA: importing MASS entries                                              | 
+ |      2   Warning in CoupSUSY::initSUSY: Block GAUGE not found or incomplete; using sin(thetaW) at mZ            | 
+ |      4   Warning in HadronWidths::pickMasses: angular momentum and running widths not used                      | 
+ |  20000   Warning in PartonLevel::wzDecayShowers: found undecayed resonance                                      | 
+ |      2   Warning in SLHAinterface::initSLHA: ignoring DECAY tables                                              | 
+ |      2   Warning in SLHAinterface::initSLHA: ignoring MASS entries                                              | 
+ |     62   Warning in SLHAinterface::initSLHA: ignoring QNUMBERS                                                  | 
+ |      2   Warning in SLHAinterface::initSLHA: ignoring empty DECAY tables                                        | 
+ |     25   Warning in SimpleTimeShower::findMEcorr: ME weight above PS one                                        | 
+ |      1   Warning in SimpleTimeShower::pTnext: negative dipole mass.                                             | 
+ |    255   Warning in StringFragmentation::fragmentToJunction: bad convergence junction rest frame                | 
+ |      2   Warning in TauDecays::decay: unknown correlated tau production, assuming from unpolarized photon       | 
+ |                                                                                                                 | 
+ *-------  End PYTHIA Error and Warning Messages Statistics  ------------------------------------------------------* 
+
+ *------------------ MEPS Merging Initialization  ------------------*
+ |                                                                  |
+ | CKKW-L merge                                                     |
+ |     pp>{x1-,-1000024}{n1,1000022}  with up to  2 additional jets |
+ | Merging scale is defined in kT, with value ktMS = 1.750e+02 GeV
+ |                                                                  |
+ *-------------- END MEPS Merging Initialization  ------------------*
+
+ *-----------------------  SusyLesHouches SUSY/BSM Interface  ------------------------*
+ | Last Change 12 Apr 2017 - P. Skands
+ | Parsing: /home/feitung/research/MG5_aMC/pp2n1c1m_2/Events/run_09/unweighted_events.lhe.gz
+ | (SLHA::readFile) line 338 - storing non-SLHA(2) block: fralpha
+ | (SLHA::readFile) line 777 - storing QNUMBERS for id = 1000022   n1
+ | (SLHA::readFile) line 785 - storing QNUMBERS for id = 1000023   n2
+ | (SLHA::readFile) line 793 - storing QNUMBERS for id = 1000025   n3
+ | (SLHA::readFile) line 801 - storing QNUMBERS for id = 1000035   n4
+ | (SLHA::readFile) line 809 - storing QNUMBERS for id = 1000024   x1+
+ | (SLHA::readFile) line 817 - storing QNUMBERS for id = 1000037   x2+
+ | (SLHA::readFile) line 825 - storing QNUMBERS for id = 1000021   go
+ | (SLHA::readFile) line 833 - storing QNUMBERS for id = 35   h2
+ | (SLHA::readFile) line 841 - storing QNUMBERS for id = 36   h3
+ | (SLHA::readFile) line 849 - storing QNUMBERS for id = 37   h+
+ | (SLHA::readFile) line 857 - storing QNUMBERS for id = 1000012   sve
+ | (SLHA::readFile) line 865 - storing QNUMBERS for id = 1000014   svm
+ | (SLHA::readFile) line 873 - storing QNUMBERS for id = 1000016   svt
+ | (SLHA::readFile) line 881 - storing QNUMBERS for id = 1000011   el-
+ | (SLHA::readFile) line 889 - storing QNUMBERS for id = 1000013   mul-
+ | (SLHA::readFile) line 897 - storing QNUMBERS for id = 1000015   ta1-
+ | (SLHA::readFile) line 905 - storing QNUMBERS for id = 2000011   er-
+ | (SLHA::readFile) line 913 - storing QNUMBERS for id = 2000013   mur-
+ | (SLHA::readFile) line 921 - storing QNUMBERS for id = 2000015   ta2-
+ | (SLHA::readFile) line 929 - storing QNUMBERS for id = 1000002   ul
+ | (SLHA::readFile) line 937 - storing QNUMBERS for id = 1000004   cl
+ | (SLHA::readFile) line 945 - storing QNUMBERS for id = 1000006   t1
+ | (SLHA::readFile) line 953 - storing QNUMBERS for id = 2000002   ur
+ | (SLHA::readFile) line 961 - storing QNUMBERS for id = 2000004   cr
+ | (SLHA::readFile) line 969 - storing QNUMBERS for id = 2000006   t2
+ | (SLHA::readFile) line 977 - storing QNUMBERS for id = 1000001   dl
+ | (SLHA::readFile) line 985 - storing QNUMBERS for id = 1000003   sl
+ | (SLHA::readFile) line 993 - storing QNUMBERS for id = 1000005   b1
+ | (SLHA::readFile) line 1001 - storing QNUMBERS for id = 2000001   dr
+ | (SLHA::readFile) line 1009 - storing QNUMBERS for id = 2000003   sr
+ | (SLHA::readFile) line 1017 - storing QNUMBERS for id = 2000005   b2
+ *------------------------------------------------------------------------------------*
+ | (SLHA::checkSpectrum) Warning: MODSEL(1) undefined. Assuming = 0
+ | (SLHA::checkSpectrum) Warning: MINPAR not found
+ | (SLHA::checkSpectrum) Warning: GAUGE not found
+ | (SLHA::checkSpectrum) Warning: ALPHA not found
+ *------------------------------------------------------------------------------------*
+ | 
+ |   Spectrum Calculator was:   unknown   version: unknown
+ |   Read <slha> spectrum from: /home/feitung/research/MG5_aMC/pp2n1c1m_2/Events/run_09/unweighted_events.lhe.gz
+ | 
+ |  ~g                  m
+ |     1000021  4.500e+09
+ | 
+ |  ~d                  m   |~dL|   |~sL|   |~bL|   |~dR|   |~sR|   |~bR|
+ |     1000001  4.500e+09   1.000   0.000   0.000   0.000   0.000   0.000  
+ |     1000003  4.500e+09   0.000   1.000   0.000   0.000   0.000   0.000  
+ |     1000005  4.500e+09   0.000   0.000   0.939   0.000   0.000   0.345  
+ |     2000001  4.500e+09   0.000   0.000   0.000   1.000   0.000   0.000  
+ |     2000003  4.500e+09   0.000   0.000   0.000   0.000   1.000   0.000  
+ |     2000005  4.500e+09   0.000   0.000   0.345   0.000   0.000   0.939  
+ | 
+ |  ~u                  m   |~uL|   |~cL|   |~tL|   |~uR|   |~cR|   |~tR|
+ |     1000002  4.500e+09   1.000   0.000   0.000   0.000   0.000   0.000  
+ |     1000004  4.500e+09   0.000   1.000   0.000   0.000   0.000   0.000  
+ |     1000006  4.500e+09   0.000   0.000   0.554   0.000   0.000   0.833  
+ |     2000002  4.500e+09   0.000   0.000   0.000   1.000   0.000   0.000  
+ |     2000004  4.500e+09   0.000   0.000   0.000   0.000   1.000   0.000  
+ |     2000006  4.500e+09   0.000   0.000   0.833   0.000   0.000   0.554  
+ | 
+ |  ~e                  m   |~eL|  |~muL| |~tauL|   |~eR|  |~muR| |~tauR|
+ |     1000011  4.500e+09   1.000   0.000   0.000   0.000   0.000   0.000  
+ |     1000013  4.500e+09   0.000   1.000   0.000   0.000   0.000   0.000  
+ |     1000015  4.500e+09   0.000   0.000   0.282   0.000   0.000   0.959  
+ |     2000011  4.500e+09   0.000   0.000   0.000   1.000   0.000   0.000  
+ |     2000013  4.500e+09   0.000   0.000   0.000   0.000   1.000   0.000  
+ |     2000015  4.500e+09   0.000   0.000   0.959   0.000   0.000   0.282  
+ | 
+ |  ~nu                 m  |~nu_e| |~nu_mu||~nu_tau|
+ |     1000012  4.500e+09    1.000    0.000    0.000  
+ |     1000014  4.500e+09    0.000    1.000    0.000  
+ |     1000016  4.500e+09    0.000    0.000    1.000  
+ | 
+ |  ~chi0               m    |~B|  |~W_3|  |~H_1|  |~H_2|
+ |     1000022    700.000   0.000   0.000   0.707   0.707  
+ |     1000023   -701.000   0.000   0.000   0.707   0.707  
+ |     1000025  4.500e+09   1.000   0.000   0.000   0.000  
+ |     1000035  4.500e+09   0.000   1.000   0.000   0.000  
+ | 
+ |  ~chi+               m   U: |~W|    |~H|  ;  V: |~W|    |~H|
+ |     1000024    701.000     0.000   1.000  ;    0.000   1.000  
+ |     1000037  4.500e+09     1.000   0.000  ;    1.000   0.000  
+ | 
+ |  Higgs               m
+ |          25    125.100
+ |          35  4.500e+09
+ |          36  4.500e+09
+ |          37  4.500e+09
+ |
+ |     alpha       absent
+ |
+ |  Hmix 
+ |     mu        3.577e+02 (DRbar running value at Q = 0.000e+00 GeV)
+ |     tan(beta) 9.749e+00 (DRbar running value at Q = 0.000e+00 GeV)
+ |     v           absent
+ |     mA       1.664e+05 (DRbar running value at Q = 0.000 GeV)
+ | 
+ | 
+ *------------------------------------------------------------------------------------*
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000022 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000023 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000025 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000035 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000024 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000037 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000021 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 35 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 36 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 37 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000012 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000014 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000016 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000011 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000013 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000015 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000011 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000013 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000015 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000002 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000004 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000006 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000002 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000004 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000006 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000001 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000003 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 1000005 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000001 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000003 (already exists)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring QNUMBERS for id = 2000005 (already exists)
+ PYTHIA Info from SLHAinterface::initSLHA: importing MASS entries for id = {35,36,37,1000001,1000002,1000003,1000004,1000005,1000006,1000011,1000012,1000013,1000014,1000015,1000016,1000021,1000022,1000023,1000024,1000025,1000035,1000037,2000001,2000002,2000003,2000004,2000005,2000006,2000011,2000013,2000015}
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring MASS entries for id = {1,2,3,4,5,11,12,13,14,15,16,21,22,23,24} (m0 < SLHA:minMassSM)
+ PYTHIA Info from SLHAinterface::initSLHA: importing DECAY tables for id = {1000022,1000023,1000024}
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring DECAY tables for id = {23,24,1,2,3,4,5,11,12,13,14,15,16,21,22} (m0 < SLHA:minMassSM)
+ PYTHIA Warning in SLHAinterface::initSLHA: ignoring empty DECAY tables for id = {6,35,36,37,1000001,1000002,1000003,1000004,1000005,1000006,1000011,1000012,1000013,1000014,1000015,1000016,1000021,1000025,1000035,1000037,2000001,2000002,2000003,2000004,2000005,2000006,2000011,2000013,2000015} (total width provided but no Branching Ratios)
+ PYTHIA Info from CoupSUSY::initSUSY: Block ALPHA not found; using alpha = beta.
+
+ *-------  PYTHIA Process Initialization  --------------------------*
+ |                                                                  |
+ | We collide p+ with p+ at a CM energy of 1.300e+04 GeV            |
+ |                                                                  |
+ |------------------------------------------------------------------|
+ |                                                    |             |
+ | Subprocess                                    Code |   Estimated |
+ |                                                    |    max (mb) |
+ |                                                    |             |
+ |------------------------------------------------------------------|
+ |                                                    |             |
+ | Les Houches User Process(es)                  9999 |   1.000e-09 |
+ |                                                                  |
+ *-------  End PYTHIA Process Initialization -----------------------*
+
+ *-------  PYTHIA Flag + Mode + Parm + Word + FVec + MVec + PVec + WVec Settings (changes only)  ------------------* 
+ |                                                                                                                 | 
+ | Name                                          |                      Now |      Default         Min         Max | 
+ |                                               |                          |                                      | 
+ | BeamRemnants:primordialKThard                 |                  1.88000 |      1.80000         0.0             | 
+ | Beams:frameType                               |                        4 |            1           1           5 | 
+ | Beams:LHEF                                    | /home/feitung/research/MG5_aMC/pp2n1c1m_2/Events/run_09/unweighted_events.lhe.gz |         void | 
+ | ColourReconnection:range                      |                  1.71000 |      1.80000         0.0    10.00000 | 
+ | HiggsA3:coup2d                                |                  9.74862 |      1.00000                         | 
+ | HiggsA3:coup2H2Z                              |                      0.0 |      1.00000                         | 
+ | HiggsA3:coup2l                                |                  0.10258 |      1.00000                         | 
+ | HiggsA3:coup2u                                |                  0.10258 |      1.00000                         | 
+ | HiggsH1:coup2d                                |                 -9.74862 |      1.00000                         | 
+ | HiggsH1:coup2Hchg                             |                 -0.19879 |          0.0                         | 
+ | HiggsH1:coup2l                                |                  0.10258 |      1.00000                         | 
+ | HiggsH1:coup2u                                |                  0.10258 |      1.00000                         | 
+ | HiggsH1:coup2W                                |                      0.0 |      1.00000                         | 
+ | HiggsH1:coup2Z                                |                      0.0 |      1.00000                         | 
+ | HiggsH2:coup2A3A3                             |                 -0.95878 |      1.00000                         | 
+ | HiggsH2:coup2d                                |                  1.00000 |      1.00000                         | 
+ | HiggsH2:coup2H1H1                             |                 -0.87635 |      1.00000                         | 
+ | HiggsH2:coup2Hchg                             |                  0.57882 |          0.0                         | 
+ | HiggsHchg:tanBeta                             |                  9.74862 |      5.00000                         | 
+ | Init:showChangedParticleData                  |                      off |           on                         | 
+ | LHEFInputs:nSubruns                           |                        3 |            0           0             | 
+ | Main:numberOfEvents                           |                    10000 |         1000           0             | 
+ | Main:subrun                                   |                        2 |         -999           0             | 
+ | Main:timesAllowErrors                         |                        3 |           10           0             | 
+ | Merging:doKTMerging                           |                       on |          off                         | 
+ | Merging:mayRemoveDecayProducts                |                       on |          off                         | 
+ | Merging:nJetMax                               |                        2 |            0           0             | 
+ | Merging:Process                               | pp>{x1-,-1000024}{n1,1000022} |         void                    | 
+ | Merging:TMS                                   |                175.00000 |          0.0                         | 
+ | MultipartonInteractions:alphaSvalue           |                  0.12600 |      0.13000   0.0600000     0.25000 | 
+ | MultipartonInteractions:pT0Ref                |                  2.09000 |      2.28000     0.50000    10.00000 | 
+ | Next:numberCount                              |                     5000 |         1000           0             | 
+ | Next:numberShowEvent                          |                        0 |            1           0             | 
+ | PartonLevel:MPI                               |                      off |           on                         | 
+ | SigmaProcess:alphaSvalue                      |                  0.14000 |      0.13000   0.0600000     0.25000 | 
+ | SpaceShower:alphaSvalue                       |                  0.12700 |      0.13650   0.0600000     0.25000 | 
+ | SpaceShower:pT0Ref                            |                  1.56000 |      2.00000     0.50000    10.00000 | 
+ | SpaceShower:pTdampFudge                       |                  1.05000 |      1.00000     0.25000     4.00000 | 
+ | SpaceShower:pTmaxFudge                        |                  0.91000 |      1.00000     0.25000     2.00000 | 
+ | TimeShower:alphaSvalue                        |                  0.12700 |      0.13650   0.0600000     0.25000 | 
+ | Tune:pp                                       |                       21 |           14          -1          34 | 
+ | UncertaintyBands:doVariations                 |                       on |          off                         | 
+ | UncertaintyBands:List                         |                          | alphaShi fsr:muRfac=0.5 isr:muRfac=0.5 | 
+ |                                               |                          |   alphaSlo fsr:muRfac=2.0 isr:muRfac=2.0 | 
+ |                                               |                          |   hardHi fsr:cNS=2.0 isr:cNS=2.0     | 
+ |                                               |                          |  hardLo fsr:cNS=-2.0 isr:cNS=-2.0    | 
+ |                                                                                                                 | 
+ *-------  End PYTHIA Flag + Mode + Parm + Word + FVec + MVec + PVec + WVec Settings  -----------------------------* 
+
+ Pythia::next(): 20000 events have been generated 
+ PYTHIA Warning in Merging::mergeProcessCKKWL: Les Houches Event fails merging scale cut. Reject event.  
+ PYTHIA Warning in History::weightCKKWL: No ordered history found. Using unordered history.  
+ PYTHIA Warning in Merging::mergeProcessCKKWL: No clusterings found. History incomplete.  
+
+ Pythia::next(): 25000 events have been generated 
+ PYTHIA Abort from Pythia::next: reached end of Les Houches Events File  
+Reached end of Les Houches Event File!
+
+ *-------  PYTHIA Event and Cross Section Statistics  -------------------------------------------------------------*
+ |                                                                                                                 |
+ | Subprocess                                    Code |            Number of events       |      sigma +- delta    |
+ |                                                    |       Tried   Selected   Accepted |     (estimated) (mb)   |
+ |                                                    |                                   |                        |
+ |-----------------------------------------------------------------------------------------------------------------|
+ |                                                    |                                   |                        |
+ | Les Houches User Process(es)                  9999 |       10000      10000       7240 |   1.067e-13  0.000e+00 |
+ |    ... whereof user classification code          1 |       10000      10000       7240 |                        | 
+ |                                                    |                                   |                        |
+ | sum                                                |       10000      10000       7240 |   1.067e-13  0.000e+00 |
+ |                                                                                                                 |
+ *-------  End PYTHIA Event and Cross Section Statistics ----------------------------------------------------------*
+
+ *-------  PYTHIA Error and Warning Messages Statistics  ----------------------------------------------------------* 
+ |                                                                                                                 | 
+ |  times   message                                                                                                | 
+ |                                                                                                                 | 
+ |      1   Abort from Pythia::next: reached end of Les Houches Events File                                        | 
+ |     21   Error in Pythia::next: hadronLevel failed; try again                                                   | 
+ |     15   Error in StringFragmentation::fragment: stuck in joining                                               | 
+ |      6   Error in StringFragmentation::fragmentToJunction: caught in junction flavour loop                      | 
+ |      3   Info from CoupSUSY::initSUSY:                                                                          | 
+ |      2   Info from Pythia::init: be aware that successive calls to init() do not clear previous settings.       | 
+ |      3   Info from SLHAinterface::initSLHA: importing DECAY tables                                              | 
+ |      3   Info from SLHAinterface::initSLHA: importing MASS entries                                              | 
+ |      3   Warning in CoupSUSY::initSUSY: Block GAUGE not found or incomplete; using sin(thetaW) at mZ            | 
+ |      5   Warning in HadronWidths::pickMasses: angular momentum and running widths not used                      | 
+ |    531   Warning in History::weightCKKWL: No ordered history found. Using unordered history.                    | 
+ |   1706   Warning in Merging::mergeProcessCKKWL: Les Houches Event fails merging scale cut. Reject event.        | 
+ |      1   Warning in Merging::mergeProcessCKKWL: No clusterings found. History incomplete.                       | 
+ |  50546   Warning in PartonLevel::wzDecayShowers: found undecayed resonance                                      | 
+ |      3   Warning in SLHAinterface::initSLHA: ignoring DECAY tables                                              | 
+ |      3   Warning in SLHAinterface::initSLHA: ignoring MASS entries                                              | 
+ |     93   Warning in SLHAinterface::initSLHA: ignoring QNUMBERS                                                  | 
+ |      3   Warning in SLHAinterface::initSLHA: ignoring empty DECAY tables                                        | 
+ |     39   Warning in SimpleTimeShower::findMEcorr: ME weight above PS one                                        | 
+ |      2   Warning in SimpleTimeShower::pTnext: negative dipole mass.                                             | 
+ |    359   Warning in StringFragmentation::fragmentToJunction: bad convergence junction rest frame                | 
+ |      2   Warning in TauDecays::decay: unknown correlated tau production, assuming from unpolarized photon       | 
+ |                                                                                                                 | 
+ *-------  End PYTHIA Error and Warning Messages Statistics  ------------------------------------------------------* 
+
+All Events:                                       8.811124e+03
+
+High-pT Jet Selection [%]:                        1.846796e+01
+Event has >= 1 DV passing [%]:                    
+High-pT Fiducial [%]:                             1.846796e+01
+High-pT R_vertex > 4 mm [%]:                      1.755380e+01
+High-pT Have track with |d_0| > 2 mm [%]:         1.755380e+01
+High-pT Selected Decay Product >= 5 [%]:          1.755380e+01
+High-pT Invariant Mass > 10 GeV [%]:              1.755380e+01
+
+Trackless Jet Selection [%]:                      7.163497e+01
+Event has >= 1 DV passing [%]:                    
+Trackless Fiducial [%]:                           7.163497e+01
+Trackless R_vertex > 4 mm [%]:                    6.571585e+01
+Trackless Have track with |d_0| > 2 mm [%]:       6.571585e+01
+Trackless Selected Decay Product >= 5 [%]:        6.571585e+01
+Trackless Invariant Mass > 10 GeV [%]:            6.571585e+01
+
+High-pT Acc:                                      1.546687e+03
+High-pT Acc x Eff:                                1.390174e+03
+Trackless Acc:                                    5.790305e+03
+Trackless Acc x Eff:                              3.728281e+03
+
+High-pT Acc [%]:                                  1.755380e+01
+High-pT Acc x Eff [%]:                            1.577748e+01
+Trackless Acc [%]:                                6.571585e+01
+Trackless Acc x Eff [%]:                          4.231334e+01
+
+The inclusive cross section after merging is:     5.952398e-13 mb

@@ -3,8 +3,8 @@
 **By Kingman Cheung, Fei-Tung Chung, Giovanna Cottin, and Zeren Simon Wang**
 
 
-[![arXiv](http://img.shields.io/badge/arXiv-2404.XXXXX-B31B1B.svg)](https://arxiv.org/abs/2404.XXXXX)
-[![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/llprecasting/recastingCodes/XXX/LICENSE.md)
+[![arXiv](http://img.shields.io/badge/arXiv-2404.06126-B31B1B.svg)](https://arxiv.org/abs/2404.06126)
+[![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/llprecasting/recastingCodes/blob/main/DisplacedVertices/ATLAS-SUSY-2018-13_GCottin/LICENSE.md)
 
 
 ## Introduction
@@ -14,7 +14,7 @@ We develop a code for recasting the LLP search reported in 2301.13866.
 
 ## Paper
 
-This code is used for recasting the LLP search reported in 2301.13866. Its validation and application in one BSM theoretical scenario are presented in [![arXiv](http://img.shields.io/badge/arXiv-2404.XXXXX-B31B1B.svg)](https://arxiv.org/abs/2404.XXXXX).
+This code is used for recasting the LLP search reported in 2301.13866. Its validation and application in one BSM theoretical scenario are presented in [![arXiv](http://img.shields.io/badge/arXiv-2404.06126-B31B1B.svg)](https://arxiv.org/abs/2404.06126).
 
 
 ## Compilation

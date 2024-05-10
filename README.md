@@ -24,6 +24,7 @@ corresponding analysis and authors:
     * [8 TeV ATLAS Displaced Vertex plus jets by GCottin](DisplacedVertices/ATLAS-SUSY-2014-02_GCottin)
   * [CalRatio Displaced Jets](CalRatioDisplacedJet)
     * [13 TeV ATLAS Displaced Jets in the calorimeter](CalRatioDisplacedJet/ATLAS-EXOT-2019-23)
+  * [Emerging Jets](EmergingJets/CMS-EXO-18-001)    
   * [Heavy Stable Charged Particles](HSCPs)
     * [13 TeV ATLAS HSCP - 139/fb](HSCPs/ATLAS-SUSY-2018-42)
     * [13 TeV ATLAS HSCP - 31.6/fb](HSCPs/ATLAS-SUSY-2016-32)

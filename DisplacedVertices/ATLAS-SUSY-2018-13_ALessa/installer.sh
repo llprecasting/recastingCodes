@@ -29,7 +29,7 @@ fi
 cd $homeDIR
 
 
-madgraph="MG5_aMC_v3.5.3.tar.gz"
+madgraph="MG5_aMC_v3.5.5.tar.gz"
 URL=https://launchpad.net/mg5amcnlo/3.0/3.5.x/+download/$madgraph
 echo -n "Install MadGraph (y/n)? "
 read answer

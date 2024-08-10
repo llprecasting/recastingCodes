@@ -193,7 +193,10 @@ def getModelDict(inputFile,model,verbose=True):
         LSP = 1000022
     elif model == 'sbottom':
         LLP = 1000005
-        LSP = 1000022        
+        LSP = 1000022
+    elif model == 'hs':
+        LLP = 35
+        LSP = 35     
     else:
         raise ValueError("Unreconized model %s" %model)
 

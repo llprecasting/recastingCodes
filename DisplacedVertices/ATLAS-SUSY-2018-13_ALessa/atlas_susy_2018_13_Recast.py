@@ -254,8 +254,8 @@ if __name__ == "__main__":
             default = None)
     ap.add_argument('-A', '--add', required=False,action='store_true',default=False,
             help='If set, the input files will be considered to refer to samples of the orthogonal processes and their weights will be added.')    
-    ap.add_argument('-m', '--model', required=False,type=str,default='sbottom',
-            help='Defines which model should be considered for extracting model parameters (strong,ewk,gluino,sbottom).')
+    ap.add_argument('-m', '--model', required=False,type=str,default='hs',
+            help='Defines which model should be considered for extracting model parameters (strong,ewk,gluino,sbottom,hs).')
     ap.add_argument('-U', '--update', required=False,action='store_true',
             help='If the flag is set only the model points containing data newer than the dataframe will be read.')
     

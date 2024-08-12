@@ -214,6 +214,12 @@ def getModelDict(inputFile,model,verbose=True):
     parsDict['mLLP'] = slhaData.blocks['MASS'][LLP]
     parsDict['mLSP'] = slhaData.blocks['MASS'][LSP]
     parsDict['width'] = slhaData.decays[LLP].totalwidth
+    if model == 'hs':
+        br = None
+        for dec in slhaData.decays[25].decays:
+            if dec.ids == [35,35]:
+                br = dec.br
+        parsDict['BR25_35_35'] = round(br,2)
     if parsDict['width']:
         parsDict['tau_ns'] = (6.582e-25/parsDict['width'])*1e9
     else:

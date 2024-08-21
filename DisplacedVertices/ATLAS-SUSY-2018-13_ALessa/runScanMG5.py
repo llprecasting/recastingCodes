@@ -164,6 +164,7 @@ def runMG5(parser):
     for key,val in comms.items():
         commandsFileF.write('set %s %s\n' %(key,val))
 
+    commandsFileF.write('set iseed %s\n' %(parser["MadGraphPars"]["runNumber"]))
     #Done setting up options
     commandsFileF.write('done\n')
     commandsFileF.write('done\n')

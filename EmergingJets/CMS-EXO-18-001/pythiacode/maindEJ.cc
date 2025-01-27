@@ -445,7 +445,7 @@ int main(int argc, char* argv[]) {
 
 ////////////
 
-    vmet2 = vmet2 - vudm;
+    //vmet2 = vmet2 - vudm;
     met2 = vmet2.pT();
 
     if (ptjja > 900.) ptTrg=true;

@@ -1,0 +1,48 @@
+import model sm 
+import model /AtlasDisk/user/corpe/LLPRecasting2024/MG5_aMC_v3_4_2/HAHM_MG5model_v3/HAHM_variableMW_v3_UFO 
+define p = g u c d s u~ c~ d~ s~ 
+define j = u c d s b u~ c~ d~ s~ b~ 
+define vl = ve vm vt
+define vl~ = ve~ vm~ vt~
+define j = g u c d s u~ c~ d~ s~ 
+define l+ = e+ mu+ ta+ 
+define l- = e- mu- ta- 
+define f = u c d s u~ c~ d~ s~ b b~ e+ e- mu+ mu- ta+ ta- t t~ 
+generate p p > w+ h, (w+ > l+ vl), (h > h2 h2, h2 > f f) 
+p p > w- h, (w- > l- vl~), (h > h2 h2, h2 > f f)
+output Script_WH600_S50_W 
+launch Script_WH600_S50_W 
+shower=Pythia8 
+0 
+set nevents = 50000 
+set mhsinput 50 
+set mhinput 600 
+set epsilon 1e-10 
+set kap 1e-4 
+set time_of_flight 0 
+set event_norm = sum 
+set ptj = 0 
+set ptb = 0 
+set pta = 0 
+set ptl = 0 
+set etaj = -1 
+set etab = -1 
+set etaa = -1 
+set etal = -1 
+set drjj = 0 
+set drbb = 0 
+set drll = 0 
+set draa = 0 
+set drbj = 0 
+set draj = 0 
+set drjl = 0 
+set drab = 0 
+set drbl = 0 
+set dral = 0 
+set use_syst = T 
+set wzp = 5
+set wh = 5
+set wt = Auto
+set whs = 5
+0 
+exit

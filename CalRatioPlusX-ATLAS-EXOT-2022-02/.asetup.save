@@ -1,0 +1,110 @@
+#Release cmake
+
+export LANG="C"
+export LC_ALL="C"
+export COOL_ORA_ENABLE_ADAPTIVE_OPT="Y"
+export ASETUP_PRINTLEVEL="0"
+export BINARY_TAG="x86_64-centos7-gcc11-opt"
+export CMTCONFIG="x86_64-centos7-gcc11-opt"
+if [ -z "${AtlasSetup:+x}" ]; then
+    export AtlasSetup="/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/AtlasSetup/V03-01-09/AtlasSetup"
+    export AtlasSetupVersion="AtlasSetup-03-01-09"
+fi
+
+if [ -d /tmp/corpe ]; then
+   export ASETUP_SYSBIN=`mktemp -d /tmp/corpe/.asetup-sysbin-XXXXXX_$$`
+else
+   export ASETUP_SYSBIN=`mktemp -d /AtlasDisk/user/corpe/LLPRecasting2024/MG5_aMC_v3_4_2/new/recastingCodes/CalRatioPlusX/.asetup-sysbin-XXXXXX_$$`
+fi
+source $AtlasSetup/scripts/sys_exe-alias.sh ''
+export PATH="${ASETUP_SYSBIN}:${PATH}"
+if [ -n "${MAKEFLAGS:+x}" ]; then
+    asetup_flags=`echo ${MAKEFLAGS} | \grep ' -l'`
+    if [ -z "${asetup_flags}" ]; then
+        export MAKEFLAGS="${MAKEFLAGS} -l40"
+    fi
+else
+    export MAKEFLAGS="-j40 -l40"
+fi
+source /cvmfs/sft.cern.ch/lcg/releases/gcc/11.2.0-8a51a/x86_64-centos7/setup.sh
+if [ -z "${CC:+x}" ]; then
+    export CC=`\env which gcc 2>/dev/null`
+    [[ -z "$CC" ]] && unset CC
+fi
+if [ -z "${CXX:+x}" ]; then
+    export CXX=`\env which g++ 2>/dev/null`
+    [[ -z "$CXX" ]] && unset CXX
+fi
+if [ -z "${CUDAHOSTCXX:+x}" ]; then
+    export CUDAHOSTCXX=`\env which g++ 2>/dev/null`
+    [[ -z "$CUDAHOSTCXX" ]] && unset CUDAHOSTCXX
+fi
+if [ -z "${FC:+x}" ]; then
+    export FC=`\env which gfortran 2>/dev/null`
+    [[ -z "$FC" ]] && unset FC
+fi
+export CMAKE_NO_VERBOSE="1"
+if [ -z "${CMAKE_BUILD_PARALLEL_LEVEL:+x}" ]; then
+    export CMAKE_BUILD_PARALLEL_LEVEL="40"
+fi
+type lsetup &>/dev/null
+if [ $? -ne 0 ]; then
+   if [ -z "$ATLAS_LOCAL_ROOT_BASE" ]; then
+      if [ -z "$ATLAS_SW_BASE" ]; then
+         export ATLAS_SW_BASE=/cvmfs
+       fi
+      export ATLAS_LOCAL_ROOT_BASE=$ATLAS_SW_BASE/atlas.cern.ch/repo/ATLASLocalRootBase
+   fi
+   source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet
+fi
+source $ATLAS_LOCAL_ROOT_BASE/packageSetups/localSetup.sh --quiet "cmake 3.27.5"
+export AtlasBaseDir="/cvmfs/atlas.cern.ch/repo/sw/software/24.2"
+export LCG_RELEASE_BASE="/cvmfs/atlas.cern.ch/repo/sw/software/24.2/sw/lcg/releases"
+export AtlasBuildStamp="2023-12-21T0220"
+export AtlasReleaseType="stable"
+export AtlasBuildBranch="24.2"
+export AtlasProject="AnalysisBase"
+export TDAQ_RELEASE_BASE="/cvmfs/atlas.cern.ch/repo/sw/tdaq/offline"
+export ATLAS_RELEASE_BASE="/cvmfs/atlas.cern.ch/repo/sw/software/24.2"
+export AtlasArea="/cvmfs/atlas.cern.ch/repo/sw/software/24.2/AnalysisBase/24.2.35"
+export AtlasVersion="24.2.35"
+source /cvmfs/atlas.cern.ch/repo/sw/software/24.2/AnalysisBase/24.2.35/InstallArea/x86_64-centos7-gcc11-opt/setup.sh
+asetup_status=$?
+if [ ${asetup_status} -ne 0 ]; then
+    \echo "AtlasSetup(ERROR): sourcing release setup script (/cvmfs/atlas.cern.ch/repo/sw/software/24.2/AnalysisBase/24.2.35/InstallArea/x86_64-centos7-gcc11-opt/setup.sh) failed"
+fi
+export TestArea="/AtlasDisk/user/corpe/LLPRecasting2024/MG5_aMC_v3_4_2/new/recastingCodes/CalRatioPlusX"
+alias_sys_exe emacs
+echo $LD_LIBRARY_PATH | egrep "LCG_[^/:]*/curl/" >/dev/null
+if [ $? -eq 0 ]; then
+    alias_sys_exe_envU git
+fi
+\expr 1 \* 1 + 1 >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo -e '\nMaking workaround-alias for expr on this *OLD* machine'; alias_sys_exe expr
+fi
+
+# resolution for the rucio conflict
+pythonpath_items=$(echo $PYTHONPATH | tr ":" "\n")
+usrlibPath=$(echo "$pythonpath_items" | grep "^/usr/lib/python[^/]*/site-packages" 2>&1)
+if [ "X$usrlibPath" != "X" ]; then
+   usrlibPath64=${usrlibPath/lib/lib64}
+   if [ -d $usrlibPath64 ]; then
+      echo "$pythonpath_items" | grep ^${usrlibPath64} >/dev/null 2>&1 || export PYTHONPATH=${PYTHONPATH}:${usrlibPath64}
+   fi
+fi
+unset pythonpath_items usrlibPath usrlibPath64
+
+#Release Summary as follows:
+#Release base=/cvmfs/atlas.cern.ch/repo/sw/software/24.2
+#Release project=AnalysisBase
+#Release releaseNum=24.2.35
+#Release asconfig=x86_64-centos7-gcc11-opt
+
+# Execute user-specified epilog
+
+source /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/swConfig/asetup/asetupEpilog.sh
+script_status=$?
+if [ ${script_status} -ne 0 ]; then
+    \echo "AtlasSetup(ERROR): User-specified epilog (source /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/swConfig/asetup/asetupEpilog.sh) reported failure (error ${script_status})"
+fi

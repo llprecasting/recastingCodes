@@ -2,6 +2,8 @@ To process the recasting, please follow these instructions.
 
 - First of all, you will need to install this version of madgraph : MG5_aMC_v3.4.2.tar.gz from : https://launchpad.net/mg5amcnlo/+download
 
+- Download the files from this `zenodo`: https://zenodo.org/records/14610411 and put them in a folder called /models
+
 - The required UFO files are available in the /UFO folder 
 
 - install `lhapdf` and `pythia8` as:

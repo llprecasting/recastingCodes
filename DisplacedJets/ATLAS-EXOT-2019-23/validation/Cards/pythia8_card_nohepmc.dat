@@ -1,0 +1,17 @@
+Init:showChangedSettings = on     ! list changed settings
+Init:showChangedParticleData = off ! list changed particle data
+Init:showProcesses = on
+Init:showMultipartonInteractions = off
+Next:numberCount = 15000             ! print message every n events
+Next:numberShowInfo = 1            ! print event information n times
+Next:numberShowProcess = 1         ! print process record n times
+Next:numberShowEvent = 1           ! print event record n times
+Next:numberShowLHA  = 0
+Stat:showProcessLevel = on
+Stat:showErrors = on
+Check:epTolErr = 1.00e-2
+Main:timesAllowErrors = 100
+Next:numberShowInfo = 1            ! print event information n times
+Next:numberShowProcess = 1         ! print process record n times
+Next:numberShowEvent = 1           ! print event record n times
+Tune:pp = 21 ! A14 tune with NNPDF2.3LO

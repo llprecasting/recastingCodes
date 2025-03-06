@@ -6,8 +6,8 @@ import numpy as np
 # to use: pip install pyyaml numpy
 # and configure the map names you downlaoded from HEPdata below 
 mapFileNames={
-  "high-ET": "HEPData-ins2043503-v3-Figure_11_of_Aux._Mat..yaml",
-  "low-ET": "HEPData-ins2043503-v3-Figure_12_of_Aux._Mat..yaml",
+  "high-ET": "ATLAS_data/HEPData-ins2043503-v3-Figure_11_of_Aux._Mat..yaml",
+  "low-ET": "ATLAS_data/HEPData-ins2043503-v3-Figure_12_of_Aux._Mat..yaml",
   }
 
 mapFileIndexRefs = {} #new!
@@ -17,9 +17,10 @@ maps = {}
 for selection, filename in mapFileNames.items():
   fIn = open(filename)
   maps[selection] = yaml.load(fIn, Loader=SafeLoader)
-  mapFileIndexRefs[selection] = []
-  for i in range(len(maps[selection]['independent_variables'][0]['values'])): # new!
-    mapFileIndexRefs[selection].append((maps[selection]['independent_variables'][0]['values'][i]["value"], maps[selection]['independent_variables'][1]['values'][i]["value"])) # new!
+  mapFileIndexRefs[selection] = {}
+  for index in range(len(maps[selection]['independent_variables'][0]['values'])): # new!
+    indices = tuple(sorted((maps[selection]['independent_variables'][0]['values'][index]["value"], maps[selection]['independent_variables'][1]['values'][index]["value"])))
+    mapFileIndexRefs[selection][indices] = index  # new!
 
 # Define the bin limits
 varBin = {
@@ -83,20 +84,14 @@ def queryMapFromIndices(index_1, index_2, selection="high-ET", return_labels=Fal
   # the map is symmetric: you could interchange llp1/llp2. To avoid duplicated info to store, we only have one side of the map here,
   # so test both combinations when looking for a match
   index = -1
-  if (index_1, index_2) in mapFileIndexRefs[selection]: index = mapFileIndexRefs[selection].index((index_1, index_2))
-  elif (index_2, index_1) in mapFileIndexRefs[selection]: index = mapFileIndexRefs[selection].index((index_2, index_1))
-  if index == -1 :
+  p = tuple(sorted((index_1,index_2)))
+  try:
+    index = mapFileIndexRefs[selection][p]
+  except KeyError:
     return result
-  else:
-    prob = maps[selection]['dependent_variables'][0]['values'][index]["value"]
-    result = prob
-    label_1 = maps[selection]['dependent_variables'][1]['values'][index]["value"]
-    label_2 = maps[selection]['dependent_variables'][2]['values'][index]["value"]
-    if return_labels:
-      result = prob, label_1, label_2
+  result = maps[selection]['dependent_variables'][0]['values'][index]["value"]
   return result
-
-# query the map directly from the kinematics
+  
 def queryMapFromKinematics(pT1, eta1, Lxy1, Lz1, decay1, pT2, eta2, Lxy2, Lz2, decay2, selection="high-ET"):
   index_1 = getGlobalBinIndex(pT1, eta1, Lxy1, Lz1, decay1) 
   index_2 = getGlobalBinIndex(pT2, eta2, Lxy2, Lz2, decay2)

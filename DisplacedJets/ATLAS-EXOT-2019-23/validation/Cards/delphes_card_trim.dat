@@ -1,0 +1,147 @@
+#######################################
+# Order of execution of various modules
+#######################################
+
+#set MaxEvents 1000
+
+set ExecutionPath {
+
+  LLPFilter
+  DMFilter
+  DMMissingET
+  JetFilter
+  GenJetFinder
+
+  ScalarHT
+
+  TreeWriter
+}
+
+
+
+#####################
+# BSM Filter
+#####################
+
+module BSMFilter LLPFilter {
+
+  set InputArray Delphes/allParticles
+  set OutputArray bsmParticles
+  set MothersArray mothers
+  set FinalDaughtersArray finalDaughters  
+  set DirectDaughtersArray directDaughters
+  set PTMin 0.0
+  set massMin 0.0
+  
+  # Select chi1
+  add PdgCode {35}
+  add PdgCode {-35}
+}
+
+
+
+#####################
+# Jet Filter
+#####################
+
+module PdgCodeFilter JetFilter {
+
+  set InputArray Delphes/stableParticles
+  set OutputArray filteredParticles
+
+  set PTMin 0.0
+  # Exclude neutrinos
+  add PdgCode {12}
+  add PdgCode {14}
+  add PdgCode {16}
+  add PdgCode {-12}
+  add PdgCode {-14}
+  add PdgCode {-16}
+  # Exclude muons
+  add PdgCode {13}
+  add PdgCode {-13}
+  # Exclude neutralinos and sbottoms
+  add PdgCode {25}
+  add PdgCode {35}
+
+}
+
+#####################
+# Dark Matter Filter
+#####################
+
+module PdgCodeFilter DMFilter {
+
+  set InputArray Delphes/allParticles
+  set OutputArray dmParticles
+  set Invert true
+  set RequireStatus true
+  set Status 1
+
+  set PTMin 0.0
+
+  add PdgCode {4000022}    
+  add PdgCode {-4000022}
+  add PdgCode {1000039}    
+  add PdgCode {-1000039}
+  
+}
+
+#####################
+# MC truth jet finder
+#####################
+
+module FastJetFinder GenJetFinder {
+  set InputArray JetFilter/filteredParticles
+
+  set OutputArray jets
+
+  # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt
+  set JetAlgorithm 6
+  set ParameterR 0.4
+
+  set JetPTMin 20.0
+}
+
+##################
+# Scalar HT merger
+##################
+
+module Merger ScalarHT {
+# add InputArray InputArray
+  add InputArray GenJetFinder/jets
+  set EnergyOutputArray energy
+}
+
+
+###############################
+# Dark Matter Missing ET merger
+###############################
+
+module Merger DMMissingET {
+  add InputArray DMFilter/dmParticles
+  set MomentumOutputArray momentum
+}
+
+
+
+##################
+# ROOT tree writer
+##################
+
+
+module TreeWriter TreeWriter {
+# add Branch InputArray BranchName BranchClass
+#  add Branch Delphes/allParticles Particle GenParticle
+#  add Branch Delphes/partons Parton GenParticle  
+#  add Branch Delphes/stableParticles StableParticle GenParticle
+  add Branch LLPFilter/bsmParticles llpParticles GenParticle
+  add Branch LLPFilter/directDaughters llpDirectDaughters GenParticle
+  add Branch LLPFilter/mothers llpMothers GenParticle
+  add Branch DMFilter/dmParticles dmParticles GenParticle
+  add Branch DMMissingET/momentum DMMissingET MissingET    
+  add Branch GenJetFinder/jets GenJet Jet
+  add Branch ScalarHT/energy ScalarHT ScalarHT
+
+}
+

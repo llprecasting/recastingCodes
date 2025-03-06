@@ -3,6 +3,7 @@
 
 ## Authors: ##
 [Louie Corpe](mailto:l.corpe@cern.ch)
+
 [Andre Lessa](mailto:andre.lessa@ufabc.edu.br)
 
 The recast code and results are based on [arXiv:2412.13976](https://arxiv.org/pdf/2412.13976), the auxiliary material
@@ -24,29 +25,30 @@ The following pre-requisites must be installed before compiling the main code:
 
 ## Running the recast code
 
-There are two paths for running the recast code or reproducing the the results in the validation folder:
+There are two paths for running the recast code or reproducing the results in the [validation folder](./validation/):
 
- 1. Generate HepMC events with MadGraph5 plus Pythia8 to generate a HepMC file, which is taken as input by [getEffsfromHepMC.py](./getEffsFromHepMC.py) to compute the efficiencies or
- 2. Run MadGraph5 plus DelphesPythia8, which stores the necessary information in a ROOT file, which is taken as input by [getEffsfromROOT.py](./getEffsfromROOT.py) to compute the efficiencies.
+ 1. Generate HepMC events with MadGraph5 plus Pythia8, which is taken as input by [getEffsfromHepMC.py](./getEffsFromHepMC.py) to compute the efficiencies or
+ 2. Run MadGraph5 plus DelphesPythia8, which stores the necessary information in a ROOT file, which is taken as input by [getEffsFromROOT.py](./getEffsFromROOT.py) to compute the efficiencies.
 
-Method 1. is based on the [original version of the recast code](https://github.com/llprecasting/recastingCodes/tree/main/DisplacedJets/ATLAS-EXOT-2019-23),
-but it requires storing large HepMC files and is about 6x slower. Method 2. is faster and requires storing small ROOT files. 
-However, it requires a [modified version of Delphes](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP), which stores LLPs and their decays in the output.
+Method 1 requires requires running only MadGraph5 and Pythia8, while Method 2 requires running in addition a [modified version of Delphes](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP), which stores LLPs and their decays in the output ROOT file.
+However, Method 2 can be about 5x faster.
 
-Examples of cards for generating events for the HAHM model using either of the methods below can be found in the [validation/Cards](./validation/Cards/) folder.
+Examples of cards for generating events for the HAHM model using either of the methods can be found in the [validation/Cards](./validation/Cards/) folder.
 
 ### Method 1
 
-After generating a HepMC file containing the events the efficiencies can running:
+After generating a HepMC file containing the events the efficiencies can be computed running:
 
 ```
-./getEffsFromHepMC.py -p <parameters_file> -f <path-to-hepmc-file>
+./getEffsFromHepMC.py -p <parameters_file> -f <path-to-hepmc-file(s)>
 ```
 where one example of the parameters file can be found [here](./parameters_getEff.ini).
 This file defines the PDGs for the LLP and what should be considered as invisible in the LLP decays.
 It also provides a list of $c\tau$ values for which the efficiencies will be computed and other options.
-The output will consist of a csv file for each ROOT file containing the efficiencies for
-the provided $c\tau$ values. The files will be stored in the same folder as the HepMC file.
+The output will consist of a csv file (stored in the same folder as the input file) for each HepMC file containing the efficiencies for
+the provided $c\tau$ values.
+
+If running over multiple files, the code allows to run the efficiency calculation in parallel (the number of parallel runs is set by the `ncpus` option).
 
 
 ### Method 2
@@ -54,13 +56,15 @@ the provided $c\tau$ values. The files will be stored in the same folder as the 
 After generating a ROOT file using the modified Delphes code (see above),  the efficiencies can be computed running:
 
 ```
-./getEffsFromROOT.py -p <parameters_file> -f <path-to-root-file>
+./getEffsFromROOT.py -p <parameters_file> -f <path-to-root-file(s)>
 ```
 where one example of the parameters file can be found [here](./parameters_getEff.ini).
 This file defines the PDGs for the LLP and what should be considered as invisible in the LLP decays.
 It also provides a list of $c\tau$ values for which the efficiencies will be computed and other options.
-The output will consist of a csv file for each ROOT file containing the efficiencies for
-the provided $c\tau$ values. The files will be stored in the same folder as the ROOT file.
+The output will consist of a csv file (stored in the same folder as the input file) for each ROOT file containing the efficiencies for
+the provided $c\tau$ values.
+
+If running over multiple files, the code allows to run the efficiency calculation in parallel (the number of parallel runs is set by the `ncpus` option).
 
 ## Plotting the results
 

@@ -1,7 +1,7 @@
 # Validation of CalRatio Recast ([ATLAS-EXOT-2019-23](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/EXOT-2019-23/))
 
 
-The recast code and results are based on [arXiv:2412.13976](https://arxiv.org/pdf/2412.13976), the auxiliary material
+The recast code and results are based on [arXiv:2412.13976](https://arxiv.org/pdf/2412.13976) and the auxiliary material
 provied in [HepDATA](https://www.hepdata.net/record/ins2043503).
 
 All the Cards used for the event generation can be found in [Cards](./Cards).

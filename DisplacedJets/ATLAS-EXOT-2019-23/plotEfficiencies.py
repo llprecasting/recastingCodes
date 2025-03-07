@@ -113,13 +113,13 @@ def plotXsecLimit(effFile,mPhi,mS,outFile,sr='high-ET',factor=1):
     _, ax = plt.subplots()
 
     # nsUL_obs = 0.5630 * 26 * factor (outdated value)
-    # Upper limits computed using number from Table 4 in 2203.01009
+    # Upper limits computed using abcd_pyhf and the numbers from Table 4 in 2203.01009
     if sr == 'high-ET':
-        nsUL_obs = 21.94 * factor #upper limit computed using: nobs = 22, nBG = 12.45, bgError = 4.7
-        nsUL_exp = 17.54 * factor #upper limit computed using: nobs = 12.45, nBG = 12.45, bgError = 4.7
+        nsUL_obs = 27.44 * factor
+        nsUL_exp = 17.31 * factor
     else:
-        nsUL_obs = 27.44 * factor #upper limit computed using: nobs = 22, nBG = 12.45, bgError = 4.7
-        nsUL_exp = 23.60 * factor #upper limit computed using: nobs = 12.45, nBG = 12.45, bgError = 4.7
+        nsUL_obs = 32.98 * factor
+        nsUL_exp = 21.51 * factor
 
     Crr_Sec_obs = (nsUL_obs)/((np.array(eff)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
     Crr_Sec_exp = (nsUL_exp)/((np.array(eff)) * 139e3 ) # Luminosity = 139e3 fb**(-1)

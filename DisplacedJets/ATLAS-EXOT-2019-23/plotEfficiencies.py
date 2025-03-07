@@ -112,11 +112,22 @@ def plotXsecLimit(effFile,mPhi,mS,outFile,sr='high-ET',factor=1):
     
     _, ax = plt.subplots()
 
-    Nsobs = 0.5630 * 26 * factor # nbr of observed events = 26 ( factor )
+    # nsUL_obs = 0.5630 * 26 * factor (outdated value)
+    # Upper limits computed using number from Table 4 in 2203.01009
+    if sr == 'high-ET':
+        nsUL_obs = 21.94 * factor #upper limit computed using: nobs = 22, nBG = 12.45, bgError = 4.7
+        nsUL_exp = 17.54 * factor #upper limit computed using: nobs = 12.45, nBG = 12.45, bgError = 4.7
+    else:
+        nsUL_obs = 27.44 * factor #upper limit computed using: nobs = 22, nBG = 12.45, bgError = 4.7
+        nsUL_exp = 23.60 * factor #upper limit computed using: nobs = 12.45, nBG = 12.45, bgError = 4.7
 
-    Crr_Sec_obs = (Nsobs)/((np.array(eff)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
+    Crr_Sec_obs = (nsUL_obs)/((np.array(eff)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
+    Crr_Sec_exp = (nsUL_exp)/((np.array(eff)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
 
-    plt.plot(tauN, Crr_Sec_obs, 'r', label ='Map results', linewidth = 2)
+    plt.plot(tauN, Crr_Sec_obs, 'r', label ='Observed (Recast)', linewidth = 2)
+    # plt.fill_between(tauN, Crr_Sec_obs/1.1,Crr_Sec_obs/0.9, label=r'Observed (Recast) $\pm 10$%', 
+                    #  alpha=0.4, color='r')
+    plt.plot(tauN, Crr_Sec_exp, 'r', label ='Expected (Recast)', linewidth = 2, linestyle='dashed')
 
     if branch_HEP_limit_exp is not None:
         plt.plot(branch_HEP_limit_exp.values(axis='both')[0], branch_HEP_limit_exp.values(axis='both')[1], 'b', label ='Expected (HEPData)', linewidth = 2, linestyle='dashed')

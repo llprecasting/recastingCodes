@@ -22,22 +22,42 @@ def getATLASdata(mPhi,mS):
     massPair = (int(mPhi),int(mS))
     effFileDict = {(1000,275) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2e_of_Aux._Mat._1000_275.root",
                     (1000,475) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2e_of_Aux._Mat._1000_475.root",
+                    (600,150) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2d_of_Aux._Mat._600_150.root",
+                    (400,100) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2c_of_Aux._Mat._400_100.root",
+                    (200,50) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2c_of_Aux._Mat._200_50.root",
+                    (155,55) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2b_of_Aux._Mat._125_55.root"
                     } #HEP data files
 
     effBranchDict = {(1000,275) : "Figure 2e of Aux. Mat. 1000_275/Graph1D_y1;1",
                     (1000,475) : "Figure 2e of Aux. Mat. 1000_475/Graph1D_y1;1",
+                    (600,150) : 'Figure 2d of Aux. Mat. 600_150/Graph1D_y1;1', 
+                    (400,100) : 'Figure 2c of Aux. Mat. 400_100/Graph1D_y1;1',
+                    (200,50) :  'Figure 2c of Aux. Mat. 200_50/Graph1D_y1;1',
+                    (155,55) : 'Figure 2b of Aux. Mat. 125_55/Graph1D_y1;1'
                     } # Efficiencies from HEP data
 
     limitFileDict = {(1000,275) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_6f_of_Aux._Mat._1000_275.root",
                     (1000,475) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_6e_of_Aux._Mat._1000_475.root",
+                    (600,150) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_6b_of_Aux._Mat._600_150.root",
+                    (400,100) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_6a_of_Aux._Mat._400_100.root",
+                    (200,50) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_5f_of_Aux._Mat._200_50.root",
+                    (155,55) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_10a_125_55.root"
                     }
 
     limitBranchExpDict = {(1000,275) : "Figure 6f of Aux. Mat./Graph1D_y1;1",
                         (1000,475) : "Figure 6e of Aux. Mat./Graph1D_y1;1",
+                        (600,150) : "Figure 6b of Aux. Mat./Graph1D_y1;1",
+                        (400,100) : "Figure 6a of Aux. Mat./Graph1D_y1;1",
+                        (200,50) : "Figure 5f of Aux. Mat./Graph1D_y1;1",
+                        (155,55) : "Figure 10a/Graph1D_y1;1"
                     }
 
     limitBranchObsDict = {(1000,275) : "Figure 6f of Aux. Mat./Graph1D_y2;1",
                         (1000,475) : "Figure 6e of Aux. Mat./Graph1D_y2;1",
+                        (600,150) : "Figure 6b of Aux. Mat./Graph1D_y2;1",
+                        (400,100) : "Figure 6a of Aux. Mat./Graph1D_y2;1",
+                        (200,50) : "Figure 5f of Aux. Mat./Graph1D_y2;1",
+                        (155,55) : "Figure 10a/Graph1D_y2;1"
                     }
     
     if massPair not in effFileDict:

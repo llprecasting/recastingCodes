@@ -37,8 +37,6 @@ The results below were obtaining using the Method 2 described [here](../README.m
      <img src="./effs/hahm_600_150_delphes_events_HTcut_xsec.png" width=80% height=80% />
  </p>
 
-
-
  * $m_{\Phi} = 1$ TeV and $m_S = 275$ GeV:
 
  <p float="center">

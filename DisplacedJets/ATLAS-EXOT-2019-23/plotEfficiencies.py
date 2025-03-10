@@ -25,7 +25,7 @@ def getATLASdata(mPhi,mS):
                     (600,150) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2d_of_Aux._Mat._600_150.root",
                     (400,100) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2c_of_Aux._Mat._400_100.root",
                     (200,50) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2c_of_Aux._Mat._200_50.root",
-                    (155,55) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2b_of_Aux._Mat._125_55.root"
+                    (125,55) : "./ATLAS_data/HEPData-ins2043503-v3-Figure_2b_of_Aux._Mat._125_55.root"
                     } #HEP data files
 
     effBranchDict = {(1000,275) : "Figure 2e of Aux. Mat. 1000_275/Graph1D_y1;1",
@@ -33,7 +33,7 @@ def getATLASdata(mPhi,mS):
                     (600,150) : 'Figure 2d of Aux. Mat. 600_150/Graph1D_y1;1', 
                     (400,100) : 'Figure 2c of Aux. Mat. 400_100/Graph1D_y1;1',
                     (200,50) :  'Figure 2c of Aux. Mat. 200_50/Graph1D_y1;1',
-                    (155,55) : 'Figure 2b of Aux. Mat. 125_55/Graph1D_y1;1'
+                    (125,55) : 'Figure 2b of Aux. Mat. 125_55/Graph1D_y1;1'
                     } # Efficiencies from HEP data
 
     limitFileDict = {(1000,275) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_6f_of_Aux._Mat._1000_275.root",
@@ -41,7 +41,7 @@ def getATLASdata(mPhi,mS):
                     (600,150) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_6b_of_Aux._Mat._600_150.root",
                     (400,100) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_6a_of_Aux._Mat._400_100.root",
                     (200,50) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_5f_of_Aux._Mat._200_50.root",
-                    (155,55) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_10a_125_55.root"
+                    (125,55) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_10a_125_55.root"
                     }
 
     limitBranchExpDict = {(1000,275) : "Figure 6f of Aux. Mat./Graph1D_y1;1",
@@ -49,7 +49,7 @@ def getATLASdata(mPhi,mS):
                         (600,150) : "Figure 6b of Aux. Mat./Graph1D_y1;1",
                         (400,100) : "Figure 6a of Aux. Mat./Graph1D_y1;1",
                         (200,50) : "Figure 5f of Aux. Mat./Graph1D_y1;1",
-                        (155,55) : "Figure 10a/Graph1D_y1;1"
+                        (125,55) : "Figure 10a/Graph1D_y1;1"
                     }
 
     limitBranchObsDict = {(1000,275) : "Figure 6f of Aux. Mat./Graph1D_y2;1",
@@ -57,7 +57,7 @@ def getATLASdata(mPhi,mS):
                         (600,150) : "Figure 6b of Aux. Mat./Graph1D_y2;1",
                         (400,100) : "Figure 6a of Aux. Mat./Graph1D_y2;1",
                         (200,50) : "Figure 5f of Aux. Mat./Graph1D_y2;1",
-                        (155,55) : "Figure 10a/Graph1D_y2;1"
+                        (125,55) : "Figure 10a/Graph1D_y2;1"
                     }
     
     if massPair not in effFileDict:
@@ -202,10 +202,14 @@ if __name__ == "__main__":
     if level in levels:       
         logger.setLevel(level = levels[level])
 
+    if int(args.mPhi) == 125:
+        factor = 0.048
+    else:
+        factor = 1.0
 
     if args.effPlot is not None:
         plotEffs(args.inputfile,args.mPhi,args.mS,outFile=args.effPlot,sr=args.signalregion)
         logger.info(f"Efficiency plot saved to {args.effPlot}")
     if args.xsecPlot is not None:
-        plotXsecLimit(args.inputfile,args.mPhi,args.mS,outFile=args.xsecPlot,sr=args.signalregion)
+        plotXsecLimit(args.inputfile,args.mPhi,args.mS,outFile=args.xsecPlot,sr=args.signalregion,factor=factor)
         logger.info(f"Cross-section limit plot saved to {args.xsecPlot}")

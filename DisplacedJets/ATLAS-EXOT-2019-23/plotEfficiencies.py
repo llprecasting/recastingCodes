@@ -44,7 +44,7 @@ def getATLASdata(mPhi,mS):
                     (125,55) : "./ATLAS_data/HEP_Limits/HEPData-ins2043503-v3-Figure_10a_125_55.root"
                     }
 
-    limitBranchExpDict = {(1000,275) : "Figure 6f of Aux. Mat./Graph1D_y1;1",
+    limitXSecExpDict = {(1000,275) : "Figure 6f of Aux. Mat./Graph1D_y1;1",
                         (1000,475) : "Figure 6e of Aux. Mat./Graph1D_y1;1",
                         (600,150) : "Figure 6b of Aux. Mat./Graph1D_y1;1",
                         (400,100) : "Figure 6a of Aux. Mat./Graph1D_y1;1",
@@ -52,7 +52,7 @@ def getATLASdata(mPhi,mS):
                         (125,55) : "Figure 10a/Graph1D_y1;1"
                     }
 
-    limitBranchObsDict = {(1000,275) : "Figure 6f of Aux. Mat./Graph1D_y2;1",
+    limitXSecObsDict = {(1000,275) : "Figure 6f of Aux. Mat./Graph1D_y2;1",
                         (1000,475) : "Figure 6e of Aux. Mat./Graph1D_y2;1",
                         (600,150) : "Figure 6b of Aux. Mat./Graph1D_y2;1",
                         (400,100) : "Figure 6a of Aux. Mat./Graph1D_y2;1",
@@ -71,12 +71,18 @@ def getATLASdata(mPhi,mS):
 
     File_HEP_limit = limitFileDict[massPair]
     file_HEP_limit = uproot.open(File_HEP_limit) # open the file from HEP data for the limits
-    Branch_HEP_limit = limitBranchExpDict[massPair]
-    branch_HEP_limit_exp = file_HEP_limit[Branch_HEP_limit] # open the branch
-    Branch_HEP_limit = limitBranchObsDict[massPair]
-    branch_HEP_limit_obs = file_HEP_limit[Branch_HEP_limit]
+    xsec_HEP_limit = limitXSecExpDict[massPair]
+    xsec_HEP_limit_exp = file_HEP_limit[xsec_HEP_limit] # open the branch
+    xsec_HEP_limit = limitXSecObsDict[massPair]
+    xsec_HEP_limit_obs = file_HEP_limit[xsec_HEP_limit]
+    # The plot for the Higgs mass value actually has limits on the Higgs BR.
+    # Therefore, to convert it to limits on sigma*BR, we must multiply by the Higgs xsec (in pb)
+    if int(mPhi) == 125:
+        higgsXSec = 48.6 # Value quoted in Fig.10 of 2203.01009
+        xsec_HEP_limit_exp._bases[0]._members['fY'] = xsec_HEP_limit_exp._bases[0]._members['fY']*higgsXSec
+        xsec_HEP_limit_obs._bases[0]._members['fY'] = xsec_HEP_limit_obs._bases[0]._members['fY']*higgsXSec
 
-    return data_HEP, branch_HEP_limit_exp, branch_HEP_limit_obs
+    return data_HEP, xsec_HEP_limit_exp, xsec_HEP_limit_obs
 
 
 
@@ -121,7 +127,7 @@ def plotEffs(effFile,mPhi,mS,outFile,sr='high-ET'):
     plt.savefig(outFile)
 
 
-def plotXsecLimit(effFile,mPhi,mS,outFile,sr='high-ET',factor=1):
+def plotXsecLimit(effFile,mPhi,mS,outFile,sr='high-ET'):
 
     _, branch_HEP_limit_exp, branch_HEP_limit_obs = getATLASdata(mPhi,mS)
         
@@ -132,14 +138,13 @@ def plotXsecLimit(effFile,mPhi,mS,outFile,sr='high-ET',factor=1):
     
     _, ax = plt.subplots()
 
-    # nsUL_obs = 0.5630 * 26 * factor (outdated value)
     # Upper limits computed using abcd_pyhf and the numbers from Table 4 in 2203.01009
     if sr == 'high-ET':
-        nsUL_obs = 27.44 * factor
-        nsUL_exp = 17.31 * factor
+        nsUL_obs = 27.44
+        nsUL_exp = 17.31
     else:
-        nsUL_obs = 32.98 * factor
-        nsUL_exp = 21.51 * factor
+        nsUL_obs = 32.98
+        nsUL_exp = 21.51
 
     Crr_Sec_obs = (nsUL_obs)/((np.array(eff)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
     # Crr_Sec_exp = (nsUL_exp)/((np.array(eff)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
@@ -149,7 +154,7 @@ def plotXsecLimit(effFile,mPhi,mS,outFile,sr='high-ET',factor=1):
                     #  alpha=0.4, color='r')
     # plt.plot(tauN, Crr_Sec_exp, 'r', label ='Expected (Recast)', linewidth = 2, linestyle='dashed')
 
-    if branch_HEP_limit_exp is not None:
+    if branch_HEP_limit_obs is not None:
         # plt.plot(branch_HEP_limit_exp.values(axis='both')[0], branch_HEP_limit_exp.values(axis='both')[1], 'b', label ='Expected (HEPData)', linewidth = 2, linestyle='dashed')
         plt.plot(branch_HEP_limit_obs.values(axis='both')[0], branch_HEP_limit_obs.values(axis='both')[1], 'b', label ='Observed (HEPData)', linewidth = 2)
     
@@ -202,14 +207,10 @@ if __name__ == "__main__":
     if level in levels:       
         logger.setLevel(level = levels[level])
 
-    if int(args.mPhi) == 125:
-        factor = 0.048
-    else:
-        factor = 1.0
 
     if args.effPlot is not None:
         plotEffs(args.inputfile,args.mPhi,args.mS,outFile=args.effPlot,sr=args.signalregion)
         logger.info(f"Efficiency plot saved to {args.effPlot}")
     if args.xsecPlot is not None:
-        plotXsecLimit(args.inputfile,args.mPhi,args.mS,outFile=args.xsecPlot,sr=args.signalregion,factor=factor)
+        plotXsecLimit(args.inputfile,args.mPhi,args.mS,outFile=args.xsecPlot,sr=args.signalregion)
         logger.info(f"Cross-section limit plot saved to {args.xsecPlot}")

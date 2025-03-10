@@ -12,36 +12,36 @@ The results below were obtaining using the Method 2 described [here](../README.m
  * $m_{\Phi} = 125$ GeV and $m_S = 55$ GeV:
 
  <p float="center">
-     <img src="./effs/hahm_125_55_delphes_events_HTcut_effs.png" width=80% height=80% />
-     <img src="./effs/hahm_125_55_delphes_events_HTcut_xsec.png" width=80% height=80% />
+     <img src="./effs/hahm_125_55_delphes_events_HTcut_effs.png" width=40% height=40% />
+     <img src="./effs/hahm_125_55_delphes_events_HTcut_xsec.png" width=40% height=40% />
  </p>
 
  * $m_{\Phi} = 200$ GeV and $m_S = 50$ GeV:
 
  <p float="center">
-     <img src="./effs/hahm_200_50_delphes_events_HTcut_effs.png" width=80% height=80% />
-     <img src="./effs/hahm_200_50_delphes_events_HTcut_xsec.png" width=80% height=80% />
+     <img src="./effs/hahm_200_50_delphes_events_HTcut_effs.png" width=40% height=40% />
+     <img src="./effs/hahm_200_50_delphes_events_HTcut_xsec.png" width=40% height=40% />
  </p>
 
  * $m_{\Phi} = 400$ GeV and $m_S = 100$ GeV:
 
  <p float="center">
-     <img src="./effs/hahm_400_100_delphes_events_HTcut_effs.png" width=80% height=80% />
-     <img src="./effs/hahm_400_100_delphes_events_HTcut_xsec.png" width=80% height=80% />
+     <img src="./effs/hahm_400_100_delphes_events_HTcut_effs.png" width=40% height=40% />
+     <img src="./effs/hahm_400_100_delphes_events_HTcut_xsec.png" width=40% height=40% />
  </p>
 
   * $m_{\Phi} = 600$ GeV and $m_S = 150$ GeV:
 
  <p float="center">
-     <img src="./effs/hahm_600_150_delphes_events_HTcut_effs.png" width=80% height=80% />
-     <img src="./effs/hahm_600_150_delphes_events_HTcut_xsec.png" width=80% height=80% />
+     <img src="./effs/hahm_600_150_delphes_events_HTcut_effs.png" width=40% height=40% />
+     <img src="./effs/hahm_600_150_delphes_events_HTcut_xsec.png" width=40% height=40% />
  </p>
 
  * $m_{\Phi} = 1$ TeV and $m_S = 275$ GeV:
 
  <p float="center">
-     <img src="./effs/hahm_1000_275_delphes_events_HTcut_effs.png" width=80% height=80% />
-     <img src="./effs/hahm_1000_275_delphes_events_HTcut_xsec.png" width=80% height=80% />
+     <img src="./effs/hahm_1000_275_delphes_events_HTcut_effs.png" width=40% height=40% />
+     <img src="./effs/hahm_1000_275_delphes_events_HTcut_xsec.png" width=40% height=40% />
  </p>
  
 
@@ -49,6 +49,6 @@ The results below were obtaining using the Method 2 described [here](../README.m
 
  
  <p float="center">
-     <img src="./effs/hahm_1000_475_delphes_events_HTcut_effs.png" width=80% height=80% />
-     <img src="./effs/hahm_1000_475_delphes_events_HTcut_xsec.png" width=80% height=80% />
+     <img src="./effs/hahm_1000_475_delphes_events_HTcut_effs.png" width=40% height=40% />
+     <img src="./effs/hahm_1000_475_delphes_events_HTcut_xsec.png" width=40% height=40% />
  </p>

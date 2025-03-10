@@ -145,15 +145,7 @@ def getEffFor(tree,tauList,llps,invisibles,applyHTcut):
     llpList = [d['parent'] for d in eventDict.values()]
     visList = [d['visible'] for d in eventDict.values()]
     visPDGList = [d['visiblePDGs'] for d in eventDict.values()]
-    
-    # Get total momentum of LLP pair (equals momentum of parent)
-    pTot = llpList[0].momentum + llpList[1].momentum
-    if pTot.m() >= 400:
-        sr = "high-ET"
-    else:
-        sr = "low-ET"
-
-    
+       
     p1 = visList[0].momentum        
     p1_pt = p1.pt()
     p1_eta = p1.eta()
@@ -189,10 +181,15 @@ def getEffFor(tree,tauList,llps,invisibles,applyHTcut):
         L1xy,L1z = getDecayLength(llpList[0],tau)
         L2xy,L2z = getDecayLength(llpList[1],tau)
 
-        eff = rmN.queryMapFromKinematics(p1_pt,p1_eta,L1xy,L1z,p1_pdgs,
+        eff_highET = rmN.queryMapFromKinematics(p1_pt,p1_eta,L1xy,L1z,p1_pdgs,
                                             p2_pt,p2_eta,L2xy,L2z,p2_pdgs,
-                                            selection = sr)
-        evt_effs[sr][i] = eff
+                                            selection = 'high-ET')
+        eff_lowET = rmN.queryMapFromKinematics(p1_pt,p1_eta,L1xy,L1z,p1_pdgs,
+                                            p2_pt,p2_eta,L2xy,L2z,p2_pdgs,
+                                            selection = 'low-ET')
+        
+        evt_effs['high-ET'][i] = eff_highET
+        evt_effs['low-ET'][i] = eff_lowET
         
     return evt_effs
 

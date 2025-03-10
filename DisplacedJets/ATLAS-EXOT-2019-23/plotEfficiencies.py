@@ -142,15 +142,15 @@ def plotXsecLimit(effFile,mPhi,mS,outFile,sr='high-ET',factor=1):
         nsUL_exp = 21.51 * factor
 
     Crr_Sec_obs = (nsUL_obs)/((np.array(eff)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
-    Crr_Sec_exp = (nsUL_exp)/((np.array(eff)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
+    # Crr_Sec_exp = (nsUL_exp)/((np.array(eff)) * 139e3 ) # Luminosity = 139e3 fb**(-1)
 
     plt.plot(tauN, Crr_Sec_obs, 'r', label ='Observed (Recast)', linewidth = 2)
     # plt.fill_between(tauN, Crr_Sec_obs/1.1,Crr_Sec_obs/0.9, label=r'Observed (Recast) $\pm 10$%', 
                     #  alpha=0.4, color='r')
-    plt.plot(tauN, Crr_Sec_exp, 'r', label ='Expected (Recast)', linewidth = 2, linestyle='dashed')
+    # plt.plot(tauN, Crr_Sec_exp, 'r', label ='Expected (Recast)', linewidth = 2, linestyle='dashed')
 
     if branch_HEP_limit_exp is not None:
-        plt.plot(branch_HEP_limit_exp.values(axis='both')[0], branch_HEP_limit_exp.values(axis='both')[1], 'b', label ='Expected (HEPData)', linewidth = 2, linestyle='dashed')
+        # plt.plot(branch_HEP_limit_exp.values(axis='both')[0], branch_HEP_limit_exp.values(axis='both')[1], 'b', label ='Expected (HEPData)', linewidth = 2, linestyle='dashed')
         plt.plot(branch_HEP_limit_obs.values(axis='both')[0], branch_HEP_limit_obs.values(axis='both')[1], 'b', label ='Observed (HEPData)', linewidth = 2)
     
 

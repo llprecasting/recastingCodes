@@ -8,7 +8,7 @@ import random
 import logging
 import configparser
 import multiprocessing
-import progressbar as P
+
 delphesDir = os.path.abspath("./DelphesLLP")
 os.environ['ROOT_INCLUDE_PATH'] = os.path.join(delphesDir,"external")
 
@@ -340,17 +340,11 @@ if __name__ == "__main__":
             children.append(p)
 
         nfiles = len(inputFileList)
-        progressbar = P.ProgressBar(widgets=[f"Reading {nfiles} files", 
-                                    P.Percentage(),P.Bar(marker=P.RotatingMarker()), P.ETA()])
-        progressbar.maxval = nfiles
-        progressbar.start()
-        ndone = 0
+        logger.info(f"Reading {nfiles} files")
         for p in children: 
             effsDict = p.get()
             outFile = effsDict['inputFile'].split('.root')[0].split('.hepmc')[0]
             outFile = outFile + output_suffix +'_effs.csv'
             saveOutput(effsDict,outFile)
-            ndone += 1
-            progressbar.update(ndone)
         
     logger.info("\n\nDone in %3.2f min" %((time.time()-t0)/60.))

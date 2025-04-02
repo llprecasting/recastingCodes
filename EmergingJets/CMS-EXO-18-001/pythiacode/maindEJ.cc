@@ -519,7 +519,7 @@ int main(int argc, char* argv[]) {
   cout << "For m_dpion=" << mN << "GeV, ctau_dpion="<< int(ctN) <<"mm" << endl; 
   cout << "If xsec=1pb, ratio of our predicted number of events and the CMS excluded ones at 95%""CL (r):" << endl;
   for (int s=0; s<7; s++){
-    eff1.push_back(Evtot[s]/nEvs);
+    eff1.push_back(Evtot[s]/nEvent);
     double ny1 = xs * lumi * eff1[s];
     double rat1 = ny1/stm[s];
     cout << "SetN "<<s+1 <<": SignalAcceptance:"<< eff1[s] <<", r = "<< rat1 << endl;

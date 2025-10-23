@@ -323,6 +323,7 @@ def getEfficiencies(inputFile,tauList):
 
   #End of loop
   print("Loop Ended! Evts analysed: ",ct,'\n')
+  return ewk_cutflow,strong_cutflow,ewk_SR,strong_SR
 
 if __name__ == "__main__":
       

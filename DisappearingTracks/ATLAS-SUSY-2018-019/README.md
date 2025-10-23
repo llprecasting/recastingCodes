@@ -1,8 +1,8 @@
-# CalRatio Recast ([ATLAS-EXOT-2019-23](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/EXOT-2019-23/))
+# CalRatio Recast ([ATLAS-SUSY-2018-019](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-019/))
 
 
 ## Authors: ##
-[Louie Corpe](mailto:l.corpe@cern.ch), [Andre Lessa](mailto:andre.lessa@ufabc.edu.br)
+[Andre Lessa](mailto:andre.lessa@ufabc.edu.br)
 
 The recast code and results are based on [arXiv:2412.13976](https://arxiv.org/pdf/2412.13976) and the auxiliary material
 provided in [HepDATA](https://www.hepdata.net/record/ins2043503).

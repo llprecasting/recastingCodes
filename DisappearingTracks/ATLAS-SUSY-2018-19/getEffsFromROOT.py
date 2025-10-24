@@ -3,13 +3,11 @@ import numpy as np
 import os,sys
 from pathlib import Path
 import tqdm
-import math
-import pandas as pd
 import logging
 from helper import (DeltaPhi, filterParticles, filterJets, \
-                    overlapRemoval, eff_trigger, \
+                    overlapRemoval, minDphilist, eff_trigger, \
                     getLLPDecayRadius,getLLPLifetime,electronPtSmear,\
-                    eff_track_EWK,eff_track_Strong)
+                    eff_track_EWK,eff_track_Strong, cutFlow)
 FORMAT = '%(levelname)s: %(message)s at %(asctime)s'
 logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger()   
@@ -30,33 +28,142 @@ ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 
 
-def minDphilist(ptc1, listptc2, length, cut):
-  if len(listptc2)==0:
-    return 0
-  infDphi = 99999999
-  for iptc,ptc2 in enumerate(listptc2):
-    if iptc>=length:
-      break
-    if ptc2.PT<cut:
-      continue
-    infDphi=min(infDphi,DeltaPhi(ptc1,ptc2))
-  return infDphi
-
-
-#Define SRs and Cutflow
-ewk_cutflow_keys = ['All', 'GRL and Cleaning', 'MET Trigger', 'Lepton Veto', 
-                    'MET > 200 GeV', 'Jet pT > 100 GeV', 'min(DeltaPhi(JetMET)) > 1.0']
-strong_cutflow_keys = ['All', 'GRL and Cleaning', 'MET Trigger', 'Lepton Veto',
-                      'MET > 250 GeV', 'Jet pT > 100,20,20 GeV', 'min(DeltaPhi(JetMET)) > 0.4']
-ewk_SR_keys = strong_SR_keys = ['All', 'Kinematic', 'Tracklet Emulation', 'Leading tracklet',
+# Define SRs and Cutflow
+ewk_cutflow = cutFlow(['All', 'GRL and Cleaning', 'MET Trigger', 'Lepton Veto', 
+                    'MET > 200 GeV', 'Jet pT > 100 GeV', 'min(DeltaPhi(JetMET)) > 1.0'])
+strong_cutflow = cutFlow(['All', 'GRL and Cleaning', 'MET Trigger', 'Lepton Veto',
+                      'MET > 250 GeV', 'Jet pT > 100,20,20 GeV', 'min(DeltaPhi(JetMET)) > 0.4'])
+ewk_SR = cutFlow(['All', 'Kinematic', 'Tracklet Emulation', 'Leading tracklet',
                                 'DeltaR(jet) > 0.4', 'DeltaR(electron) > 0.4', 'DeltaR(muon) > 0.4',
-                                 '0.1 < Eta < 1.9']
-ewk_cutflow = {k : np.array((0.,0.)) for k in ewk_cutflow_keys}
-strong_cutflow = {k : np.array((0.,0.)) for k in strong_cutflow_keys}
-ewk_SR = {k : np.array((0.,0.)) for k in ewk_SR_keys}
-strong_SR = {k : np.array((0.,0.)) for k in strong_SR_keys}
+                                 '0.1 < Eta < 1.9'])
+strong_SR = cutFlow(['All', 'Kinematic', 'Tracklet Emulation', 'Leading tracklet',
+                                'DeltaR(jet) > 0.4', 'DeltaR(electron) > 0.4', 'DeltaR(muon) > 0.4',
+                                 '0.1 < Eta < 1.9'])
 
 
+def getObjects(DelphesTree):
+
+  llps = DelphesTree.bsm
+  jets = DelphesTree.Jet
+  bmet = DelphesTree.MissingET
+  muons = DelphesTree.Muon
+  electrons = DelphesTree.Electron
+  
+  llps = filterParticles(llps,pTmin=0.0,etaMax=5.0)
+  met = bmet.At(0).MET
+  jets = filterJets(jets,pTmin=20.0,etaMax=2.8)
+  muons = filterParticles(muons,pTmin=10.0,etaMax=2.7)
+  electrons = filterParticles(electrons, pTmin=10.0, etaMax=2.47)
+  
+  #Overlap Removal
+  electrons = overlapRemoval(electrons, muons, 0.05)
+  electrons = overlapRemoval(electrons, jets, 0.4)
+  muons = overlapRemoval(muons, jets, 0.4)
+  jets.sort(key=lambda j: j.PT,reverse=True)
+
+  return llps,muons,electrons,jets,met
+
+
+def preSelection(muons,electrons,jets,met,weight,
+                 ewk_cutflow,strong_cutflow):
+ 
+  
+  #Event Cleaning
+  #Clean Bad Jets
+  passedbadJets=True  ### ????
+  for jet in jets:
+    if jet.Eta>2.4:
+      passedbadJets=False
+      break
+  if not passedbadJets:
+    return 0.0
+
+  ewk_cutflow.fill(weight)
+  strong_cutflow.fill(weight)
+
+  weight_EWK = 0.0
+  weight_Strong = 0.0
+
+  if not jets:
+    return 0.0
+
+  jet1pt = jets[0].PT
+
+  temp = weight
+
+  if met>500:
+    pass
+  else:
+    weight = weight*eff_trigger.reweight(met,min(499.0,jet1pt))
+    if np.isnan(weight) or weight==0:
+      return weight_EWK,weight_Strong
+
+  if np.isnan(weight) or weight < 0:
+    print("Previous weight: ",temp," / Current Weight: ",weight)
+    raise ValueError
+
+  ewk_cutflow.fill(weight)
+  strong_cutflow.fill(weight)
+
+  if len(electrons)>0 or len(muons)>0:
+    return weight_EWK,weight_Strong
+
+  ewk_cutflow.fill(weight)
+  strong_cutflow.fill(weight)
+
+  #EWK-specific pre-selection
+  passedKinEWK = True
+
+  #MET Cut
+  if met < 200:
+    passedKinEWK=False
+  else:
+    ewk_cutflow.fill(weight)
+
+  if passedKinEWK:
+    if jet1pt < 100:
+      passedKinEWK=False
+    else:
+      ewk_cutflow.fill(weight)
+
+  if passedKinEWK:
+    if minDphilist(met,jets,4,50.0) > 1.0:
+      ewk_cutflow.fill(weight)
+    else:
+      passedKinEWK=False
+
+  #Strong-specific Pre-selection
+  passedKinStrong=True
+
+  #MET Cut
+  if met < 250:
+    passedKinStrong=False
+  else:
+    strong_cutflow.fill(weight)
+
+  #Jet PT Cuts
+  if passedKinStrong:
+    if jet1pt < 100:
+      passedKinStrong=False
+    elif len(jets)<3:
+      passedKinStrong=False
+    elif jets[1].PT<20 or jets[2].PT < 20:
+      passedKinStrong=False
+    else:
+      strong_cutflow.fill(weight)
+
+  #min(DeltaPhi(Jet,MET)) cut
+  if passedKinStrong:
+    if minDphilist(met,jets,4,50.0) > 0.4:
+      strong_cutflow.fill(weight)
+    else:
+      passedKinStrong=False
+
+  #Event must pass at least one preselection
+  weight_EWK = weight*float(passedKinEWK)
+  weight_Strong = weight*float(passedKinStrong)
+
+  return weight_EWK,weight_Strong
 
 def getEfficiencies(inputFile,tauList):
 
@@ -66,143 +173,34 @@ def getEfficiencies(inputFile,tauList):
   f = ROOT.TFile(inputFile,'read')
   DelphesTree = f.Get('Delphes')
   nevts = DelphesTree.GetEntries()
-
-  DelphesTree.GetEntry(0)
-
-  llps = DelphesTree.bsm
-  jets = DelphesTree.Jet
-  bmet = DelphesTree.MissingET
-  muons = DelphesTree.Muon
-  electrons = DelphesTree.Electron
-  bweight = DelphesTree.Weight
-  bdd = DelphesTree.bsmDirectDaughters
-
+ 
   totalweight = 0
-
   ct=0
 
   for entry in tqdm.tqdm(range(0,nevts)):
     DelphesTree.GetEntry(entry)
     ct+=1
-    llps = filterParticles(llps,pTmin=0.0,etaMax=5.0)
-    met = bmet.At(0).MET
-    jets = filterJets(jets,pTmin=20.0,etaMax=2.8)
-    muons = filterParticles(muons,pTmin=10.0,etaMax=2.7)
-    electrons = filterParticles(electrons, pTmin=10.0, etaMax=2.47)
-    weights = bweight.At(0).Weight
+    weights = DelphesTree.Weight.At(0).Weight
     totalweight += weights
-
     weight = float(weights)
+    llps,muons,electrons,jets,met = getObjects(DelphesTree)
 
-    #Overlap Removal
-    electrons = overlapRemoval(electrons, muons, 0.05)
-    electrons = overlapRemoval(electrons, jets, 0.4)
-    muons = overlapRemoval(muons, jets, 0.4)
-    jets.sort(key=lambda j: j.PT,reverse=True)
-
-    # Reset keys
-    ewk_cutflow_keys_tmp = ewk_cutflow_keys[:]
-    strong_cutflow_keys_tmp = strong_cutflow_keys[:]
-    ewk_SR_keys_tmp = ewk_SR_keys[:]
-    strong_SR_keys_tmp = strong_SR_keys[:]
+    # Reset cutflows to beginning
+    ewk_cutflow.reset()
+    strong_cutflow.reset()
+    ewk_SR.reset()
+    strong_SR.reset()
 
     # Fill first key (All)
-    ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-    strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-    ewk_SR[ewk_SR_keys_tmp.pop(0)] += (weight,weight**2)
-    strong_SR[strong_SR_keys_tmp.pop(0)] += (weight,weight**2)
+    ewk_cutflow.fill(weight)
+    strong_cutflow.fill(weight)
+    ewk_SR.fill(weight)
+    strong_SR.fill(weight)
 
-    #Event Cleaning
-    #Clean Bad Jets
-    passedbadJets=True
-    for jet in jets:
-      if jet.Eta>2.4:
-        passedbadJets=False
-        break
-    if not passedbadJets:
-      continue
-
-    ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-    strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-
-    if not jets:
-      continue
-
-    jet1pt = jets[0].PT
-
-
-    temp = weight
-
-    if met>500:
-      pass
-    else:
-      weight = weight*eff_trigger.reweight(met,min(499.0,jet1pt))
-      if math.isnan(weight) or weight==0:
-        continue
-
-    if math.isnan(weight) or weight < 0:
-      print("Previous weight: ",temp," / Current Weight: ",weight)
-      raise ValueError
-
-    ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-    strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-
-    if len(electrons)>0 or len(muons)>0:
-      continue
-
-    ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-    strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-
-    #EWK-specific pre-selection
-    passedKinEWK = True
-
-    #MET Cut
-    if met < 200:
-      passedKinEWK=False
-    else:
-      ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-
-    if passedKinEWK:
-      if jet1pt < 100:
-        passedKinEWK=False
-      else:
-        ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-
-    if passedKinEWK:
-      if minDphilist(met,jets,4,50.0) > 1.0:
-        ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-      else:
-        passedKinEWK=False
-
-    #Strong-specific Pre-selection
-    passedKinStrong=True
-
-    #MET Cut
-    if met < 250:
-      passedKinStrong=False
-    else:
-      strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-
-    #Jet PT Cuts
-    if passedKinStrong:
-      if jet1pt < 100:
-        passedKinStrong=False
-      elif len(jets)<3:
-        passedKinStrong=False
-      elif jets[1].PT<20 or jets[2].PT < 20:
-        passedKinStrong=False
-      else:
-        strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-
-    #min(DeltaPhi(Jet,MET)) cut
-    if passedKinStrong:
-      if minDphilist(met,jets,4,50.0) > 0.4:
-        strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
-      else:
-        passedKinStrong=False
-
-    #Event must pass at least one preselection
-    if not (passedKinEWK or passedKinStrong):
+    weight_EWK,weight_Strong = preSelection(muons,electrons,jets,met,weight,
+                                            ewk_cutflow,strong_cutflow)
+    
+    if (not weight_EWK) and (not weight_Strong):
       continue
 
     #Signal Regions#
@@ -211,26 +209,26 @@ def getEfficiencies(inputFile,tauList):
     StrongLLPs = []
 
     for llp in llps:
-      llp.daughter = bdd.At(llp.D1)
+      llp.daughter = DelphesTree.bsmDirectDaughters.At(llp.D1)
       llp.decayR = getLLPDecayRadius(llp)
       llp.lifetime0 = getLLPLifetime(llp)
       llp.smearedPt = electronPtSmear(llp.PT, llp.Charge)
 
-      if passedKinEWK:
-        ewk_SR[ewk_SR_keys_tmp.pop(0)] += (weight,weight**2)
+      if weight_EWK:
+        ewk_SR.fill(weight)
         tracklet_weight = eff_track_EWK.reweight(llp.Eta,llp.decayR)
-        if math.isnan(tracklet_weight):
-          print("NAN weight detected: ",weight," entry number: ",entry)
+        if np.isnan(tracklet_weight):
+          print("NAN weight detected: ",weight_EWK," entry number: ",entry)
           continue
         if len(tauList) > 0:
           tracklet_weight = tracklet_weight*np.exp(llp.lifetime0/tau_base-llp.lifetime0/args.tau_reweighting)
         if tracklet_weight > 0:
           EWKLLPs.append([llp,tracklet_weight])
 
-      if passedKinStrong:
-        strong_SR[strong_SR_keys_tmp.pop(0)] += (weight,weight**2)
+      if weight_Strong:
+        strong_SR.fill(weight)
         tracklet_weight = eff_track_Strong.reweight(llp.Eta,llp.decayR)
-        if math.isnan(tracklet_weight):
+        if np.isnan(tracklet_weight):
           print("NAN weight detected: ",weight," entry number: ",entry)
           continue
         if args.tau_reweighting > 0:
@@ -247,12 +245,12 @@ def getEfficiencies(inputFile,tauList):
 
     #EWK tracklet selection
     
-    loop_over_SR = [(ewk_SR,ewk_SR_keys_tmp,EWKLLPs),
-                 (strong_SR,strong_SR_keys_tmp,StrongLLPs)]
-    for cutflow,c_keys,llpList in loop_over_SR:
+    loop_over_SR = [(ewk_SR,EWKLLPs),
+                 (strong_SR,StrongLLPs)]
+    for cutflow,llpList in loop_over_SR:
       first = True
       for llp,reweight in llpList:
-        cutflow[c_keys.pop(0)] += (weight,weight**2)
+        cutflow.fill(weight)
         
         if llp.smearedPt < 20: #Since we've sorted by descending smeared pT, no further charginos to consider once one hits the threshold
           break
@@ -271,28 +269,28 @@ def getEfficiencies(inputFile,tauList):
           break
         first = False
 
-        cutflow[c_keys.pop(0)] += (weight,weight**2)
+        cutflow.fill(weight)
 
         #DeltaR(jets) > 0.4
         if any(llp.P4().DeltaR(jet.P4())<0.4 for jet in jets):
           continue
-        cutflow[c_keys.pop(0)] += (weight,weight**2)
+        cutflow.fill(weight)
 
         #DeltaR(electron) > 0.4
         if any(llp.P4().DeltaR(elec.P4())<0.4 for elec in electrons):
           continue
-        cutflow[c_keys.pop(0)] += (weight,weight**2)
+        cutflow.fill(weight)
 
         #DeltaR(muon) > 0.4
         if any(llp.P4().DeltaR(muon.P4())<0.4 for muon in muons):
           continue
-        cutflow[c_keys.pop(0)] += (weight,weight**2)
+        cutflow.fill(weight)
 
         # 0.1 < abs(eta) < 1.9
         trackletEta = abs(llp.Eta)
         if not (0.1 < trackletEta < 1.9):
           continue
-        cutflow[c_keys.pop(0)] += (weight,weight**2)
+        cutflow.fill(weight)
         
         #Calo-veto would enter here, but also folded in the efficiency map
         #fill("hist_Tracklet_Pt",chargino.PT)

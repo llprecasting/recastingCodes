@@ -49,9 +49,9 @@ class effMap:
 
 #Initialize efficiency maps
 
-eff_trigger = effMap('eff_trigger_average',filepath='/data/01/lucasmdr/MG5_aMC_v3_6_3/atlasdt/DisappearingTrack2018-EfficiencyMaps.root')
-eff_track_EWK = effMap('h_effmap_average_EWK',filepath='/data/01/lucasmdr/MG5_aMC_v3_6_3/atlasdt/DisappearingTrack2018-EfficiencyMaps.root')
-eff_track_Strong = effMap('h_effmap_average_Strong',filepath='/data/01/lucasmdr/MG5_aMC_v3_6_3/atlasdt/DisappearingTrack2018-EfficiencyMaps.root')
+eff_trigger = effMap('eff_trigger_average',filepath='DisappearingTrack2018-EfficiencyMaps.root')
+eff_track_EWK = effMap('h_effmap_average_EWK',filepath='DisappearingTrack2018-EfficiencyMaps.root')
+eff_track_Strong = effMap('h_effmap_average_Strong',filepath='DisappearingTrack2018-EfficiencyMaps.root')
 
 
 #Define class for smearing functions

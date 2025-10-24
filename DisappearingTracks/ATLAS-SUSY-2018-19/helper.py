@@ -103,6 +103,28 @@ class smearingFunction(rv_continuous):
       PtSmeared = (1 / QoverPtSmeared) * 1e+3
       return PtSmeared
 
+class cutFlow(object):
+
+  def __init__(self,levels,zero_weight = 0.0) -> None:
+    self.keys = levels[:]
+    self.weights = np.full(len(levels),fill_value=zero_weight)
+    self.weights2 = np.full(len(levels),fill_value=zero_weight**2)
+    self._current_level = 0
+
+  def reset(self):
+    self._current_level = 0
+
+  def fill(self,weight):
+    clevel = self._current_level
+    self.weights[clevel] += weight
+    self.weights2[clevel] += weight**2
+    self._current_level += 1
+
+  def to_dict(self):
+
+    cDict = {k : (w,w2) for k,w,w2 in zip(self.keys,self.weights,self.weights2)}
+
+    return cDict
 
 #Initialize efficiency maps
 
@@ -165,6 +187,19 @@ def deltaR(ptc1,ptc2):
 
 def DeltaPhi(ptc1, ptc2):
   return abs(ptc1.P4().DeltaPhi(ptc2.P4()))
+
+def minDphilist(ptc1, listptc2, length, cut):
+  if len(listptc2)==0:
+    return 0
+  infDphi = 99999999
+  for iptc,ptc2 in enumerate(listptc2):
+    if iptc>=length:
+      break
+    if ptc2.PT<cut:
+      continue
+    infDphi=min(infDphi,DeltaPhi(ptc1,ptc2))
+  return infDphi
+
 
 def overlapRemoval(input,filter,dR=0.05,mode='None'):
   if len(input)==0 or len(filter)==0:

@@ -1,11 +1,10 @@
-# CalRatio Recast ([ATLAS-SUSY-2018-019](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-019/))
+# CalRatio Recast ([ATLAS-SUSY-2018-19](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-19/))
 
 
 ## Authors: ##
-[Andre Lessa](mailto:andre.lessa@ufabc.edu.br)
+[Lucas Magno](mailto:lucas.magno.ramos@usp.br) and [Andre Lessa](mailto:andre.lessa@ufabc.edu.br)
 
-The recast code and results are based on [arXiv:2412.13976](https://arxiv.org/pdf/2412.13976) and the auxiliary material
-provided in [HepDATA](https://www.hepdata.net/record/ins2043503).
+The recast code and results are based on the [recast note](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-19/hepdata_info.pdf) and the [SimpleAnalysis code](https://gitlab.cern.ch/atlas-sa/simple-analysis/-/blob/master/SimpleAnalysisCodes/src/ANA-SUSY-2018-19_TrackletAcc.cxx).
 
 
 Validation of the results can be found in the [validation folder](./validation).
@@ -16,40 +15,19 @@ Validation of the results can be found in the [validation folder](./validation).
 
 The following pre-requisites must be installed before running the main code:
 
-  * [PyYAML](https://pypi.org/project/PyYAML/)
-  * [pyhepmc](https://pypi.org/project/pyhepmc/) (if using HepMC files as input)
-  * [pyROOT](https://root.cern.ch/) (if using ROOT files as input)
+  * [DelphesLLP](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP)
+  * [pyROOT](https://root.cern.ch/)
 
 
 ## Running the recast code
 
-There are two paths for running the recast code or reproducing the results in the [validation folder](./validation/):
+For running the recast code or reproducing the results in the [validation folder](./validation/) one must:
 
- 1. Generate HepMC events with MadGraph5 plus Pythia8, which is taken as input by [getEffsfromHepMC.py](./getEffsFromHepMC.py) to compute the efficiencies or
- 2. Run MadGraph5 plus DelphesPythia8, which stores the necessary information in a ROOT file, which is taken as input by [getEffsFromROOT.py](./getEffsFromROOT.py) to compute the efficiencies.
+ 1. Generate HepMC events with MadGraph5 plus Pythia8.
+ 2. Run Delphes on the HepMC events using a [modified version of Delphes](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP), which stores LLPs and their decays in the output ROOT file.
 
-Method 1 only requires MadGraph5 and Pythia8, while Method 2 requires running in addition a [modified version of Delphes](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP), which stores LLPs and their decays in the output ROOT file.
-However, Method 2 can be about 5x faster.
+Examples of cards for generating events for the wino model can be found in the [validation/Cards](./validation/Cards/) folder.
 
-Examples of cards for generating events for the HAHM model using either of the methods above can be found in the [validation/Cards](./validation/Cards/) folder.
-
-### Method 1
-
-After generating a HepMC file containing the events, the efficiencies can be computed running:
-
-```
-./getEffsFromHepMC.py -p <parameters_file> -f <path-to-hepmc-file(s)>
-```
-An example of the parameters file can be found [here](./parameters_getEff.ini).
-This file defines the PDGs for the LLP and what should be considered as invisible in the LLP decays.
-It also provides a list of $c\tau$ values for which the efficiencies will be computed and other options.
-The output will consist of a csv file (stored in the same folder as the input file) for each HepMC file containing the efficiencies for
-the provided $c\tau$ values.
-
-If running over multiple files, the code allows to run the efficiency calculation in parallel (the number of parallel runs is set by the `ncpus` option).
-
-
-### Method 2
 
 After generating a ROOT file using the modified Delphes code (see above),  the efficiencies can be computed running:
 

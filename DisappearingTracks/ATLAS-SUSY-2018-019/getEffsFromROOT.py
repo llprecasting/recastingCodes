@@ -7,9 +7,9 @@ import math
 import pandas as pd
 import logging
 from helper import (DeltaPhi, filterParticles, filterJets, \
-                    gen_fill,overlapRemoval, eff_trigger, \
-                      getLLPDecayRadius,getLLPLifetime,electronPtSmear,\
-                        eff_track_EWK,eff_track_Strong,addHistogram2D)
+                    overlapRemoval, eff_trigger, \
+                    getLLPDecayRadius,getLLPLifetime,electronPtSmear,\
+                    eff_track_EWK,eff_track_Strong)
 FORMAT = '%(levelname)s: %(message)s at %(asctime)s'
 logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger()   
@@ -18,12 +18,12 @@ logger = logging.getLogger()
 np.random.seed(seed=123)
 
 DelphesLLP_path = Path(os.path.abspath("./DelphesLLP"))
-os.environ['ROOT_INCLUDE_PATH'] = os.path.join(delphesDir,"external")
+os.environ['ROOT_INCLUDE_PATH'] = os.path.join(DelphesLLP_path,"external")
 
 import ROOT
 
 
-ROOT.gSystem.Load(os.path.join(delphesDir,"libDelphes.so"))
+ROOT.gSystem.Load(os.path.join(DelphesLLP_path,"libDelphes.so"))
 
 ROOT.gInterpreter.Declare('#include "classes/SortableObject.h"')
 ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
@@ -44,44 +44,26 @@ def minDphilist(ptc1, listptc2, length, cut):
 
 
 #Define SRs and Cutflow
-ewk_cutflow = {
-               'All' : 0,
-               'GRL and Cleaning' : 0,
-                'MET Trigger' : 0,
-                'Lepton Veto' : 0,
-                'MET > 200 GeV' : 0,
-                'Jet pT > 100 GeV' : 0,
-                'min(DeltaPhi(JetMET)) > 1.0' : 0
-              }
-strong_cutflow = {
-               'All' : 0,
-               'GRL and Cleaning' : 0,
-                'MET Trigger' : 0,
-                'Lepton Veto' : 0,
-                'MET > 250 GeV' : 0,
-                'Jet pT > 100,20,20 GeV' : 0,
-                'min(DeltaPhi(JetMET)) > 0.4' : 0,
-              }
-ewk_SR = {
-          'All' : 0,
-          'Kinematic' : 0,
-          'Tracklet Emulation' : 0,
-          'Leading tracklet' : 0,
-          'DeltaR(jet) > 0.4' : 0,
-          'DeltaR(electron) > 0.4' : 0,
-          'DeltaR(muon) > 0.4' : 0,
-          '0.1 < Eta < 1.9' : 0,
-        }
+ewk_cutflow_keys = ['All', 'GRL and Cleaning', 'MET Trigger', 'Lepton Veto', 
+                    'MET > 200 GeV', 'Jet pT > 100 GeV', 'min(DeltaPhi(JetMET)) > 1.0']
+strong_cutflow_keys = ['All', 'GRL and Cleaning', 'MET Trigger', 'Lepton Veto',
+                      'MET > 250 GeV', 'Jet pT > 100,20,20 GeV', 'min(DeltaPhi(JetMET)) > 0.4']
+ewk_SR_keys = strong_SR_keys = ['All', 'Kinematic', 'Tracklet Emulation', 'Leading tracklet',
+                                'DeltaR(jet) > 0.4', 'DeltaR(electron) > 0.4', 'DeltaR(muon) > 0.4',
+                                 '0.1 < Eta < 1.9']
+ewk_cutflow = {k : np.array((0.,0.)) for k in ewk_cutflow_keys}
+strong_cutflow = {k : np.array((0.,0.)) for k in strong_cutflow_keys}
+ewk_SR = {k : np.array((0.,0.)) for k in ewk_SR_keys}
+strong_SR = {k : np.array((0.,0.)) for k in strong_SR_keys}
 
-strong_SR = { key : val for key,val in ewk_SR.items()}
-
-histlist = {}
-addHistogram2D(histlist,"hist_jet1pt_met",50,0,500,50,0,500)
 
 
 def getEfficiencies(inputFile,tauList):
 
-  f = ROOT.TFile(inputfile,'read')
+  eff_dict = {'EWK' : np.zeros((len(tauList),2)),
+              'Strong' : np.zeros((len(tauList),2)),}
+
+  f = ROOT.TFile(inputFile,'read')
   DelphesTree = f.Get('Delphes')
   nevts = DelphesTree.GetEntries()
 
@@ -99,7 +81,6 @@ def getEfficiencies(inputFile,tauList):
 
   ct=0
 
-  bkeeping=[]
   for entry in tqdm.tqdm(range(0,nevts)):
     DelphesTree.GetEntry(entry)
     ct+=1
@@ -111,8 +92,7 @@ def getEfficiencies(inputFile,tauList):
     weights = bweight.At(0).Weight
     totalweight += weights
 
-    weight = 1
-    fill,fill2D = gen_fill(histlist,weight)
+    weight = float(weights)
 
     #Overlap Removal
     electrons = overlapRemoval(electrons, muons, 0.05)
@@ -121,16 +101,16 @@ def getEfficiencies(inputFile,tauList):
     jets.sort(key=lambda j: j.PT,reverse=True)
 
     # Reset keys
-    ewk_cutflow_keys = list(ewk_cutflow.keys())
-    strong_cutflow_keys = list(strong_cutflow.keys())
-    ewk_SR_keys = list(ewk_SR.keys())
-    strong_SR_keys = list(strong_SR.keys())
+    ewk_cutflow_keys_tmp = ewk_cutflow_keys[:]
+    strong_cutflow_keys_tmp = strong_cutflow_keys[:]
+    ewk_SR_keys_tmp = ewk_SR_keys[:]
+    strong_SR_keys_tmp = strong_SR_keys[:]
 
     # Fill first key (All)
-    ewk_cutflow[ewk_cutflow_keys.pop(0)] += 1
-    strong_cutflow[strong_cutflow_keys.pop(0)] += 1
-    ewk_SR[ewk_SR_keys.pop(0)] += 1
-    strong_SR[strong_SR_keys.pop(0)] += 1
+    ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
+    strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
+    ewk_SR[ewk_SR_keys_tmp.pop(0)] += (weight,weight**2)
+    strong_SR[strong_SR_keys_tmp.pop(0)] += (weight,weight**2)
 
     #Event Cleaning
     #Clean Bad Jets
@@ -142,15 +122,14 @@ def getEfficiencies(inputFile,tauList):
     if not passedbadJets:
       continue
 
-    ewk_cutflow[ewk_cutflow_keys.pop(0)] += 1
-    strong_cutflow[strong_cutflow_keys.pop(0)] += 1
+    ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
+    strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
 
     if not jets:
       continue
 
     jet1pt = jets[0].PT
 
-    fill2D("hist_jet1pt_met",met,jet1pt)
 
     temp = weight
 
@@ -160,20 +139,19 @@ def getEfficiencies(inputFile,tauList):
       weight = weight*eff_trigger.reweight(met,min(499.0,jet1pt))
       if math.isnan(weight) or weight==0:
         continue
-      fill,fill2D=gen_fill(histlist,weight)
 
     if math.isnan(weight) or weight < 0:
       print("Previous weight: ",temp," / Current Weight: ",weight)
       raise ValueError
 
-    ewk_cutflow[ewk_cutflow_keys.pop(0)] += 1
-    strong_cutflow[strong_cutflow_keys.pop(0)] += 1
+    ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
+    strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
 
     if len(electrons)>0 or len(muons)>0:
       continue
 
-    ewk_cutflow[ewk_cutflow_keys.pop(0)] += 1
-    strong_cutflow[strong_cutflow_keys.pop(0)] += 1
+    ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
+    strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
 
     #EWK-specific pre-selection
     passedKinEWK = True
@@ -182,17 +160,17 @@ def getEfficiencies(inputFile,tauList):
     if met < 200:
       passedKinEWK=False
     else:
-      ewk_cutflow[ewk_cutflow_keys.pop(0)] += 1
+      ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
 
     if passedKinEWK:
       if jet1pt < 100:
         passedKinEWK=False
       else:
-        ewk_cutflow[ewk_cutflow_keys.pop(0)] += 1
+        ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
 
     if passedKinEWK:
       if minDphilist(met,jets,4,50.0) > 1.0:
-        ewk_cutflow[ewk_cutflow_keys.pop(0)] += 1
+        ewk_cutflow[ewk_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
       else:
         passedKinEWK=False
 
@@ -203,7 +181,7 @@ def getEfficiencies(inputFile,tauList):
     if met < 250:
       passedKinStrong=False
     else:
-      strong_cutflow[strong_cutflow_keys.pop(0)] += 1
+      strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
 
     #Jet PT Cuts
     if passedKinStrong:
@@ -214,12 +192,12 @@ def getEfficiencies(inputFile,tauList):
       elif jets[1].PT<20 or jets[2].PT < 20:
         passedKinStrong=False
       else:
-        strong_cutflow[strong_cutflow_keys.pop(0)] += 1
+        strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
 
     #min(DeltaPhi(Jet,MET)) cut
     if passedKinStrong:
       if minDphilist(met,jets,4,50.0) > 0.4:
-        strong_cutflow[strong_cutflow_keys.pop(0)] += 1
+        strong_cutflow[strong_cutflow_keys_tmp.pop(0)] += (weight,weight**2)
       else:
         passedKinStrong=False
 
@@ -239,18 +217,18 @@ def getEfficiencies(inputFile,tauList):
       llp.smearedPt = electronPtSmear(llp.PT, llp.Charge)
 
       if passedKinEWK:
-        ewk_SR[ewk_SR_keys.pop(0)] += 1
+        ewk_SR[ewk_SR_keys_tmp.pop(0)] += (weight,weight**2)
         tracklet_weight = eff_track_EWK.reweight(llp.Eta,llp.decayR)
         if math.isnan(tracklet_weight):
           print("NAN weight detected: ",weight," entry number: ",entry)
           continue
-        if args.tau_reweighting > 0:
+        if len(tauList) > 0:
           tracklet_weight = tracklet_weight*np.exp(llp.lifetime0/tau_base-llp.lifetime0/args.tau_reweighting)
         if tracklet_weight > 0:
           EWKLLPs.append([llp,tracklet_weight])
 
       if passedKinStrong:
-        strong_SR[strong_SR_keys.pop(0)] += 1
+        strong_SR[strong_SR_keys_tmp.pop(0)] += (weight,weight**2)
         tracklet_weight = eff_track_Strong.reweight(llp.Eta,llp.decayR)
         if math.isnan(tracklet_weight):
           print("NAN weight detected: ",weight," entry number: ",entry)
@@ -269,14 +247,12 @@ def getEfficiencies(inputFile,tauList):
 
     #EWK tracklet selection
     
-    loop_over_SR = [(ewk_SR,ewk_SR_keys,EWKLLPs),
-                 (strong_SR,strong_SR_keys,StrongLLPs)]
+    loop_over_SR = [(ewk_SR,ewk_SR_keys_tmp,EWKLLPs),
+                 (strong_SR,strong_SR_keys_tmp,StrongLLPs)]
     for cutflow,c_keys,llpList in loop_over_SR:
       first = True
       for llp,reweight in llpList:
-        fill,fill2D = gen_fill(histlist,weight*reweight)
-        bkeeping.append({'entry':entry,'weight':weight,'reweight':reweight,'chgEta':llp.Eta,'chgDR':llp.decayR})
-        cutflow[c_keys.pop(0)] += 1
+        cutflow[c_keys.pop(0)] += (weight,weight**2)
         
         if llp.smearedPt < 20: #Since we've sorted by descending smeared pT, no further charginos to consider once one hits the threshold
           break
@@ -295,28 +271,28 @@ def getEfficiencies(inputFile,tauList):
           break
         first = False
 
-        cutflow[c_keys.pop(0)] += 1
+        cutflow[c_keys.pop(0)] += (weight,weight**2)
 
         #DeltaR(jets) > 0.4
         if any(llp.P4().DeltaR(jet.P4())<0.4 for jet in jets):
           continue
-        cutflow[c_keys.pop(0)] += 1
+        cutflow[c_keys.pop(0)] += (weight,weight**2)
 
         #DeltaR(electron) > 0.4
         if any(llp.P4().DeltaR(elec.P4())<0.4 for elec in electrons):
           continue
-        cutflow[c_keys.pop(0)] += 1
+        cutflow[c_keys.pop(0)] += (weight,weight**2)
 
         #DeltaR(muon) > 0.4
         if any(llp.P4().DeltaR(muon.P4())<0.4 for muon in muons):
           continue
-        cutflow[c_keys.pop(0)] += 1
+        cutflow[c_keys.pop(0)] += (weight,weight**2)
 
         # 0.1 < abs(eta) < 1.9
         trackletEta = abs(llp.Eta)
         if not (0.1 < trackletEta < 1.9):
           continue
-        cutflow[c_keys.pop(0)] += 1
+        cutflow[c_keys.pop(0)] += (weight,weight**2)
         
         #Calo-veto would enter here, but also folded in the efficiency map
         #fill("hist_Tracklet_Pt",chargino.PT)

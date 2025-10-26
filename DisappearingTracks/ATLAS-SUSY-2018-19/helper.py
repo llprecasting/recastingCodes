@@ -105,32 +105,64 @@ class smearingFunction(rv_continuous):
 
 class cutFlow(object):
 
-  def __init__(self,levels,zero_weight = 0.0) -> None:
+  def __init__(self,name,levels,zero_weight = 0.0) -> None:
+    self.name = name
     self.keys = levels[:]
     self.weights = np.full(len(levels),fill_value=zero_weight)
     self.weights2 = np.full(len(levels),fill_value=zero_weight**2)
     self._current_level = 0
 
-  def reset(self):
-    self._current_level = 0
+  def reset(self,to_level=0):
+    self._current_level = to_level
 
+  def fill_next(self,weight):
+    """
+    Add weight to the next level in the cutflow
+    """
+    self._current_level += 1
+    self.fill(weight)
+    
   def fill(self,weight):
-    clevel = self._current_level
+    """
+    Add weight to the current level in the cutflow
+    """
+    
+    clevel = self.current_level
+    if not (0 <= clevel < len(self.weights)):
+      msg = f"Trying to fill the cutflow at level {clevel+1}, but it only has {len(self.weights)} levels."
+      msg += " Check your cutflow definitions and if it is being properly reset."
+      raise ValueError(msg)
     self.weights[clevel] += weight
     self.weights2[clevel] += weight**2
-    self._current_level += 1
+
+  @property
+  def current_level(self):
+    """
+    Simple method for getting the current level of the cutflow
+    """
+
+    return self._current_level
 
   def to_dict(self):
 
     cDict = {k : (w,w2) for k,w,w2 in zip(self.keys,self.weights,self.weights2)}
 
     return cDict
+  
+  def to_string(self):
+
+    d = self.to_dict()
+    lines = [f"==== {self.name} ==="]
+    for k,(w,w2) in d.items():
+      lines.append(f"{k} = {w:1.4e} +- {np.sqrt(w2):1.4e}")
+    lines.append(f"===" + "="*len(self.name) + "===")
+    return '\n'.join(lines)
 
 #Initialize efficiency maps
 
-eff_trigger = effMap('eff_trigger_average',filepath='/data/01/lucasmdr/MG5_aMC_v3_6_3/atlasdt/DisappearingTrack2018-EfficiencyMaps.root')
-eff_track_EWK = effMap('h_effmap_average_EWK',filepath='/data/01/lucasmdr/MG5_aMC_v3_6_3/atlasdt/DisappearingTrack2018-EfficiencyMaps.root')
-eff_track_Strong = effMap('h_effmap_average_Strong',filepath='/data/01/lucasmdr/MG5_aMC_v3_6_3/atlasdt/DisappearingTrack2018-EfficiencyMaps.root')
+eff_trigger = effMap('eff_trigger_average',filepath='DisappearingTrack2018-EfficiencyMaps.root')
+eff_track_EWK = effMap('h_effmap_average_EWK',filepath='DisappearingTrack2018-EfficiencyMaps.root')
+eff_track_Strong = effMap('h_effmap_average_Strong',filepath='DisappearingTrack2018-EfficiencyMaps.root')
 
 
 # Create smearing functions for each pT range
@@ -224,7 +256,7 @@ def getLLPDecayRadius(llp):
 
 def getLLPLifetime(llp):
   p4 = llp.P4()
-  return 1e09*(llp.daughter.T - llp.T)/p4.Gamma(),1e09*(llp.daughter.T-llp.T) #Assume genpart T is in sec, convert to ns
+  return 1e09*(llp.daughter.T - llp.T)/p4.Gamma() #Assume genpart T is in sec, convert to ns
 
 def getLLPDecayLength_REST(llp, llp_daughter):
   return np.sqrt(llp_daughter.X**2 + llp_daughter.Y**2 + llp_daughter.Z**2)/llp.P4().Gamma()

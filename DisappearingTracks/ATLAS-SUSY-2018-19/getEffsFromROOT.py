@@ -4,7 +4,7 @@ import os,sys
 from pathlib import Path
 import tqdm
 import logging
-from helper import (DeltaPhi, filterParticles, filterJets, \
+from helper import (DeltaPhi, filterObjects, \
                     overlapRemoval, minDphilist, eff_trigger, \
                     getLLPDecayRadius,getLLPLifetime,electronPtSmear,\
                     eff_track_EWK,eff_track_Strong, cutFlow)
@@ -49,11 +49,11 @@ def getObjects(DelphesTree):
   muons = DelphesTree.Muon
   electrons = DelphesTree.Electron
   
-  llps = filterParticles(llps,pTmin=0.0,etaMax=5.0)
+  llps = filterObjects(llps,pTmin=0.0,etaMax=5.0)
   met = bmet.At(0)
-  jets = filterJets(jets,pTmin=20.0,etaMax=2.8)
-  muons = filterParticles(muons,pTmin=10.0,etaMax=2.7)
-  electrons = filterParticles(electrons, pTmin=10.0, etaMax=2.47)
+  jets = filterObjects(jets,pTmin=20.0,etaMax=2.8)
+  muons = filterObjects(muons,pTmin=10.0,etaMax=2.7)
+  electrons = filterObjects(electrons, pTmin=10.0, etaMax=2.47)
   
   #Overlap Removal
   electrons = overlapRemoval(electrons, muons, 0.05)

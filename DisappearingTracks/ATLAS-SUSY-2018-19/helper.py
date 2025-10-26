@@ -183,22 +183,7 @@ def electronPtSmear(pT, charge):
   return -1.0
 
 #Object readers
-def filterJets(jetList, pTmin, etaMax, skipBSM=True):
-  filteredJets = []  
-  for jet in jetList:
-    if jet.PT < pTmin:
-      continue
-    if abs(jet.Eta)>etaMax:
-      continue
-    # Skip jets containing BSM particles
-    if skipBSM:
-      if any(1000000 < abs(ptc.PID) < 3000000 for ptc in jet.Particles):
-        continue
-    filteredJets.append(jet)
-  
-  return filteredJets
-
-def filterParticles(particleList, pTmin, etaMax):
+def filterObjects(particleList, pTmin, etaMax):
   filteredParticles = []
   for ptc in particleList:
     if ptc.PT < pTmin:

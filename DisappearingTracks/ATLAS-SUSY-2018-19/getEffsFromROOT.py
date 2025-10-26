@@ -245,12 +245,21 @@ def getEfficiencies(inputFile,tau0,tauList):
     clevel_EWK = ewk_SR.current_level
     clevel_Strong = strong_SR.current_level
     for illp,llp in enumerate(llps):
+      llp.weight_EWK = 0.0
+      llp.weight_Strong = 0.0
+      # Lifetime reweighting:
+      llp.lifetime_reweight = np.exp(llp.decayT0/tau0-llp.decayT0/tauList)
+
       # Reset cutflows to correct level
       ewk_SR.reset(to_level=clevel_EWK)
       strong_SR.reset(to_level=clevel_Strong)
 
       track_weight_EWK = weight_EWK*llp.tracklet_weight['EWK']
       track_weight_Strong = weight_Strong*llp.tracklet_weight['Strong']
+
+      # Skip LLPs with zero total weight for both SRs
+      if (not track_weight_EWK) and (not track_weight_Strong):
+        continue
       
       ewk_SR.fill_next(track_weight_EWK)
       strong_SR.fill_next(track_weight_Strong)
@@ -294,18 +303,24 @@ def getEfficiencies(inputFile,tau0,tauList):
       ewk_SR.fill_next(track_weight_EWK)
       strong_SR.fill_next(track_weight_Strong)
 
-      # If passed all the cuts and the SR weight still is zero,
-      # set it to weight*tracklet_weight for the corresponding SR
-      if (not sr_weight_EWK.any()) and (track_weight_EWK > 0.0):
-        lifetime_reweight_list = np.exp(llp.decayT0/tau0-llp.decayT0/tauList)
-        sr_weight_EWK = track_weight_EWK*lifetime_reweight_list
-      if (not sr_weight_Strong.any()) and (track_weight_Strong > 0.0):
-        lifetime_reweight_list = np.exp(llp.decayT0/tau0-llp.decayT0/tauList)
-        sr_weight_Strong = track_weight_Strong*lifetime_reweight_list
-
+      # If passed all the cuts set the LLP total weight,
+      # (weight*tracklet_weight) for the corresponding SR
+      llp.weight_EWK = track_weight_EWK
+      llp.weight_Strong = track_weight_Strong
+     
     
-    eff_dict['EWK'] += sr_weight_EWK
-    eff_dict['Strong'] += sr_weight_Strong
+    
+    # Reweight by lifetime:
+    
+    # Compute the event efficiency:
+    # eff = 1 - prod_i (1-llp[i].eff*reweight)
+    evt_eff_EWK = 1.0 - np.prod([(1.0-llp.weight_EWK*llp.lifetime_reweight) 
+                                 for llp in llps],axis=0)
+    evt_eff_Strong = 1.0 - np.prod([(1.0-llp.weight_Strong*llp.lifetime_reweight) 
+                                    for llp in llps],axis=0)
+
+    eff_dict['EWK'] += evt_eff_EWK
+    eff_dict['Strong'] += evt_eff_Strong
         
     #Calo-veto would enter here, but also folded in the efficiency map
     #fill("hist_Tracklet_Pt",chargino.PT)

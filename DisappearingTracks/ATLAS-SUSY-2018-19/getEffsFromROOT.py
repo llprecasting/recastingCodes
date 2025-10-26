@@ -309,18 +309,26 @@ def getEfficiencies(inputFile,tau0,tauList):
       llp.weight_Strong = track_weight_Strong
      
     
-    
-    # Reweight by lifetime:
-    
-    # Compute the event efficiency:
-    # eff = 1 - prod_i (1-llp[i].eff*reweight)
-    evt_eff_EWK = 1.0 - np.prod([(1.0-llp.weight_EWK*llp.lifetime_reweight) 
-                                 for llp in llps],axis=0)
-    evt_eff_Strong = 1.0 - np.prod([(1.0-llp.weight_Strong*llp.lifetime_reweight) 
-                                    for llp in llps],axis=0)
 
-    eff_dict['EWK'] += evt_eff_EWK
-    eff_dict['Strong'] += evt_eff_Strong
+    evt_weight_EWK = np.zeros(len(tauList))
+    evt_weight_Strong = np.zeros(len(tauList))
+    # Compute the event final weight:
+    # weight = 1 - prod_i (1-llp[i].eff*reweight)
+    
+    llps_EWK = [llp for llp in llps if llp.weight_EWK > 0.0]
+    if llps_EWK:
+      evt_weight_EWK = llps_EWK[0].weight_EWK*llps_EWK[0].lifetime_reweight # Use just first LLP
+      # evt_weight_EWK = 1.0 - np.prod([(1.0-llp.weight_EWK*llp.lifetime_reweight) # Weight for at least one LLP
+                                #  for llp in llps_EWK],axis=0)
+    llps_Strong = [llp for llp in llps if llp.weight_Strong > 0.0]
+    if llps_Strong:
+      evt_weight_Strong = llps_Strong[0].weight_EWK*llps_Strong[0].lifetime_reweight  # Use just first LLP
+      # evt_eff_Strong = 1.0 - np.prod([(1.0-llp.weight_Strong*llp.lifetime_reweight)  # Weight for at least one LLP
+                                    # for llp in llps_Strong],axis=0)
+
+
+    eff_dict['EWK'] += evt_weight_EWK
+    eff_dict['Strong'] += evt_weight_Strong
         
     #Calo-veto would enter here, but also folded in the efficiency map
     #fill("hist_Tracklet_Pt",chargino.PT)

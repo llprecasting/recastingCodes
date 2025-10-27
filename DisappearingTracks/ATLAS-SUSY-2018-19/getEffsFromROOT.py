@@ -4,9 +4,9 @@ import os,sys
 from pathlib import Path
 import tqdm
 import logging
-from helper import (DeltaPhi, filterObjects, \
+from helper import (filterObjects,getLLPLifetime, \
                     overlapRemoval, minDphilist, eff_trigger, \
-                    getLLPDecayRadius,getLLPLifetime,electronPtSmear,\
+                    getLLPDecayRadius,getLLPDecayTime,electronPtSmear,\
                     eff_track_EWK,eff_track_Strong, cutFlow)
 FORMAT = '%(levelname)s: %(message)s at %(asctime)s'
 logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -68,8 +68,8 @@ def preSelection(muons,electrons,jets,met,weight,
                  ewk_cutflow,strong_cutflow):
  
 
-  weight_EWK = 0.0
-  weight_Strong = 0.0
+  preSel_eff_EWK = 0.0
+  preSel_eff_Strong = 0.0
   
   #Event Cleaning
   #Clean Bad Jets
@@ -79,34 +79,28 @@ def preSelection(muons,electrons,jets,met,weight,
       passedbadJets=False
       break
   if not passedbadJets:
-    return weight_EWK,weight_Strong
+    return preSel_eff_EWK,preSel_eff_Strong
 
   ewk_cutflow.fill_next(weight)
   strong_cutflow.fill_next(weight)
 
   if not jets:
-    return weight_EWK,weight_Strong
+    return preSel_eff_EWK,preSel_eff_Strong
 
   jet1pt = jets[0].PT
 
-  temp = weight
-
   if met.MET>500:
-    pass
+    preSel_eff = 1.0
   else:
-    weight = weight*eff_trigger.reweight(met.MET,min(499.0,jet1pt))
-    if np.isnan(weight) or weight==0:
-      return weight_EWK,weight_Strong
-
-  if np.isnan(weight) or weight < 0:
-    print("Previous weight: ",temp," / Current Weight: ",weight)
-    raise ValueError
+    preSel_eff = eff_trigger.efficiency(met.MET,min(499.0,jet1pt))
+    if np.isnan(preSel_eff) or preSel_eff==0:
+      return preSel_eff_EWK,preSel_eff_Strong
 
   ewk_cutflow.fill_next(weight)
   strong_cutflow.fill_next(weight)
 
   if len(electrons)>0 or len(muons)>0:
-    return weight_EWK,weight_Strong
+    return preSel_eff_EWK,preSel_eff_Strong
 
   ewk_cutflow.fill_next(weight)
   strong_cutflow.fill_next(weight)
@@ -160,16 +154,16 @@ def preSelection(muons,electrons,jets,met,weight,
       passedKinStrong=False
 
   #Event must pass at least one preselection
-  weight_EWK = weight*float(passedKinEWK)
-  weight_Strong = weight*float(passedKinStrong)
+  preSel_eff_EWK = preSel_eff*float(passedKinEWK)
+  preSel_eff_Strong = preSel_eff*float(passedKinStrong)
 
-  return weight_EWK,weight_Strong
+  return preSel_eff_EWK,preSel_eff_Strong
 
 def getEfficiencies(inputFile,tau0,tauList):
 
   tauList = np.array(tauList)
-  eff_dict = {'EWK' : np.zeros((len(tauList),2)),
-              'Strong' : np.zeros((len(tauList),2)),}
+  eff_SR = cutFlow(name="Efficiencies",levels=['EWK SR', 'Strong SR'],
+                   zero_weight=np.zeros(len(tauList)))
 
   f = ROOT.TFile(inputFile,'read')
   DelphesTree = f.Get('Delphes')
@@ -181,10 +175,9 @@ def getEfficiencies(inputFile,tau0,tauList):
   for entry in tqdm.tqdm(range(0,nevts)):
     DelphesTree.GetEntry(entry)
     ct+=1
-    weights = DelphesTree.Weight.At(0).Weight
-    totalweight += weights
-    # weight = float(weights)
+    # weights = float(DelphesTree.Weight.At(0).Weight)
     weight = 1.0
+    totalweight += weight
     llps,muons,electrons,jets,met = getObjects(DelphesTree)
 
     # Reset cutflows to beginning
@@ -199,144 +192,120 @@ def getEfficiencies(inputFile,tau0,tauList):
     ewk_SR.fill(weight)
     strong_SR.fill(weight)
 
-    weight_EWK,weight_Strong = preSelection(muons,electrons,jets,met,weight,
-                                            ewk_cutflow,strong_cutflow)
-    
-    if (not weight_EWK) and (not weight_Strong):
+    preSel_eff_EWK,preSel_eff_Strong = preSelection(muons,electrons,jets,met,weight,
+                                                    ewk_cutflow,strong_cutflow)
+  
+    if (not preSel_eff_EWK) and (not preSel_eff_Strong):
       continue
 
     if not llps:
       continue
 
-    for illp,llp in enumerate(llps):
+    # Compute relevant LLP variables
+    for llp in llps:
       llp.daughter = DelphesTree.bsmDirectDaughters.At(llp.D1)
       llp.decayR = getLLPDecayRadius(llp)
-      llp.decayT0 = getLLPLifetime(llp)
+      llp.decayT = getLLPDecayTime(llp)
       llp.smearedPt = electronPtSmear(llp.PT, llp.Charge)
-      llp.tracklet_weight = {'EWK' : np.zeros(len(tauList)),
-                             'Strong' : np.zeros(len(tauList))}
-
-      if weight_EWK:
-        if illp == 0:
-          ewk_SR.fill_next(weight_EWK)
-        else:
-          ewk_SR.fill(weight_EWK)
-        tracklet_weight = eff_track_EWK.reweight(llp.Eta,llp.decayR)
-        if np.isnan(tracklet_weight):
-          print("NAN weight detected: ",weight_EWK," entry number: ",entry)
-          continue
-        llp.tracklet_weight['EWK'] = tracklet_weight
-
-      if weight_Strong:
-        if illp == 0:
-          strong_SR.fill_next(weight_Strong)
-        else:
-          strong_SR.fill(weight_Strong)
-        tracklet_weight = eff_track_Strong.reweight(llp.Eta,llp.decayR)
-        if np.isnan(tracklet_weight):
-          print("NAN weight detected: ",weight," entry number: ",entry)
-          continue
-        llp.tracklet_weight['Strong'] = tracklet_weight
-
-
-    # Consider only the LLP with highest smeared PT:
-    sr_weight_EWK = np.zeros(len(tauList))
-    sr_weight_Strong = np.zeros(len(tauList))
-    clevel_EWK = ewk_SR.current_level
-    clevel_Strong = strong_SR.current_level
-    for illp,llp in enumerate(llps):
-      llp.weight_EWK = 0.0
-      llp.weight_Strong = 0.0
+      track_eff_EWK =  eff_track_EWK.efficiency(llp.Eta,llp.decayR)
+      if np.isnan(track_eff_EWK):
+        track_eff_EWK = 0.0
+      track_eff_Strong =  eff_track_Strong.efficiency(llp.Eta,llp.decayR)
+      if np.isnan(track_eff_Strong):
+        track_eff_Strong = 0.0
+        
+      llp.tracklet_eff_EWK = track_eff_EWK
+      llp.tracklet_eff_Strong = track_eff_Strong
       # Lifetime reweighting:
-      llp.lifetime_reweight = np.exp(llp.decayT0/tau0-llp.decayT0/tauList)
+      if tau0 > 0.0:
+        # llp.lifetime_reweight = np.exp(llp.decayT0/tau0-llp.decayT0/tauList)
+        gamma = llp.P4().Gamma()
+        llp.lifetime_reweight = (tau0/tauList)*np.exp(-(llp.decayT/gamma)*(1/tauList-1/tau0))
+      else:
+        llp.lifetime_reweight = np.ones(tauList.shape)
+  
 
-      # Reset cutflows to correct level
-      ewk_SR.reset(to_level=clevel_EWK)
-      strong_SR.reset(to_level=clevel_Strong)
+    # Sort by smearedPt:
+    llps = sorted(llps, key=lambda llp: llp.smearedPt,reverse=True)
 
-      track_weight_EWK = weight_EWK*llp.tracklet_weight['EWK']
-      track_weight_Strong = weight_Strong*llp.tracklet_weight['Strong']
-
-      # Skip LLPs with zero total weight for both SRs
-      if (not track_weight_EWK) and (not track_weight_Strong):
-        continue
-      
-      ewk_SR.fill_next(track_weight_EWK)
-      strong_SR.fill_next(track_weight_Strong)
-      
-      if llp.smearedPt < 20: #Since we've sorted by descending smeared pT, no further charginos to consider once one hits the threshold
-        continue
-
-      #The following are included in the efficiency map:
-      # 4 pixel laters and nSCT Hits == 0
-      # nGangedFlaggedFake == 0
-      # Pixel spoilt hits == 0
-      # nPixel outliers == 0
-      # |d0significance| < 1.5
-      # |z0sin(theta)| < 0.5
-      # ptcone40pT<0.04 (isolated)
-
-      ewk_SR.fill_next(track_weight_EWK)
-      strong_SR.fill_next(track_weight_Strong)
-
-      #DeltaR(jets) > 0.4
-      if any(llp.P4().DeltaR(jet.P4())<0.4 for jet in jets):
-        continue
-      ewk_SR.fill_next(track_weight_EWK)
-      strong_SR.fill_next(track_weight_Strong)
-      #DeltaR(electron) > 0.4
-      if any(llp.P4().DeltaR(elec.P4())<0.4 for elec in electrons):
-        continue
-      ewk_SR.fill_next(track_weight_EWK)
-      strong_SR.fill_next(track_weight_Strong)
-
-      #DeltaR(muon) > 0.4
-      if any(llp.P4().DeltaR(muon.P4())<0.4 for muon in muons):
-        continue
-      ewk_SR.fill_next(track_weight_EWK)
-      strong_SR.fill_next(track_weight_Strong)
-
-      # 0.1 < abs(eta) < 1.9
-      trackletEta = abs(llp.Eta)
-      if not (0.1 < trackletEta < 1.9):
-        continue
-      ewk_SR.fill_next(track_weight_EWK)
-      strong_SR.fill_next(track_weight_Strong)
-
-      # If passed all the cuts set the LLP total weight,
-      # (weight*tracklet_weight) for the corresponding SR
-      llp.weight_EWK = track_weight_EWK
-      llp.weight_Strong = track_weight_Strong
-     
+    # Add one entry for each llp
+    ewk_SR.fill_next(weight*preSel_eff_EWK*len(llps))
+    strong_SR.fill_next(weight*preSel_eff_Strong*len(llps))
     
+    # Selected llps with track effciency > 0:
+    llps_EWK = [llp for llp in llps if llp.tracklet_eff_EWK > 0.0]
+    fill_EWK = 0.0
+    if llps_EWK:
+      fill_EWK = weight*preSel_eff_EWK*llps_EWK[0].tracklet_eff_EWK
+      ######### Use only leading LLP!!
+      llps_EWK = llps_EWK[:1]
+    ewk_SR.fill_next(fill_EWK)
+
+    llps_Strong = [llp for llp in llps if llp.tracklet_eff_Strong > 0.0]
+    fill_Strong = 0.0
+    if llps_Strong:
+      fill_Strong = weight*preSel_eff_Strong*llps_Strong[0].tracklet_eff_Strong
+      ######### Use only leading LLP!!
+      llps_Strong = llps_Strong[:1]
+    strong_SR.fill_next(fill_Strong)
+
+    # Select llps with smearedPt > 20:
+    llps_EWK = [llp for llp in llps_EWK[:] if llp.smearedPt > 20.0]
+    if llps_EWK:
+      ewk_SR.fill_next(fill_EWK)
+
+    llps_Strong = [llp for llp in llps_Strong[:] if llp.smearedPt > 20.0]
+    if llps_Strong:
+      strong_SR.fill_next(fill_Strong)
+
+    # Remove LLPs with overlap to jets, electrons and muons:
+    for objList in [jets,electrons,muons]:
+      llps_EWK = overlapRemoval(llps_EWK,objList,0.4)
+      if llps_EWK:
+        ewk_SR.fill_next(fill_EWK)
+      llps_Strong = overlapRemoval(llps_Strong,objList,0.4)
+      if llps_Strong:
+        strong_SR.fill_next(fill_Strong)
+    # Apply eta cut: 0.1 < abs(eta) < 1.9
+    llps_EWK = [llp for llp in llps_EWK if 0.1 < abs(llp.Eta) < 1.9]
+    if llps_EWK:
+      ewk_SR.fill_next(fill_EWK)
+    llps_Strong = [llp for llp in llps_Strong if 0.1 < abs(llp.Eta) < 1.9]
+    if llps_Strong:
+      strong_SR.fill_next(fill_Strong)
+      
+    # Finally compute event weight:
+    # evt_weight = weight*preSelectionEff*llp_eff    
 
     evt_weight_EWK = np.zeros(len(tauList))
     evt_weight_Strong = np.zeros(len(tauList))
-    # Compute the event final weight:
-    # weight = 1 - prod_i (1-llp[i].eff*reweight)
-    
-    llps_EWK = [llp for llp in llps if llp.weight_EWK > 0.0]
+
     if llps_EWK:
-      evt_weight_EWK = llps_EWK[0].weight_EWK*llps_EWK[0].lifetime_reweight # Use just first LLP
-      # evt_weight_EWK = 1.0 - np.prod([(1.0-llp.weight_EWK*llp.lifetime_reweight) # Weight for at least one LLP
-                                #  for llp in llps_EWK],axis=0)
-    llps_Strong = [llp for llp in llps if llp.weight_Strong > 0.0]
+      # Require at least one LLP to be reconstructed and isolated
+      llp_eff = 1.0 - np.prod([(1.0-llp.tracklet_eff_EWK*llp.lifetime_reweight)
+                                 for llp in llps_EWK],axis=0)
+      evt_weight_EWK = weight*preSel_eff_EWK*llp_eff
+    
     if llps_Strong:
-      evt_weight_Strong = llps_Strong[0].weight_EWK*llps_Strong[0].lifetime_reweight  # Use just first LLP
-      # evt_eff_Strong = 1.0 - np.prod([(1.0-llp.weight_Strong*llp.lifetime_reweight)  # Weight for at least one LLP
-                                    # for llp in llps_Strong],axis=0)
+      # Require at least one LLP to be reconstructed and isolated
+      llp_eff = 1.0 - np.prod([(1.0-llp.tracklet_eff_Strong*llp.lifetime_reweight)
+                                 for llp in llps_Strong],axis=0)   
+      evt_weight_Strong = weight*preSel_eff_Strong*llp_eff
 
 
-    eff_dict['EWK'] += evt_weight_EWK
-    eff_dict['Strong'] += evt_weight_Strong
+    eff_SR.fill_level('EWK SR',evt_weight_EWK)
+    eff_SR.fill_level('Strong SR',evt_weight_Strong)
+
         
+
     #Calo-veto would enter here, but also folded in the efficiency map
     #fill("hist_Tracklet_Pt",chargino.PT)
 
   #End of loop
   print("Loop Ended! Evts analysed: ",ct,'\n')
-  eff_dict['EWK'] = eff_dict['EWK']/totalweight
-  eff_dict['Strong'] = eff_dict['Strong']/totalweight
+  eff_SR.divide(totalweight)
+  eff_dict = {}
+  eff_dict['Eff SR'] = eff_SR
   eff_dict['totalweight'] = totalweight
   eff_dict['Nevents'] = ct
 
@@ -355,7 +324,7 @@ if __name__ == "__main__":
   import argparse
   parser = argparse.ArgumentParser(description='Analyse delphesLLP output to produce efficiencies for ATLAS-ANA-SUSY-2019-018 DT search')
   parser.add_argument('inputfile', metavar='inputfile_path', help='Path to the delphesLLP root file with the event sample to be analysed.')
-  parser.add_argument('-tau0','--tau0',metavar='tau0', help='Proper lifetime (in ns) used for event generation',type=float, required=True)
+  parser.add_argument('-tau0','--tau0',metavar='tau0', help='Proper lifetime (in ns) used for event generation',type=float, required=False, default=0.0)
   parser.add_argument('-tauF','--tau_file',metavar='tau_file', help='CSV file containing the lifetime values (in ns) used for reweighting',
                       type=str, required=False, default=None)
   parser.add_argument('-v', '--verbose', default='info',
@@ -394,15 +363,21 @@ if __name__ == "__main__":
     try:
       import csv
       with open(tau_file, mode='r', newline='') as file:
-        csv_reader = csv.reader(file)
-        tauList = [float(row[0]) for row in csv_reader if row[0]]
-    except:
+        csv_reader = csv.reader(l for l in file.readlines() 
+                                if not l.strip().startswith('#'))
+        tauList += [float(row[0]) for row in csv_reader if row]
+    except Exception as e:
+      logger.error(str(e))
       logger.error(f"Error reding {tau_file}. Reweighting will not be applied.")
     tauList = np.sort(np.unique(tauList))
 
-  effsDict = getEfficiencies(inputfile,tau0,tauList)
+  resDict = getEfficiencies(inputfile,tau0,tauList)
 
-  print(effsDict)
+  effsDict = resDict['Eff SR'].to_dict()
+  for i,tau in enumerate(tauList):
+    print(f'\ntau(ns) = {tau:1.3g}:')
+    for sr in effsDict:
+      print(f'  {sr} = {effsDict[sr][0][i]:1.3e} +- {np.sqrt(effsDict[sr][1][i]):1.3e}')
 
 #print("Final SR error: %1.6e\n"%(np.sqrt(err)))
 #print(err_sqr)

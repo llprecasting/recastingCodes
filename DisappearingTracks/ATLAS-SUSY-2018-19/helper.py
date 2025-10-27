@@ -31,7 +31,7 @@ class effMap:
       return True
     return False
 
-  def reweight(self, x, y):
+  def efficiency(self, x, y):
     return self.getEff(x,y)
 
 
@@ -108,9 +108,15 @@ class cutFlow(object):
   def __init__(self,name,levels,zero_weight = 0.0) -> None:
     self.name = name
     self.keys = levels[:]
-    self.weights = np.full(len(levels),fill_value=zero_weight)
-    self.weights2 = np.full(len(levels),fill_value=zero_weight**2)
+    self.weights = np.array([zero_weight for _ in levels])
+    self.weights2 = np.array([zero_weight**2 for _ in levels])
     self._current_level = 0
+
+  def __repr__(self) -> str:
+    return str(self)
+  
+  def __str__(self) -> str:
+    return self.name
 
   def reset(self,to_level=0):
     self._current_level = to_level
@@ -121,6 +127,16 @@ class cutFlow(object):
     """
     self._current_level += 1
     self.fill(weight)
+
+  def fill_level(self,level,weight):
+    """
+    Fill a specific level with the weight
+    """
+    if not (level in self.keys):
+      raise ValueError(f"Level {level} not defined for {self}")
+    clevel = self.keys.index(level)
+    self.weights[clevel] += weight
+    self.weights2[clevel] += weight**2
     
   def fill(self,weight):
     """
@@ -134,6 +150,14 @@ class cutFlow(object):
       raise ValueError(msg)
     self.weights[clevel] += weight
     self.weights2[clevel] += weight**2
+
+  def divide(self,factor):
+    """
+    Divide cutflow levels by factor.
+    """
+    for iw,w in enumerate(self.weights):
+      self.weights[iw] = w/factor
+      self.weights2[iw] = self.weights2[iw]/factor**2
 
   @property
   def current_level(self):
@@ -217,23 +241,17 @@ def minDphilist(ptc1, listptc2, length, cut):
     infDphi=min(infDphi,DeltaPhi(ptc1,ptc2))
   return infDphi
 
-
-def overlapRemoval(input,filter,dR=0.05,mode='None'):
+def overlapRemoval(input,filter,dR=0.4):
+  
   if len(input)==0 or len(filter)==0:
-    return input
+    return input[:]
+  
   output=[]
-  for ptc2 in filter:
-    # print("Ops!")
-    for ptc1 in input:
-      if mode=='LessThan3Trakcs':
-        ctTracks=0
-        for track in ptc1.Constituents:
-          if track.PT > 500:
-            ctTracks+=1
-        if ctTracks>2:
-          continue
-      if deltaR(ptc1,ptc2)>dR:
-        output.append(ptc1)
+  for ptc1 in input:
+    if any(deltaR(ptc1,ptc2)<dR for ptc2 in filter):
+      continue
+    output.append(ptc1)
+
   return output
 
 def getLLPDecayRadius(llp):
@@ -241,22 +259,10 @@ def getLLPDecayRadius(llp):
 
 def getLLPLifetime(llp):
   p4 = llp.P4()
-  return 1e09*(llp.daughter.T - llp.T)/p4.Gamma() #Assume genpart T is in sec, convert to ns
+  return 1e9*(llp.daughter.T - llp.T)/p4.Gamma() #Assume genpart T is in sec, convert to ns
+
+def getLLPDecayTime(llp):
+  return 1e9*(llp.daughter.T - llp.T) #Assume genpart T is in sec, convert to ns
 
 def getLLPDecayLength_REST(llp, llp_daughter):
   return np.sqrt(llp_daughter.X**2 + llp_daughter.Y**2 + llp_daughter.Z**2)/llp.P4().Gamma()
-
-
-def addHistogram(histlist, name, nbins, xlow, xup):
-  histlist[name]=ROOT.TH1F(name,name,nbins,xlow,xup)
-  histlist[name].Sumw2()
-
-def addHistogram2D(histlist,name,nbinsx,xlow,xup,nbinsy,ylow,yup):
-  histlist[name]=ROOT.TH2F(name,name,nbinsx,xlow,xup,nbinsy,ylow,yup)
-
-def gen_fill(histlist, weight):
-  def fill(histname, entry):
-    histlist[histname].Fill(entry,weight)
-  def fill2D(histname,entryx,entryy):
-    histlist[histname].Fill(entryx,entryy,weight)
-  return fill,fill2D

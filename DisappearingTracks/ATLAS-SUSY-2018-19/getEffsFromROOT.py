@@ -305,7 +305,7 @@ def getEfficiencies(inputFile,tau0,tauList,ijob=0):
     #fill("hist_Tracklet_Pt",chargino.PT)
 
   #End of loop
-  logger.info("Loop Ended! Evts analysed: ",ct,'\n')
+  logger.info(f"Loop Ended! Evts analysed: {ct}")
   eff_SR.divide(totalweight)
   eff_dict = {}
   eff_dict['Eff SR'] = eff_SR
@@ -318,8 +318,8 @@ def getEfficiencies(inputFile,tau0,tauList,ijob=0):
   logger.debug(f"{ewk_cutflow.to_string()}\n\n")
   logger.debug(f"{strong_cutflow.to_string()}\n\n")
 
-  logger.info(f"{ewk_SR.to_string()}\n\n")
-  logger.info(f"{strong_SR.to_string()}\n\n")
+  logger.debug(f"{ewk_SR.to_string()}\n\n")
+  logger.debug(f"{strong_SR.to_string()}\n\n")
 
   
   return eff_dict

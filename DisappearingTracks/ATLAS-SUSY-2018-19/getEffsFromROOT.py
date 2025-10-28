@@ -8,7 +8,7 @@ from helper import (filterObjects,getLLPLifetime, \
                     overlapRemoval, minDphilist, eff_trigger, \
                     getLLPDecayRadius,getLLPDecayTime,electronPtSmear,\
                     eff_track_EWK,eff_track_Strong, cutFlow)
-FORMAT = '%(levelname)s: %(message)s at %(asctime)s'
+FORMAT = '%(levelname)s: %(message)s'
 logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger()   
 
@@ -159,7 +159,7 @@ def preSelection(muons,electrons,jets,met,weight,
 
   return preSel_eff_EWK,preSel_eff_Strong
 
-def getEfficiencies(inputFile,tau0,tauList):
+def getEfficiencies(inputFile,tau0,tauList,ijob=0):
 
   tauList = np.array(tauList)
   eff_SR = cutFlow(name="Efficiencies",levels=['EWK SR', 'Strong SR'],
@@ -172,7 +172,10 @@ def getEfficiencies(inputFile,tau0,tauList):
   totalweight = 0
   ct=0
 
-  for entry in tqdm.tqdm(range(0,nevts)):
+
+  for entry in tqdm.tqdm(range(nevts),position=ijob,
+                          desc=inputFile,
+                          leave=False):
     DelphesTree.GetEntry(entry)
     ct+=1
     # weights = float(DelphesTree.Weight.At(0).Weight)
@@ -238,7 +241,7 @@ def getEfficiencies(inputFile,tau0,tauList):
     if llps_EWK:
       fill_EWK = weight*preSel_eff_EWK*llps_EWK[0].tracklet_eff_EWK
       ######### Use only leading LLP!!
-      llps_EWK = llps_EWK[:1]
+      # llps_EWK = llps_EWK[:1]
     ewk_SR.fill_next(fill_EWK)
 
     llps_Strong = [llp for llp in llps if llp.tracklet_eff_Strong > 0.0]
@@ -246,7 +249,7 @@ def getEfficiencies(inputFile,tau0,tauList):
     if llps_Strong:
       fill_Strong = weight*preSel_eff_Strong*llps_Strong[0].tracklet_eff_Strong
       ######### Use only leading LLP!!
-      llps_Strong = llps_Strong[:1]
+      # llps_Strong = llps_Strong[:1]
     strong_SR.fill_next(fill_Strong)
 
     # Select llps with smearedPt > 20:
@@ -302,12 +305,15 @@ def getEfficiencies(inputFile,tau0,tauList):
     #fill("hist_Tracklet_Pt",chargino.PT)
 
   #End of loop
-  print("Loop Ended! Evts analysed: ",ct,'\n')
+  logger.info("Loop Ended! Evts analysed: ",ct,'\n')
   eff_SR.divide(totalweight)
   eff_dict = {}
   eff_dict['Eff SR'] = eff_SR
   eff_dict['totalweight'] = totalweight
   eff_dict['Nevents'] = ct
+  eff_dict['inputFile'] = inputFile
+  eff_dict['tau_ns'] = tauList
+  eff_dict['tau0_ns'] = tau0
 
   logger.debug(f"{ewk_cutflow.to_string()}\n\n")
   logger.debug(f"{strong_cutflow.to_string()}\n\n")
@@ -318,12 +324,68 @@ def getEfficiencies(inputFile,tau0,tauList):
   
   return eff_dict
 
+def saveOutput(effsDict,outputFile):
+        
+    tauList = effsDict['tau_ns']
+    effs = effsDict['Eff SR'].to_dict()
+    cols_labels = ['tau_ns']
+    data = [tauList]
+    for sr,effList in effs.items():
+      cols_labels.append(sr)
+      data.append(effList[0])
+      cols_labels.append(sr+' Error')
+      data.append(effList[1])
+
+    data = np.array(list(zip(*tuple(data))))
+
+    header_lines = [f'Input file: {effsDict['inputFile']}',
+                    f'Generated lifetime (ns): {effsDict['tau0_ns']}',
+                    f'Number of events: {effsDict['Nevents']}',
+                    f'Total weight (pb): {effsDict['totalweight']}',
+                    ','.join(cols_labels)
+                    ]
+    
+    np.savetxt(outputFile, data, 
+                header='\n'.join(header_lines),
+                delimiter=',',fmt='%1.3e')
+
+def main(inputfile,tau0,tau_file,ijob=0):
+
+  tauList = [float(tau0)]
+  if tau_file:
+    if not os.path.isfile(tau_file):
+      raise ValueError(f"Reweighting file {tau_file} not found!")
+    try:
+      import csv
+      with open(tau_file, mode='r', newline='') as file:
+        csv_reader = csv.reader(l for l in file.readlines() 
+                                if not l.strip().startswith('#'))
+        tauList += [float(row[0]) for row in csv_reader if row]
+    except Exception as e:
+      logger.error(str(e))
+      logger.error(f"Error reding {tau_file}. Reweighting will not be applied.")
+    tauList = np.sort(np.unique(tauList))
+
+  resDict = getEfficiencies(inputfile,tau0,tauList,ijob)
+
+  outFile = inputfile.split('.root')[0].split('.hepmc')[0]
+  outFile = outFile +'_effs.csv'
+  saveOutput(resDict,outFile)
+
+
+  effsDict = resDict['Eff SR'].to_dict()
+  i, = np.where(np.isclose(tauList, tau0))
+  i = i[0]
+  logger.info(f'tau(ns) = {tauList[i]:1.3g}:')
+  for sr in effsDict:
+    logger.info(f'  {sr} = {effsDict[sr][0][i]:1.3e} +- {effsDict[sr][1][i]:1.3e}')
+
+
 if __name__ == "__main__":
       
-  #Process events
   import argparse
-  parser = argparse.ArgumentParser(description='Analyse delphesLLP output to produce efficiencies for ATLAS-ANA-SUSY-2019-018 DT search')
-  parser.add_argument('inputfile', metavar='inputfile_path', help='Path to the delphesLLP root file with the event sample to be analysed.')
+  parser = argparse.ArgumentParser(description='Analyse delphesLLP output to produce efficiencies for ATLAS-SUSY-2019-18 DT search')
+  parser.add_argument('-f','--inputfile', help='Path to the Delphes root file with the event sample to be analysed.')
   parser.add_argument('-tau0','--tau0',metavar='tau0', help='Proper lifetime (in ns) used for event generation',type=float, required=False, default=0.0)
   parser.add_argument('-tauF','--tau_file',metavar='tau_file', help='CSV file containing the lifetime values (in ns) used for reweighting',
                       type=str, required=False, default=None)
@@ -356,28 +418,4 @@ if __name__ == "__main__":
   inputfile = args.inputfile
   tau0 = args.tau0
   tau_file = args.tau_file
-  tauList = [float(tau0)]
-  if tau_file:
-    if not os.path.isfile(tau_file):
-      raise ValueError(f"Reweighting file {tau_file} not found!")
-    try:
-      import csv
-      with open(tau_file, mode='r', newline='') as file:
-        csv_reader = csv.reader(l for l in file.readlines() 
-                                if not l.strip().startswith('#'))
-        tauList += [float(row[0]) for row in csv_reader if row]
-    except Exception as e:
-      logger.error(str(e))
-      logger.error(f"Error reding {tau_file}. Reweighting will not be applied.")
-    tauList = np.sort(np.unique(tauList))
-
-  resDict = getEfficiencies(inputfile,tau0,tauList)
-
-  effsDict = resDict['Eff SR'].to_dict()
-  for i,tau in enumerate(tauList):
-    print(f'\ntau(ns) = {tau:1.3g}:')
-    for sr in effsDict:
-      print(f'  {sr} = {effsDict[sr][0][i]:1.3e} +- {np.sqrt(effsDict[sr][1][i]):1.3e}')
-
-#print("Final SR error: %1.6e\n"%(np.sqrt(err)))
-#print(err_sqr)
+  main(inputfile,tau0,tau_file)

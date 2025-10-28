@@ -109,7 +109,7 @@ class cutFlow(object):
     self.name = name
     self.keys = levels[:]
     self.weights = np.array([zero_weight for _ in levels])
-    self.weights2 = np.array([zero_weight**2 for _ in levels])
+    self.weightsErr = np.array([zero_weight for _ in levels])
     self._current_level = 0
 
   def __repr__(self) -> str:
@@ -136,7 +136,7 @@ class cutFlow(object):
       raise ValueError(f"Level {level} not defined for {self}")
     clevel = self.keys.index(level)
     self.weights[clevel] += weight
-    self.weights2[clevel] += weight**2
+    self.weightsErr[clevel] = np.sqrt(self.weightsErr[clevel]**2 + weight**2)
     
   def fill(self,weight):
     """
@@ -149,7 +149,7 @@ class cutFlow(object):
       msg += " Check your cutflow definitions and if it is being properly reset."
       raise ValueError(msg)
     self.weights[clevel] += weight
-    self.weights2[clevel] += weight**2
+    self.weightsErr[clevel] = np.sqrt(self.weightsErr[clevel]**2 + weight**2)
 
   def divide(self,factor):
     """
@@ -157,7 +157,7 @@ class cutFlow(object):
     """
     for iw,w in enumerate(self.weights):
       self.weights[iw] = w/factor
-      self.weights2[iw] = self.weights2[iw]/factor**2
+      self.weightsErr[iw] = self.weightsErr[iw]/factor
 
   @property
   def current_level(self):
@@ -169,7 +169,7 @@ class cutFlow(object):
 
   def to_dict(self):
 
-    cDict = {k : (w,w2) for k,w,w2 in zip(self.keys,self.weights,self.weights2)}
+    cDict = {k : (w,wErr) for k,w,wErr in zip(self.keys,self.weights,self.weightsErr)}
 
     return cDict
   
@@ -177,8 +177,8 @@ class cutFlow(object):
 
     d = self.to_dict()
     lines = [f"==== {self.name} ==="]
-    for k,(w,w2) in d.items():
-      lines.append(f"{k} = {w:1.4e} +- {np.sqrt(w2):1.4e}")
+    for k,(w,wErr) in d.items():
+      lines.append(f"{k} = {w:1.4e} +- {wErr:1.4e}")
     lines.append(f"===" + "="*len(self.name) + "===")
     return '\n'.join(lines)
 

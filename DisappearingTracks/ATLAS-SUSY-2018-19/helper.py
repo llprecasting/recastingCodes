@@ -1,37 +1,36 @@
 #!/usr/bin/env python3
 import numpy as np
-import os
 from scipy.stats import rv_continuous,uniform
 from scipy.special import erf
-from pathlib import Path
-import tqdm
-import math
-import pandas as pd
+from numpy import float64, ndarray
+from typing import Any, Dict, List, Tuple, Union
+from cppyy.gbl import TClonesArray
 
 # Fix seed so results are reproducible!
 np.random.seed(seed=123)
 
-import ROOT
+from ROOT import TFile
 
 class effMap:
-  def __init__(self, mapname, filepath="DisappearingTrack2018-EfficiencyMaps.root"):
-    self.fh = ROOT.TFile(filepath)
+  def __init__(self, mapname: str, filepath: str="DisappearingTrack2018-EfficiencyMaps.root"):
+    
+    self.fh = TFile(filepath)
     try:
       self.h_eff = self.fh.Get(mapname)
     except:
       raise ValueError("No TH2D efficiency map with tag ", mapname," found in file ", filepath)
 
-  def getEff(self,x,y):
+  def getEff(self,x: float,y: Union[float64, float]) -> float:
     return self.h_eff.GetBinContent(self.h_eff.FindBin(x,y))
 
-  def passes(self, x, y):
+  def passes(self, x: float, y: float) -> bool:
     eff = self.getEff(x,y)
     rnd = uniform.rvs()
     if rnd < eff:
       return True
     return False
 
-  def efficiency(self, x, y):
+  def efficiency(self, x: float, y: Union[float64, float]) -> float:
     return self.getEff(x,y)
 
 
@@ -44,19 +43,26 @@ class smearingFunction(rv_continuous):
     .rvs (random number generator).
     """
 
-    def setPars(self,alpha, sigma, mean0=0.0):
-      self.alpha = alpha
-      self.sigma = sigma
-      self.mean0 = mean0
-      zmin = (self.a-mean0)/sigma
-      zmax = (self.b-mean0)/sigma      
-      self.norm = np.exp(-alpha**2/2)*(1-np.exp(alpha*(alpha+zmin)))/alpha
-      self.norm += np.exp(-alpha**2/2)*(1-np.exp(alpha*(alpha-zmax)))/alpha
-      self.norm += np.sqrt(2*np.pi)*erf(alpha/np.sqrt(2))
-      self.norm = float(self.norm*sigma)
+    def __init__(self,*kargs,**kwargs):
+        super().__init__(*kargs,**kwargs)
+        if self.a is None:
+            self.a = -1000.0
+        if self.b is None:
+            self.b = 1000.0
+
+    def setPars(self,alpha: float, sigma: float, mean0: float=0.0):
+        self.alpha = alpha
+        self.sigma = sigma
+        self.mean0 = mean0
+        zmin = (self.a-mean0)/sigma
+        zmax = (self.b-mean0)/sigma      
+        self.norm = np.exp(-alpha**2/2)*(1-np.exp(alpha*(alpha+zmin)))/alpha
+        self.norm += np.exp(-alpha**2/2)*(1-np.exp(alpha*(alpha-zmax)))/alpha
+        self.norm += np.sqrt(2*np.pi)*erf(alpha/np.sqrt(2))
+        self.norm = float(self.norm*sigma)
 
 
-    def _pdf(self, x):
+    def _pdf(self, x :float, *args) -> float:
         sigma = self.sigma
         alpha = self.alpha
         mean0 = self.mean0
@@ -68,7 +74,7 @@ class smearingFunction(rv_continuous):
         else:
           return np.exp(-z**2/2.0)/self.norm
     
-    def _cdf(self,x):
+    def _cdf(self,x: ndarray, *args) -> float:
         sigma = self.sigma
         alpha = self.alpha
         mean0 = self.mean0
@@ -76,28 +82,31 @@ class smearingFunction(rv_continuous):
         b = (self.b-mean0)/sigma
         z = (x[0]-mean0)/sigma
         z = min(b,z)
+        
         cdf_ret = 0.0
         if z < a:
-           return cdf_ret
-        if z >= a:
-           i_a = np.exp(alpha**2/2)*np.exp(a*alpha)/alpha
-           i_z1 = np.exp(alpha**2/2)*np.exp(z*alpha)/alpha
-           cdf_ret = i_z1 - i_a           
-        if z > -alpha:
-           i_z1 = np.exp(alpha**2/2)*np.exp(-alpha*alpha)/alpha
-           i_malpha = -np.sqrt(np.pi/2)*erf(alpha/np.sqrt(2))
-           i_z2 = np.sqrt(np.pi/2)*erf(z/np.sqrt(2))
-           cdf_ret = (i_z1 - i_a) + (i_z2 - i_malpha)
-        if z > alpha:
-           i_z2 = np.sqrt(np.pi/2)*erf(alpha/np.sqrt(2))
-           i_alpha = np.exp(-alpha**2/2)*(-1.0)/alpha
-           i_z3 = np.exp(-alpha**2/2)*(-np.exp(alpha*(alpha-z)))
-           cdf_ret = (i_z1 - i_a) + (i_z2 - i_malpha) + (i_z3 - i_alpha)
+            return cdf_ret
         
+        i_a = np.exp(alpha**2/2)*np.exp(a*alpha)/alpha
+        i_z1 = np.exp(alpha**2/2)*np.exp(z*alpha)/alpha
+        cdf_ret = i_z1 - i_a           
+        if -alpha <= z <= alpha:
+            i_z1 = np.exp(alpha**2/2)*np.exp(-alpha*alpha)/alpha
+            i_malpha = -np.sqrt(np.pi/2)*erf(alpha/np.sqrt(2))
+            i_z2 = np.sqrt(np.pi/2)*erf(z/np.sqrt(2))
+            cdf_ret = (i_z1 - i_a) + (i_z2 - i_malpha)
+        else:
+            i_z1 = np.exp(alpha**2/2)*np.exp(-alpha*alpha)/alpha
+            i_malpha = -np.sqrt(np.pi/2)*erf(alpha/np.sqrt(2))
+            i_z2 = np.sqrt(np.pi/2)*erf(alpha/np.sqrt(2))
+            i_alpha = np.exp(-alpha**2/2)*(-1.0)/alpha
+            i_z3 = np.exp(-alpha**2/2)*(-np.exp(alpha*(alpha-z)))
+            cdf_ret = (i_z1 - i_a) + (i_z2 - i_malpha) + (i_z3 - i_alpha)
+          
         cdf_ret = sigma*cdf_ret/self.norm
         return cdf_ret
     
-    def smear(self, pT, charge):
+    def smear(self, pT: float, charge: int) -> float:
       QoverPt = charge / (pT*1e-3) # [TeV^-1]
       QoverPtSmeared = abs(QoverPt + self.rvs())
       PtSmeared = (1 / QoverPtSmeared) * 1e+3
@@ -105,7 +114,7 @@ class smearingFunction(rv_continuous):
 
 class cutFlow(object):
 
-  def __init__(self,name,levels,zero_weight = 0.0) -> None:
+  def __init__(self,name: str,levels: List[str],zero_weight : Union[float,ndarray] = 0.0) -> None:
     self.name = name
     self.keys = levels[:]
     self.weights = np.array([zero_weight for _ in levels])
@@ -118,17 +127,17 @@ class cutFlow(object):
   def __str__(self) -> str:
     return self.name
 
-  def reset(self,to_level=0):
+  def reset(self,to_level: int=0):
     self._current_level = to_level
 
-  def fill_next(self,weight):
+  def fill_next(self,weight: Union[float,ndarray]):
     """
     Add weight to the next level in the cutflow
     """
     self._current_level += 1
     self.fill(weight)
 
-  def fill_level(self,level,weight):
+  def fill_level(self,level: str,weight: Union[float,ndarray]):
     """
     Fill a specific level with the weight
     """
@@ -138,7 +147,7 @@ class cutFlow(object):
     self.weights[clevel] += weight
     self.weightsErr[clevel] = np.sqrt(self.weightsErr[clevel]**2 + weight**2)
     
-  def fill(self,weight):
+  def fill(self,weight: Union[float,ndarray]):
     """
     Add weight to the current level in the cutflow
     """
@@ -151,7 +160,7 @@ class cutFlow(object):
     self.weights[clevel] += weight
     self.weightsErr[clevel] = np.sqrt(self.weightsErr[clevel]**2 + weight**2)
 
-  def divide(self,factor):
+  def divide(self,factor: float):
     """
     Divide cutflow levels by factor.
     """
@@ -160,20 +169,20 @@ class cutFlow(object):
       self.weightsErr[iw] = self.weightsErr[iw]/factor
 
   @property
-  def current_level(self):
+  def current_level(self) -> int:
     """
     Simple method for getting the current level of the cutflow
     """
 
     return self._current_level
 
-  def to_dict(self):
+  def to_dict(self) -> Dict[str, Union[Tuple[ndarray, ndarray], Tuple[float, float]]]:
 
     cDict = {k : (w,wErr) for k,w,wErr in zip(self.keys,self.weights,self.weightsErr)}
 
     return cDict
   
-  def to_string(self):
+  def to_string(self) -> str:
 
     d = self.to_dict()
     lines = [f"==== {self.name} ==="]
@@ -198,7 +207,7 @@ for pT,alpha,sigma in pTalphaSigmaPairs:
     electronSmearF.setPars(alpha=alpha,sigma=sigma)
     electronSmearList.append((pT,electronSmearF))
 
-def electronPtSmear(pT, charge):
+def electronPtSmear(pT: float, charge: int) -> float:
   if (pT < 10.0):
       return -1.0
   for pT_bin,smearFunc in electronSmearList:
@@ -207,7 +216,7 @@ def electronPtSmear(pT, charge):
   return -1.0
 
 #Object readers
-def filterObjects(particleList, pTmin, etaMax):
+def filterObjects(particleList: TClonesArray, pTmin: float, etaMax: float) -> List[Any]:
   filteredParticles = []
   for ptc in particleList:
     if ptc.PT < pTmin:
@@ -221,15 +230,15 @@ def filterObjects(particleList, pTmin, etaMax):
 
 
 #Get Kinematic variables from objects
-def deltaR(ptc1,ptc2):
+def deltaR(ptc1,ptc2) -> float:
   lv1 = ptc1.P4() #Check if this is the proper way to read 4vector and use as input for DeltaR
   lv2 = ptc2.P4()
   return lv1.DeltaR(lv2)
 
-def DeltaPhi(ptc1, ptc2):
+def DeltaPhi(ptc1, ptc2) -> float:
   return abs(ptc1.P4().DeltaPhi(ptc2.P4()))
 
-def minDphilist(ptc1, listptc2, length, cut):
+def minDphilist(ptc1, listptc2, length, cut) -> float:
   if len(listptc2)==0:
     return 0
   infDphi = 99999999
@@ -241,7 +250,7 @@ def minDphilist(ptc1, listptc2, length, cut):
     infDphi=min(infDphi,DeltaPhi(ptc1,ptc2))
   return infDphi
 
-def overlapRemoval(input,filter,dR=0.4):
+def overlapRemoval(input: List[Any],filter: List[Any],dR: float=0.4) -> List[Any]:
   
   if len(input)==0 or len(filter)==0:
     return input[:]
@@ -254,15 +263,8 @@ def overlapRemoval(input,filter,dR=0.4):
 
   return output
 
-def getLLPDecayRadius(llp):
+def getLLPDecayRadius(llp) -> float:
   return np.sqrt(llp.daughter.X**2 + llp.daughter.Y**2)
 
-def getLLPLifetime(llp):
-  p4 = llp.P4()
-  return 1e9*(llp.daughter.T - llp.T)/p4.Gamma() #Assume genpart T is in sec, convert to ns
-
-def getLLPDecayTime(llp):
+def getLLPDecayTime(llp) -> float:
   return 1e9*(llp.daughter.T - llp.T) #Assume genpart T is in sec, convert to ns
-
-def getLLPDecayLength_REST(llp, llp_daughter):
-  return np.sqrt(llp_daughter.X**2 + llp_daughter.Y**2 + llp_daughter.Z**2)/llp.P4().Gamma()

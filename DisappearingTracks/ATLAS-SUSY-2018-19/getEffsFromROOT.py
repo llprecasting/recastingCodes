@@ -4,10 +4,13 @@ import os,sys
 from pathlib import Path
 import tqdm
 import logging
-from helper import (filterObjects,getLLPLifetime, \
+from helper import (filterObjects, \
                     overlapRemoval, minDphilist, eff_trigger, \
                     getLLPDecayRadius,getLLPDecayTime,electronPtSmear,\
                     eff_track_EWK,eff_track_Strong, cutFlow)
+from numpy import ndarray
+from typing import Any, Dict, List, Tuple, Union
+
 FORMAT = '%(levelname)s: %(message)s'
 logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger()   
@@ -19,13 +22,11 @@ DelphesLLP_path = Path(os.path.abspath("./DelphesLLP"))
 os.environ['ROOT_INCLUDE_PATH'] = os.path.join(DelphesLLP_path,"external")
 
 import ROOT
-
-
 ROOT.gSystem.Load(os.path.join(DelphesLLP_path,"libDelphes.so"))
-
 ROOT.gInterpreter.Declare('#include "classes/SortableObject.h"')
 ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
+from ROOT import TFile,Electron, Jet, MissingET, Muon, TTree
 
 
 # Define SRs and Cutflow
@@ -41,7 +42,7 @@ strong_SR = cutFlow(name='Strong_SR',levels=['All', 'Kinematic', 'Tracklet Emula
                                  '0.1 < Eta < 1.9'])
 
 
-def getObjects(DelphesTree):
+def getObjects(DelphesTree: TTree) -> Any:
     """
     Returns the needed objects from the tree after applying
     minimum requirements on pT, eta and overlap.
@@ -68,8 +69,8 @@ def getObjects(DelphesTree):
     return llps,muons,electrons,jets,met
 
 
-def preSelection(muons,electrons,jets,met,weight,
-                 ewk_cutflow,strong_cutflow):
+def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, Any]],jets: List[Union[Any, Jet]],met: MissingET,weight: float,
+                 ewk_cutflow: cutFlow,strong_cutflow: cutFlow) -> Tuple[float, float]:
     """
     Apply the pre-selection including the trigger efficiency.
     Returns the pre-selection efficiency for each signal region 
@@ -162,13 +163,13 @@ def preSelection(muons,electrons,jets,met,weight,
 
     return preSel_eff_EWK,preSel_eff_Strong
 
-def getEfficiencies(inputFile,tau0,tauList,ijob=0):
+def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> Dict[str, Any]:
 
     tauList = np.array(tauList)
     eff_SR = cutFlow(name="Efficiencies",levels=['EWK SR', 'Strong SR'],
                       zero_weight=np.zeros(len(tauList)))
 
-    f = ROOT.TFile(inputFile,'read')
+    f = TFile(inputFile,'read')
     DelphesTree = f.Get('Delphes')
     nevts = DelphesTree.GetEntries()
     
@@ -322,7 +323,7 @@ def getEfficiencies(inputFile,tau0,tauList,ijob=0):
     
     return eff_dict
 
-def saveOutput(effsDict,outputFile):
+def saveOutput(effsDict: Dict[str, Any],outputFile: str):
         
     tauList = effsDict['tau_ns']
     effs = effsDict['Eff SR'].to_dict()
@@ -347,7 +348,7 @@ def saveOutput(effsDict,outputFile):
                 header='\n'.join(header_lines),
                 delimiter=',',fmt='%1.3e')
 
-def main(inputfile,tau0,tau_file,ijob=0):
+def main(inputfile: str,tau0: float,tau_file: str,ijob: int=0):
 
     tauList = [float(tau0)]
     if tau_file:
@@ -359,11 +360,13 @@ def main(inputfile,tau0,tau_file,ijob=0):
                 csv_reader = csv.reader(l for l in file.readlines() 
                                         if not l.strip().startswith('#'))
                 tauList += [float(row[0]) for row in csv_reader if row]
+            
         except Exception as e:
             logger.error(str(e))
             logger.error(f"Error reding {tau_file}. Reweighting will not be applied.")
-            tauList = np.sort(np.unique(tauList))
+            tauList = sorted(np.unique(tauList))
 
+    tauList = np.array(tauList)
     resDict = getEfficiencies(inputfile,tau0,tauList,ijob)
 
     outFile = inputfile.split('.root')[0].split('.hepmc')[0]

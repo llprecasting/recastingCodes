@@ -59,7 +59,7 @@ if __name__ == "__main__":
     children = []
     ijob = 0
     for rootFile in found_files:
-        p = pool.apply_async(main, args=(rootFile,args.tau_file,ijob,))
+        p = pool.apply_async(main, args=(rootFile,args.llpPDG,args.tau_file,ijob,))
         ijob += 1
         children.append(p)
 

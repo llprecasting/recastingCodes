@@ -326,7 +326,7 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> 
 
 
 
-def main(inputfile: str,tau_file: Union[str,None],ijob: int=0):
+def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
 
     # Read banner file to extract information about LLP mass, LLP lifetime and total cross-section
     bannerFile = None
@@ -337,7 +337,7 @@ def main(inputfile: str,tau_file: Union[str,None],ijob: int=0):
         raise ValueError()
     
     bannerFile = b_files[0]
-    modelDict = getModelInfo(bannerFile,args.llpPDG)
+    modelDict = getModelInfo(bannerFile,llpPDG)
     tau0 = modelDict['tau0_ns']
 
     tauList = [float(tau0)]
@@ -421,5 +421,6 @@ if __name__ == "__main__":
 
     inputfile = args.inputfile
     tau_file = args.tau_file
+    llpPDG = args.llpPDG
 
-    main(inputfile,tau_file)
+    main(inputfile,llpPDG,tau_file)

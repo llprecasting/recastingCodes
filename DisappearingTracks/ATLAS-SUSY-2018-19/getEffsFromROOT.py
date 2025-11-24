@@ -354,9 +354,9 @@ def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
         except Exception as e:
             logger.error(str(e))
             logger.error(f"Error reding {tau_file}. Reweighting will not be applied.")
-            tauList = sorted(np.unique(tauList))
 
-    tauList = np.array(tauList)
+    tauList = np.array([float(f"{tau:1.4e}") for tau in tauList[:]])
+    tauList = sorted(np.unique(tauList))
     resDict = getEfficiencies(inputfile,tau0,tauList,ijob)
     resDict.update(modelDict)
 

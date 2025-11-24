@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import numpy as np
-import os,sys
+import os,sys,glob
 from pathlib import Path
 import tqdm
 import logging
-from helper import (filterObjects, \
+from helper import (filterObjects,getModelInfo,saveOutput, \
                     overlapRemoval, minDphilist, eff_trigger, \
                     getLLPDecayRadius,getLLPDecayTime,electronPtSmear,\
                     eff_track_EWK,eff_track_Strong, cutFlow)
@@ -40,6 +40,7 @@ ewk_SR = cutFlow(name='EWK_SR',levels=['All', 'Kinematic', 'Tracklet Emulation',
 strong_SR = cutFlow(name='Strong_SR',levels=['All', 'Kinematic', 'Tracklet Emulation', 'Leading tracklet',
                                 'DeltaR(jet) > 0.4', 'DeltaR(electron) > 0.4', 'DeltaR(muon) > 0.4',
                                  '0.1 < Eta < 1.9'])
+
 
 
 def getObjects(DelphesTree: TTree) -> Any:
@@ -323,35 +324,24 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> 
     
     return eff_dict
 
-def saveOutput(effsDict: Dict[str, Any],outputFile: str):
-        
-    tauList = effsDict['tau_ns']
-    effs = effsDict['Eff SR'].to_dict()
-    cols_labels = ['tau_ns']
-    data = [tauList]
-    for sr,effList in effs.items():
-        cols_labels.append(sr)
-        data.append(effList[0])
-        cols_labels.append(sr+' Error')
-        data.append(effList[1])
 
-    data = np.array(list(zip(*tuple(data))))
 
-    header_lines = [f'Input file: {effsDict['inputFile']}',
-                    f'Generated lifetime (ns): {effsDict['tau0_ns']}',
-                    f'Number of events: {effsDict['Nevents']}',
-                    f'Total weight (pb): {effsDict['totalweight']}',
-                    ','.join(cols_labels)
-                    ]
+def main(inputfile: str,tau_file: Union[str,None],ijob: int=0):
+
+    # Read banner file to extract information about LLP mass, LLP lifetime and total cross-section
+    bannerFile = None
+    d = os.path.dirname(inputfile)
+    b_files = list(glob.glob(os.path.join(d,'*_banner.txt')))
+    if not b_files:
+        logger.error(f"No banner files found in {d}!")
+        raise ValueError()
     
-    np.savetxt(outputFile, data, 
-                header='\n'.join(header_lines),
-                delimiter=',',fmt='%1.3e')
-
-def main(inputfile: str,tau0: float,tau_file: str,ijob: int=0):
+    bannerFile = b_files[0]
+    modelDict = getModelInfo(bannerFile,args.llpPDG)
+    tau0 = modelDict['tau0_ns']
 
     tauList = [float(tau0)]
-    if tau_file:
+    if tau_file is not None:
         if not os.path.isfile(tau_file):
             raise ValueError(f"Reweighting file {tau_file} not found!")
         try:
@@ -368,18 +358,33 @@ def main(inputfile: str,tau0: float,tau_file: str,ijob: int=0):
 
     tauList = np.array(tauList)
     resDict = getEfficiencies(inputfile,tau0,tauList,ijob)
+    resDict.update(modelDict)
 
     outFile = inputfile.split('.root')[0].split('.hepmc')[0]
-    outFile = outFile +'_effs.csv'
-    saveOutput(resDict,outFile)
+    outFile = outFile +'_effs.json'
 
+    effs = resDict.pop('Eff SR').to_dict()
+    tauList = resDict.pop("tau_ns")
+    effsList = []
+    for itau,tau in enumerate(tauList):
+        effDict = {'tau_ns' : tau}
+        for sr in effs:
+            effDict[sr] = effs[sr][0][itau]
+            effDict[sr+' Error'] = effs[sr][1][itau]
+        effsList.append(effDict)
 
-    effsDict = resDict['Eff SR'].to_dict()
     i, = np.where(np.isclose(tauList, tau0))
     i = i[0]
     logger.info(f'tau(ns) = {tauList[i]:1.3g}:')
-    for sr in effsDict:
-        logger.info(f'  {sr} = {effsDict[sr][0][i]:1.3e} +- {effsDict[sr][1][i]:1.3e}')
+    for sr in effs:
+        logger.info(f'  {sr} = {effs[sr][0][i]:1.3e} +- {effs[sr][1][i]:1.3e}')
+    
+    
+    resDict['Efficiencies'] = effsList
+    saveOutput(resDict,outFile)
+
+
+    
 
 
 if __name__ == "__main__":
@@ -387,8 +392,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Analyse delphesLLP output to produce efficiencies for ATLAS-SUSY-2019-18 DT search')
     parser.add_argument('-f','--inputfile', help='Path to the Delphes root file with the event sample to be analysed.')
-    parser.add_argument('-tau0','--tau0',metavar='tau0', help='Proper lifetime (in ns) used for event generation',type=float, required=False, default=0.0)
-    parser.add_argument('-tauF','--tau_file',metavar='tau_file', help='CSV file containing the lifetime values (in ns) used for reweighting',
+    parser.add_argument('-l','--llpPDG',help='LLP PDG [1000024]',type=int, required=False, default=1000024)
+    parser.add_argument('-tauF','--tau_file',metavar='tau_file', help='CSV file containing the lifetime values (in ns) used for reweighting. If not defined, will not apply reweighting.',
                         type=str, required=False, default=None)
     parser.add_argument('-v', '--verbose', default='info',
                         help='verbose level (debug, info, warning or error). Default is info')
@@ -414,9 +419,7 @@ if __name__ == "__main__":
     if level in levels:       
         logger.setLevel(level = levels[level])
 
-
-
     inputfile = args.inputfile
-    tau0 = args.tau0
     tau_file = args.tau_file
-    main(inputfile,tau0,tau_file)
+
+    main(inputfile,tau_file)

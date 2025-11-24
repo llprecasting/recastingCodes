@@ -4,32 +4,10 @@ import os,sys,glob
 from getEffsFromROOT import logger,main
 import subprocess
 import logging
-import pyslha
 import multiprocessing
-from typing import  Dict
 
 
 
-def getModelInfo(bannerFile : str, llpPDG : int) -> Dict[str, float]:
-
-    with open(bannerFile,'r') as ff:
-        slhaData = ff.read()
-        if '<slha>' in slhaData:
-            slhaData = slhaData.split('<slha>')[1].split('</slha>')[0]
-            
-        slhaData = pyslha.readSLHA(slhaData)
-    
-    if slhaData is None:
-       logger.error(f'Error reading banner file {bannerFile}')
-       raise ValueError()
-    
-    
-    modelInfoDict = {}
-    modelInfoDict['mLLP'] = slhaData.blocks['MASS'][llpPDG]
-    if slhaData.decays:
-        modelInfoDict['tau0_ns'] = (6.58212e-16/slhaData.decays[llpPDG].totalwidth)
-    
-    return modelInfoDict
 
 if __name__ == "__main__":
       

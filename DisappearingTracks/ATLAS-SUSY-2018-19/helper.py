@@ -5,6 +5,9 @@ from scipy.special import erf
 from numpy import float64, ndarray
 from typing import Any, Dict, List, Tuple, Union
 from cppyy.gbl import TClonesArray
+import pyslha
+import glob
+import json
 
 # Fix seed so results are reproducible!
 np.random.seed(seed=123)
@@ -268,3 +271,47 @@ def getLLPDecayRadius(llp) -> float:
 
 def getLLPDecayTime(llp) -> float:
   return 1e9*(llp.daughter.T - llp.T) #Assume genpart T is in sec, convert to ns
+
+def getModelInfo(bannerFile : str, llpPDG : int) -> Dict[str, Union[float,int]]:
+
+    modelInfoDict = {'llpPDG' : llpPDG}
+    slhaData = None
+    mgInfo = None
+    with open(bannerFile,'r') as ff:
+        data = ff.read()
+        if '<slha>' in data:
+            slhaData = data.split('<slha>')[1].split('</slha>')[0]
+            slhaData = pyslha.readSLHA(slhaData)
+        if '<MGGenerationInfo>' in data:
+            mgInfo = data.split('<MGGenerationInfo>')[1].split('</MGGenerationInfo>')[0]
+            for l in mgInfo.split('\n'):
+                l = l.strip()
+                if not  l: continue
+                k,v = l.split(':')
+                modelInfoDict[k.replace('#','').strip()] = float(v)
+  
+    if slhaData is None:
+       raise ValueError(f'Error reading banner file {bannerFile}')
+    
+    modelInfoDict['mLLP'] = slhaData.blocks['MASS'][llpPDG]
+    if slhaData.decays:
+        modelInfoDict['tau0_ns'] = (6.58212e-16/slhaData.decays[llpPDG].totalwidth)
+    
+    return modelInfoDict
+
+def saveOutput(resultsDict: Dict[str, Any],outputFile: str):
+
+  saveDict = {}
+  for k,v in resultsDict.items():
+    if isinstance(v,np.ndarray):
+      saveDict[k] = v.tolist()
+    else:
+       saveDict[k] = v
+  # Sort results by type of key:
+  saveDict = {k : v for k,v in sorted(list(saveDict.items()), key = lambda x: isinstance(x[1],list),
+                                           reverse=False)}
+
+        
+  with open(outputFile, 'w') as f:
+    json.dump(saveDict,f,indent=4)
+

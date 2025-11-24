@@ -53,23 +53,13 @@ if __name__ == "__main__":
     else:
         logger.info(f"Found {len(found_files)} files")
 
-    banner_files = []
-    for f in found_files:
-        d = os.path.dirname(f)
-        b_files = list(glob.glob(os.path.join(d,'*_banner.txt')))
-        if not b_files:
-            logger.error(f"No banner files found in {d}!")
-            raise ValueError()
-        else:
-            banner_files.append(b_files[0])
-    
+        
     ncpus = min(len(found_files),args.ncpus)
     pool = multiprocessing.Pool(processes=ncpus)
     children = []
     ijob = 0
-    for rootFile,bannerFile in zip(found_files,banner_files):
-        tau0 = getModelInfo(bannerFile,args.llpPDG)['tau0_ns']
-        p = pool.apply_async(main, args=(rootFile,tau0,args.tau_file,ijob,))
+    for rootFile in found_files:
+        p = pool.apply_async(main, args=(rootFile,args.tau_file,ijob,))
         ijob += 1
         children.append(p)
 

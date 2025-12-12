@@ -257,12 +257,13 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> 
             # llps_Strong = llps_Strong[:1]
         strong_SR.fill_next(fill_Strong)
 
-        # Select llps with smearedPt > 20:
-        llps_EWK = [llp for llp in llps_EWK[:] if llp.smearedPt > 20.0]
+        # Select llps with smearedPt > minPT:
+        minPT = 60.0
+        llps_EWK = [llp for llp in llps_EWK[:] if llp.smearedPt > minPT]
         if llps_EWK:
             ewk_SR.fill_next(fill_EWK)
 
-        llps_Strong = [llp for llp in llps_Strong[:] if llp.smearedPt > 20.0]
+        llps_Strong = [llp for llp in llps_Strong[:] if llp.smearedPt > minPT]
         if llps_Strong:
             strong_SR.fill_next(fill_Strong)
 

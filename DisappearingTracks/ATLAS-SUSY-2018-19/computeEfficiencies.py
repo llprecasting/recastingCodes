@@ -71,7 +71,6 @@ def getObjects(DelphesTree: TTree) -> Any:
 
     return llps,muons,electrons,jets,met
 
-
 def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, Any]],jets: List[Union[Any, Jet]],met: MissingET,weight: float,
                  ewk_cutflow: cutFlow,strong_cutflow: cutFlow) -> Tuple[float, float]:
     """
@@ -180,9 +179,13 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> 
     ct=0
 
 
+    disable = False
+    if ijob < 0:
+        disable = True
     for entry in tqdm.tqdm(range(nevts),position=ijob,
                             desc=inputFile,
-                            leave=False):
+                            leave=False,
+                            disable=disable):
         DelphesTree.GetEntry(entry)
         ct+=1
         # weights = float(DelphesTree.Weight.At(0).Weight)
@@ -329,7 +332,6 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> 
     return eff_dict
 
 
-
 def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
 
     # Read banner file to extract information about LLP mass, LLP lifetime and total cross-section
@@ -449,12 +451,22 @@ if __name__ == "__main__":
     ncpus = min(len(inputFiles),args.ncpus)
     pool = multiprocessing.Pool(processes=ncpus)
     children = []
-    ijob = 0
+    if ncpus > 1:
+        ijob = -1
+    else:
+        ijob = 0
     for rootFile in inputFiles:
         p = pool.apply_async(main, args=(rootFile,args.llpPDG,args.tau_file,ijob,))
-        ijob += 1
         children.append(p)
 
     logger.info(f'Running {ijob} jobs in {ncpus} instances')
-    for p in children: 
-        p.get()
+    # If ijob < 0, show progressbar for each job, else suppress it
+    disable = True
+    if ijob < 0:
+        disable = False
+    for ichildren in tqdm.tqdm(range(len(children)),
+                            desc=f'Job',
+                            leave=True,
+                            disable=disable):
+        children[ichildren].get()
+

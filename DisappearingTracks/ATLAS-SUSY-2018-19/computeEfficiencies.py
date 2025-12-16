@@ -402,8 +402,8 @@ if __name__ == "__main__":
     parser.add_argument('-tauF','--tau_file',metavar='tau_file', help='CSV file containing the lifetime values (in ns) used for reweighting. If empty or file not found, it will not apply reweighting [tau_list.csv].',
                         type=str, required=False, default='tau_list.csv')
     parser.add_argument('-n', '--ncpus',type=int,default=1,help='number of parallel jobs to run when running over multiple files [default=1].')
-    parser.add_argument('-v', '--verbose', default='info',
-                        help='verbose level (debug, info, warning or error). Default is info')
+    parser.add_argument('-v', '--verbose', default='warning',
+                        help='verbose level (debug, info, warning or error). Default is warning')
 
     args = parser.parse_args()
 

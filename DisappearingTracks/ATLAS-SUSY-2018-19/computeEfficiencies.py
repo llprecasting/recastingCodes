@@ -433,12 +433,12 @@ if __name__ == "__main__":
 
     if os.path.isfile(inputF):
         inputFiles = [os.path.abspath(inputF)]
-    elif os.path.isdir(args.folder):
+    elif os.path.isdir(args.input):
         # Find root files:
-        pattern = os.path.join(args.folder, "**", f"*.root")
+        pattern = os.path.join(args.input, "**", f"*.root")
         inputFiles = list(glob.glob(pattern, recursive=True))
         if not inputFiles:
-            logger.error(f"No .root files found in {args.folder}!")
+            logger.error(f"No .root files found in {args.input}!")
             raise ValueError()
             
     else:

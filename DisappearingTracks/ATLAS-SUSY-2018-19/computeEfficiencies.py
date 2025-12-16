@@ -10,6 +10,8 @@ from helper import (filterObjects,getModelInfo,saveOutput, \
                     eff_track_EWK,eff_track_Strong, cutFlow)
 from numpy import ndarray
 from typing import Any, Dict, List, Tuple, Union
+import multiprocessing
+import subprocess
 
 FORMAT = '%(levelname)s: %(message)s'
 logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -258,6 +260,7 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> 
         strong_SR.fill_next(fill_Strong)
 
         # Select llps with smearedPt > minPT:
+        # minPT = 60 (20) GeV for the model-independent (model-dependent) search strategy
         minPT = 60.0
         llps_EWK = [llp for llp in llps_EWK[:] if llp.smearedPt > minPT]
         if llps_EWK:
@@ -391,11 +394,12 @@ def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
 if __name__ == "__main__":
       
     import argparse
-    parser = argparse.ArgumentParser(description='Analyse delphesLLP output to produce efficiencies for ATLAS-SUSY-2019-18 DT search')
-    parser.add_argument('-f','--inputfile', help='Path to the Delphes root file with the event sample to be analysed.')
+    parser = argparse.ArgumentParser(description='Analyse the Delphes output to produce efficiencies for the ATLAS-SUSY-2019-18 DT search')
+    parser.add_argument('-i','--input', help='Path to  Delphes ROOT file or to a folder containing Delphes ROOT files with the event samples to be analysed.')
     parser.add_argument('-l','--llpPDG',help='LLP PDG [1000024]',type=int, required=False, default=1000024)
-    parser.add_argument('-tauF','--tau_file',metavar='tau_file', help='CSV file containing the lifetime values (in ns) used for reweighting. If not defined, will not apply reweighting.',
-                        type=str, required=False, default=None)
+    parser.add_argument('-tauF','--tau_file',metavar='tau_file', help='CSV file containing the lifetime values (in ns) used for reweighting. If empty or file not found, it will not apply reweighting [tau_list.csv].',
+                        type=str, required=False, default='tau_list.csv')
+    parser.add_argument('-n', '--ncpus',type=int,default=1,help='number of parallel jobs to run when running over multiple files [default=1].')
     parser.add_argument('-v', '--verbose', default='info',
                         help='verbose level (debug, info, warning or error). Default is info')
 
@@ -420,8 +424,37 @@ if __name__ == "__main__":
     if level in levels:       
         logger.setLevel(level = levels[level])
 
-    inputfile = args.inputfile
+
+    inputF = args.input
     tau_file = args.tau_file
+    if not tau_file or not os.path.isfile(tau_file):
+        tau_file = None
     llpPDG = args.llpPDG
 
-    main(inputfile,llpPDG,tau_file)
+    if os.path.isfile(inputF):
+        inputFiles = [os.path.abspath(inputF)]
+    elif os.path.isdir(args.folder):
+        # Find root files:
+        pattern = os.path.join(args.folder, "**", f"*.root")
+        inputFiles = list(glob.glob(pattern, recursive=True))
+        if not inputFiles:
+            logger.error(f"No .root files found in {args.folder}!")
+            raise ValueError()
+            
+    else:
+        logger.error(f"File/Folder {args.input} not found!")
+        raise ValueError()
+    
+    logger.info(f"Running over {len(inputFiles)} files")
+    ncpus = min(len(inputFiles),args.ncpus)
+    pool = multiprocessing.Pool(processes=ncpus)
+    children = []
+    ijob = 0
+    for rootFile in inputFiles:
+        p = pool.apply_async(main, args=(rootFile,args.llpPDG,args.tau_file,ijob,))
+        ijob += 1
+        children.append(p)
+
+    logger.info(f'Running {ijob} jobs in {ncpus} instances')
+    for p in children: 
+        p.get()

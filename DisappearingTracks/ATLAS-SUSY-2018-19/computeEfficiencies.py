@@ -459,7 +459,7 @@ if __name__ == "__main__":
         p = pool.apply_async(main, args=(rootFile,args.llpPDG,args.tau_file,ijob,))
         children.append(p)
 
-    logger.info(f'Running {ijob} jobs in {ncpus} instances')
+    logger.info(f'Running {len(inputFiles)} jobs in {ncpus} instances')
     # If ijob < 0, show progressbar for each job, else suppress it
     disable = True
     if ijob < 0:

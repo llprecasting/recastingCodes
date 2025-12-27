@@ -6,7 +6,6 @@ from numpy import float64, ndarray
 from typing import Any, Dict, List, Tuple, Union
 from cppyy.gbl import TClonesArray
 import pyslha
-import glob
 import json
 
 # Fix seed so results are reproducible!
@@ -190,7 +189,12 @@ class cutFlow(object):
     d = self.to_dict()
     lines = [f"==== {self.name} ==="]
     for k,(w,wErr) in d.items():
-      lines.append(f"{k} = {w:1.4e} +- {wErr:1.4e}")
+      if isinstance(w,(float,int)):
+        lines.append(f"{k} = {w:1.4e} +- {wErr:1.4e}")
+      elif isinstance(w,(list,ndarray)):
+        l = f"{k} = "
+        l += ' / '.join([f"{wx:1.4e} +- {wErrx:1.4e}" for wx,wErrx in zip(w,wErr)])
+        lines.append(l)
     lines.append(f"===" + "="*len(self.name) + "===")
     return '\n'.join(lines)
 

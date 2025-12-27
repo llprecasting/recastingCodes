@@ -328,6 +328,10 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> 
     logger.debug(f"{ewk_SR.to_string()}\n\n")
     logger.debug(f"{strong_SR.to_string()}\n\n")
 
+    logger.debug("Efficiencies for all lifetimes:")
+    logger.debug(f"{eff_SR.to_string()}\n\n")
+
+
     
     return eff_dict
 

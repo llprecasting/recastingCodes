@@ -5,7 +5,10 @@
 #set MaxEvents 1000
 
 set ExecutionPath {
- ParticlePropagator
+
+
+  ParticlePropagator
+  PDGFilter
 
   ChargedHadronTrackingEfficiency
   ElectronTrackingEfficiency
@@ -87,6 +90,19 @@ module ParticlePropagator ParticlePropagator {
 
   # magnetic field
   set Bz 2.0
+}
+
+#################
+# PDG filter
+#################
+
+module PdgCodeFilter PDGFilter {
+  set InputArray Delphes/allParticles
+  set OutputArray particles
+  set Invert true
+  add PdgCode {1000022}
+  add PdgCode {1000024}
+  add PdgCode {-1000024}
 }
 
 ####################################
@@ -878,7 +894,7 @@ module UniqueObjectFinder UniqueObjectFinder {
 module TreeWriter TreeWriter {
 # add Branch InputArray BranchName BranchClass
 #  add Branch Delphes/allParticles Particle GenParticle
-# add Branch Delphes/partons Parton GenParticle  
+#  add Branch Delphes/partons Parton GenParticle  
 # add Branch Delphes/stableParticles StableParticle GenParticle
 
 # add Branch TrackMerger/tracks Track Track
@@ -888,6 +904,8 @@ module TreeWriter TreeWriter {
 # add Branch ECal/eflowPhotons EFlowPhoton Tower
 # add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
 
+  add Branch PDGFilter/particles FilterParticle GenParticle
+  
   add Branch LLPFilter/finalDaughters bsmFinalDaughters GenParticle
   add Branch LLPFilter/directDaughters bsmDirectDaughters GenParticle
   add Branch LLPFilter/mothers bsmMothers GenParticle  

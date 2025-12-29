@@ -165,7 +165,8 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
 
     return preSel_eff_EWK,preSel_eff_Strong
 
-def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> Dict[str, Any]:
+def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0,
+                    biasN: Union[None,float] = None, biasPT: Union[None,float] = None) -> Dict[str, Any]:
 
     tauList = np.array(tauList)
     eff_SR = cutFlow(name="Efficiencies",levels=['EWK SR', 'Strong SR'],
@@ -178,6 +179,11 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> 
     totalweight = 0
     ct=0
 
+    # Based on the bias parameters decide whether events are reweighted or not
+    if (biasN is None) or (biasPT is None):
+        reweight_evts = False
+    else:
+        reweight_evts = True
 
     disable = False
     if ijob < 0:
@@ -188,8 +194,20 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0) -> 
                             disable=disable):
         DelphesTree.GetEntry(entry)
         ct+=1
-        # weights = float(DelphesTree.Weight.At(0).Weight)
-        weight = 1.0
+
+        weight = float(DelphesTree.Weight.At(0).Weight)
+        if reweight_evts:
+            # Only the heavy partons are used for the bias
+            # (since the bias was compute pre-showering, we need the pre-showered
+            # partons for computing the bias)
+            heavy_partons = [ptc for ptc in DelphesTree.FilterParticle 
+                              if (ptc.Mass > 10.0 and abs(ptc.Status) in [22,23])]
+            
+            pTmax = max([ptc.PT for ptc in heavy_partons])
+            if pTmax > 0.0:
+                bias_weight = (pTmax/biasPT)**biasN
+                weight = weight/bias_weight
+    
         totalweight += weight
         llps,muons,electrons,jets,met = getObjects(DelphesTree)
 
@@ -350,6 +368,21 @@ def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
     modelDict = getModelInfo(bannerFile,llpPDG)
     tau0 = modelDict['tau0_ns']
 
+    bias_fct = modelDict.get('custom_fcts',None)
+    biasN = modelDict.get('pt_bias_enhancement_power',None)
+    biasPT = modelDict.get('pt_bias_target',None)
+    
+    if bias_fct is not None:
+        if 'ptchg_bias.f' not in str(bias_fct):
+            logger.error(f'Bias function {bias_fct} not known! \
+                            Check the definition of custom_fcts in the run_card!')
+            raise ValueError()
+        if (biasN is None) or (biasPT is None):
+            logger.error('Bias is being used, but values for \
+                         pt_bias_enhancement_power and pt_bias_target were not found!')
+            raise ValueError()
+        logger.warning(f"Events in {inputfile} will be reweighted by 1/( pTmax(C1/N1)/{biasPT:1.1f} )^{biasN:1.1f} !")
+
     tauList = [float(tau0)]
     if tau_file is not None:
         if not os.path.isfile(tau_file):
@@ -367,7 +400,7 @@ def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
 
     tauList = np.array([float(f"{tau:1.4e}") for tau in tauList[:]])
     tauList = np.sort(np.unique(tauList))
-    resDict = getEfficiencies(inputfile,tau0,tauList,ijob)
+    resDict = getEfficiencies(inputfile,tau0,tauList,ijob,biasN,biasPT)
     resDict.update(modelDict)
 
     outFile = inputfile.split('.root')[0].split('.hepmc')[0]

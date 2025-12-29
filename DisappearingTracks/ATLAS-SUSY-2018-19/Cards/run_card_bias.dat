@@ -106,8 +106,9 @@
 # list of files containing fortran function that overwrite default   *
 #*********************************************************************
   "../ptchg_bias/ptchg_bias.f" = custom_fcts ! List of files containing user hook function
-  1000.0 = pt_bias_target_chg
-  4.0 = pt_bias_enhancement_power_chg
+  1000.0 = pt_bias_target
+  4.0 = pt_bias_enhancement_power
+  50.0 = pt_bias_min
 #*******************************                                                 
 # Parton level cuts definition *
 #*******************************

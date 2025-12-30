@@ -87,8 +87,8 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
     if any(abs(jet.Eta) > 2.4 for jet in jets):
         return preSel_eff_EWK,preSel_eff_Strong
 
-    ewk_cutflow.fill_next(weight)
-    strong_cutflow.fill_next(weight)
+    ewk_cutflow.fill_next(1.0)
+    strong_cutflow.fill_next(1.0)
 
     if not jets:
         return preSel_eff_EWK,preSel_eff_Strong
@@ -102,14 +102,14 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
         if np.isnan(preSel_eff) or preSel_eff==0:
             return preSel_eff_EWK,preSel_eff_Strong
 
-    ewk_cutflow.fill_next(weight)
-    strong_cutflow.fill_next(weight)
+    ewk_cutflow.fill_next(1.0)
+    strong_cutflow.fill_next(1.0)
 
     if len(electrons)>0 or len(muons)>0:
         return preSel_eff_EWK,preSel_eff_Strong
 
-    ewk_cutflow.fill_next(weight)
-    strong_cutflow.fill_next(weight)
+    ewk_cutflow.fill_next(1.0)
+    strong_cutflow.fill_next(1.0)
 
     #EWK-specific pre-selection
     passedKinEWK = True
@@ -118,17 +118,17 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
     if met.MET < 200:
         passedKinEWK=False
     else:
-        ewk_cutflow.fill_next(weight)
+        ewk_cutflow.fill_next(1.0)
 
     if passedKinEWK:
         if jet1pt < 100:
             passedKinEWK=False
         else:
-            ewk_cutflow.fill_next(weight)
+            ewk_cutflow.fill_next(1.0)
 
     if passedKinEWK:
         if minDphilist(met,jets,4,50.0) > 1.0:
-            ewk_cutflow.fill_next(weight)
+            ewk_cutflow.fill_next(1.0)
         else:
             passedKinEWK=False
 
@@ -139,7 +139,7 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
     if met.MET < 250:
         passedKinStrong=False
     else:
-        strong_cutflow.fill_next(weight)
+        strong_cutflow.fill_next(1.0)
 
     #Jet PT Cuts
     if passedKinStrong:
@@ -150,12 +150,12 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
         elif jets[1].PT<20 or jets[2].PT < 20:
             passedKinStrong=False
         else:
-            strong_cutflow.fill_next(weight)
+            strong_cutflow.fill_next(1.0)
 
     #min(DeltaPhi(Jet,MET)) cut
     if passedKinStrong:
         if minDphilist(met,jets,4,50.0) > 0.4:
-            strong_cutflow.fill_next(weight)
+            strong_cutflow.fill_next(1.0)
         else:
             passedKinStrong=False
 
@@ -165,8 +165,9 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
 
     return preSel_eff_EWK,preSel_eff_Strong
 
-def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0,
-                    biasN: Union[None,float] = None, biasPT: Union[None,float] = None) -> Dict[str, Any]:
+def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,
+                    ijob: int=0,
+                    bias_pars: Dict[str,Union[str,float,None]] = {}) -> Dict[str, Any]:
 
     tauList = np.array(tauList)
     eff_SR = cutFlow(name="Efficiencies",levels=['EWK SR', 'Strong SR'],
@@ -180,7 +181,7 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0,
     ct=0
 
     # Based on the bias parameters decide whether events are reweighted or not
-    if (biasN is None) or (biasPT is None):
+    if (not bias_pars) or any(b is None for b in bias_pars.values()):
         reweight_evts = False
     else:
         reweight_evts = True
@@ -203,9 +204,10 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0,
             heavy_partons = [ptc for ptc in DelphesTree.FilterParticle 
                               if (ptc.Mass > 10.0 and abs(ptc.Status) in [22,23])]
             
-            pTmax = max([ptc.PT for ptc in heavy_partons])
+            pTmax = bias_pars['biasMin']
+            pTmax = max(pTmax,max([ptc.PT for ptc in heavy_partons]))
             if pTmax > 0.0:
-                bias_weight = (pTmax/biasPT)**biasN
+                bias_weight = (pTmax/bias_pars['biasPT'])**bias_pars['biasN']
                 weight = weight/bias_weight
     
         totalweight += weight
@@ -218,8 +220,8 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,ijob: int=0,
         strong_SR.reset()
 
         # Fill first key (All)
-        ewk_cutflow.fill(weight)
-        strong_cutflow.fill(weight)
+        ewk_cutflow.fill(1.0)
+        strong_cutflow.fill(1.0)
         ewk_SR.fill(weight)
         strong_SR.fill(weight)
 
@@ -368,20 +370,22 @@ def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
     modelDict = getModelInfo(bannerFile,llpPDG)
     tau0 = modelDict['tau0_ns']
 
-    bias_fct = modelDict.get('custom_fcts',None)
-    biasN = modelDict.get('pt_bias_enhancement_power',None)
-    biasPT = modelDict.get('pt_bias_target',None)
+    bias_pars = {'bias_fct' : modelDict.get('custom_fcts',None), 
+                 'biasN' : modelDict.get('pt_bias_enhancement_power',None), 
+                 'biasPT' : modelDict.get('pt_bias_target',None),
+                 'biasMin' : modelDict.get('pt_bias_min',None)}
     
-    if bias_fct is not None:
-        if 'ptchg_bias.f' not in str(bias_fct):
-            logger.error(f'Bias function {bias_fct} not known! \
-                            Check the definition of custom_fcts in the run_card!')
+    if bias_pars['bias_fct'] is not None:
+        if 'ptchg_bias.f' not in str(bias_pars['bias_fct']):
+            logger.error(f"Bias function {bias_pars['bias_fct']} not known! " +
+                            "Check the definition of custom_fcts in the run_card!")
             raise ValueError()
-        if (biasN is None) or (biasPT is None):
-            logger.error('Bias is being used, but values for \
-                         pt_bias_enhancement_power and pt_bias_target were not found!')
+        if any(b is None for b in bias_pars.values()):
+            logger.error('Bias is being used, but values for ' +
+                         'pt_bias_enhancement_power, pt_bias_target or pt_bias_min were not found!')
             raise ValueError()
-        logger.warning(f"Events in {inputfile} will be reweighted by 1/( pTmax(C1/N1)/{biasPT:1.1f} )^{biasN:1.1f} !")
+        logger.warning(f"Events in {inputfile} will be reweighted by " +
+                       f"1/( max({bias_pars['biasMin']:1.0f},pTmax(C1/N1))/{bias_pars['biasPT']:1.1f} )^{bias_pars['biasN']:1.1f} !")
 
     tauList = [float(tau0)]
     if tau_file is not None:
@@ -400,8 +404,12 @@ def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
 
     tauList = np.array([float(f"{tau:1.4e}") for tau in tauList[:]])
     tauList = np.sort(np.unique(tauList))
-    resDict = getEfficiencies(inputfile,tau0,tauList,ijob,biasN,biasPT)
+    resDict = getEfficiencies(inputfile,tau0,tauList,ijob,bias_pars)
     resDict.update(modelDict)
+    if 'totalweight' in resDict and "Number of Events" in resDict:
+        resDict['Cross-Section (pb)'] = resDict['totalweight']/resDict["Number of Events"]
+    else:
+        resDict['Cross-Section (pb)'] = None
 
     outFile = inputfile.split('.root')[0].split('.hepmc')[0]
     outFile = outFile +'_effs.json'

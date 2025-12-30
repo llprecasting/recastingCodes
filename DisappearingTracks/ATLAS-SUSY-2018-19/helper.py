@@ -294,7 +294,7 @@ def getModelInfo(bannerFile : str, llpPDG : int) -> Dict[str, Union[float,int]]:
         if '<MGRunCard>' in data:
             runInfo = data.split('<MGRunCard>')[1].split('</MGRunCard>')[0]
             fields = ['custom_fcts','pt_bias_target',
-                      'pt_bias_enhancement_power']
+                      'pt_bias_enhancement_power', 'pt_bias_min']
             for l in runInfo.split('\n'):
                 l = l.strip()
                 if not  l: continue

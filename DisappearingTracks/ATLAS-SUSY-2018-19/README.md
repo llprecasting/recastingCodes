@@ -2,7 +2,7 @@
 
 
 ## Authors: ##
-[Lucas Magno](mailto:lucas.magno.ramos@usp.br) and [Andre Lessa](mailto:andre.lessa@ufabc.edu.br)
+[Lucas Magno](mailto:lucas.magno.ramos@usp.br) and [Andre Lessa](mailto:lessa.a.p@gmail.com)
 
 The recast code and results are based on the [recast note](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-19/hepdata_info.pdf) and the [SimpleAnalysis code](https://gitlab.cern.ch/atlas-sa/simple-analysis/-/blob/master/SimpleAnalysisCodes/src/ANA-SUSY-2018-19_TrackletAcc.cxx).
 
@@ -33,7 +33,7 @@ A ROOT installation must already be present in the system.
 For running the recast code or reproducing the results in the [validation folder](./validation/) one must first:
 
  1. Generate HepMC events with MadGraph5 plus Pythia8.
- 2. Run Delphes on the HepMC events using a [modified version of Delphes](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP), which stores LLPs and their decays in the output ROOT file.
+ 2. Run Delphes on the HepMC events using a [modified version of Delphes](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP), which stores LLPs and their decays in the output ROOT file. **The PDG codes of the LLP(s) need to explicitly defined in the BSMFilter module of the delphes card**. See [delphes_card_chargino.dat](validation/Cards/delphes_card_chargino.dat) for an example where the LLP has PDG `1000024`.
 
 Examples of cards for generating events for the wino model can be found in the [validation/Cards](./validation/Cards/) folder.
 

@@ -68,7 +68,10 @@ The options include:
 *  `-n` or `--ncpus` : number of parallel jobs to run when running over multiple files [default=1].
 *  `-v` or `--verbose` : verbose level (debug, info, warning or error). If debug, it will also print the cutflows [default=warning].
 
-An example of the lifetime CSV file can be found [here](./tau_list.csv).
+An example of the lifetime CSV file which can be used for lifetime reweighting can be found [here](./tau_list.csv).
+*One must be careful when applying the lifetime reweighting to lifetime values too far away from the one assumed for event generation,
+since it may result in large uncertainties.*
+
 If running over multiple files, the code allows to run the efficiency calculation in parallel (the number of parallel runs is set by the `ncpus` option).
 
 For each ROOT file, the output is stored in a JSON file in the same folder containing the input ROOT file, with the suffix `_effs.json`. This file contains basic information about the input file as
@@ -116,6 +119,7 @@ For convenience a script ([collectData.py](./collectData.py)) is provided to col
 
 The output file will then contain a list of dictionaries contanining the information of each `*_effs.json` file found in the input folder (or its subfolders).
 
+
 ## Plotting the results
 
 Validation plots similar to the ones in [arXiv:2412.13976](https://arxiv.org/pdf/2412.13976) can be generated running:
@@ -130,4 +134,4 @@ the corresponding ( $m_{\Phi}$ , $m_{S}$ ) mass values assumed by ATLAS (for com
 
 ## Validation
 
-More information about validation can be found in the [validation](./validation/) folder and in the [recast note](https://arxiv.org/pdf/2412.13976).
+More information about validation can be found in the [validation](./validation/) folder.

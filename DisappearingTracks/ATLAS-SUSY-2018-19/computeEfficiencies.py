@@ -2,7 +2,6 @@
 import numpy as np
 import os,sys,glob
 from pathlib import Path
-import tqdm
 import logging
 from helper import (filterObjects,getModelInfo,saveOutput, \
                     overlapRemoval, minDphilist, eff_trigger, \
@@ -165,9 +164,7 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
 
     return preSel_eff_EWK,preSel_eff_Strong
 
-def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,
-                    ijob: int=0,
-                    bias_pars: Dict[str,Union[str,float,None]] = {}) -> Dict[str, Any]:
+def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray) -> Dict[str, Any]:
 
     tauList = np.array(tauList)
     eff_SR = cutFlow(name="Efficiencies",levels=['EWK SR', 'Strong SR'],
@@ -180,36 +177,12 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,
     totalweight = 0
     ct=0
 
-    # Based on the bias parameters decide whether events are reweighted or not
-    if (not bias_pars) or any(b is None for b in bias_pars.values()):
-        reweight_evts = False
-    else:
-        reweight_evts = True
 
-    disable = False
-    if ijob < 0:
-        disable = True
-    for entry in tqdm.tqdm(range(nevts),position=ijob,
-                            desc=inputFile,
-                            leave=False,
-                            disable=disable):
+    for entry in range(nevts):
         DelphesTree.GetEntry(entry)
         ct+=1
 
-        weight = float(DelphesTree.Weight.At(0).Weight)
-        if reweight_evts:
-            # Only the heavy partons are used for the bias
-            # (since the bias was compute pre-showering, we need the pre-showered
-            # partons for computing the bias)
-            heavy_partons = [ptc for ptc in DelphesTree.FilterParticle 
-                              if (ptc.Mass > 10.0 and abs(ptc.Status) in [22,23])]
-            
-            pTmax = bias_pars['biasMin']
-            pTmax = max(pTmax,max([ptc.PT for ptc in heavy_partons]))
-            if pTmax > 0.0:
-                bias_weight = (pTmax/bias_pars['biasPT'])**bias_pars['biasN']
-                weight = weight/bias_weight
-    
+        weight = float(DelphesTree.Weight.At(0).Weight)    
         totalweight += weight
         llps,muons,electrons,jets,met = getObjects(DelphesTree)
 
@@ -270,16 +243,12 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,
         fill_EWK = 0.0
         if llps_EWK:
             fill_EWK = weight*preSel_eff_EWK*llps_EWK[0].tracklet_eff_EWK
-        ######### Use only leading LLP!!
-            # llps_EWK = llps_EWK[:1]
         ewk_SR.fill_next(fill_EWK)
 
         llps_Strong = [llp for llp in llps if llp.tracklet_eff_Strong > 0.0]
         fill_Strong = 0.0
         if llps_Strong:
             fill_Strong = weight*preSel_eff_Strong*llps_Strong[0].tracklet_eff_Strong
-        ######### Use only leading LLP!!
-            # llps_Strong = llps_Strong[:1]
         strong_SR.fill_next(fill_Strong)
 
         # Select llps with smearedPt > minPT:
@@ -310,8 +279,6 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,
             strong_SR.fill_next(fill_Strong)
         
         # Finally compute event weight:
-        # evt_weight = weight*preSelectionEff*llp_eff    
-
         evt_weight_EWK = np.zeros(len(tauList))
         evt_weight_Strong = np.zeros(len(tauList))
 
@@ -350,13 +317,11 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray,
 
     logger.debug("Efficiencies for all lifetimes:")
     logger.debug(f"{eff_SR.to_string()}\n\n")
-
-
     
     return eff_dict
 
 
-def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
+def main(inputfile: str,llpPDG :int, tau_file: Union[str,None]):
 
     # Read banner file to extract information about LLP mass, LLP lifetime and total cross-section
     bannerFile = None
@@ -369,23 +334,6 @@ def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
     bannerFile = b_files[0]
     modelDict = getModelInfo(bannerFile,llpPDG)
     tau0 = modelDict['tau0_ns']
-
-    bias_pars = {'bias_fct' : modelDict.get('custom_fcts',None), 
-                 'biasN' : modelDict.get('pt_bias_enhancement_power',None), 
-                 'biasPT' : modelDict.get('pt_bias_target',None),
-                 'biasMin' : modelDict.get('pt_bias_min',None)}
-    
-    if bias_pars['bias_fct'] is not None:
-        if 'ptchg_bias.f' not in str(bias_pars['bias_fct']):
-            logger.error(f"Bias function {bias_pars['bias_fct']} not known! " +
-                            "Check the definition of custom_fcts in the run_card!")
-            raise ValueError()
-        if any(b is None for b in bias_pars.values()):
-            logger.error('Bias is being used, but values for ' +
-                         'pt_bias_enhancement_power, pt_bias_target or pt_bias_min were not found!')
-            raise ValueError()
-        logger.warning(f"Events in {inputfile} will be reweighted by " +
-                       f"1/( max({bias_pars['biasMin']:1.0f},pTmax(C1/N1))/{bias_pars['biasPT']:1.1f} )^{bias_pars['biasN']:1.1f} !")
 
     tauList = [float(tau0)]
     if tau_file is not None:
@@ -404,7 +352,7 @@ def main(inputfile: str,llpPDG :int, tau_file: Union[str,None],ijob: int=0):
 
     tauList = np.array([float(f"{tau:1.4e}") for tau in tauList[:]])
     tauList = np.sort(np.unique(tauList))
-    resDict = getEfficiencies(inputfile,tau0,tauList,ijob,bias_pars)
+    resDict = getEfficiencies(inputfile,tau0,tauList)
     resDict.update(modelDict)
     if 'totalweight' in resDict and "Number of Events" in resDict:
         resDict['Cross-Section (pb)'] = resDict['totalweight']/resDict["Number of Events"]
@@ -501,17 +449,10 @@ if __name__ == "__main__":
     else:
         ijob = 0
     for rootFile in inputFiles:
-        p = pool.apply_async(main, args=(rootFile,args.llpPDG,args.tau_file,ijob,))
+        p = pool.apply_async(main, args=(rootFile,args.llpPDG,args.tau_file,))
         children.append(p)
 
     logger.info(f'Running {len(inputFiles)} jobs in {ncpus} instances')
-    # If ijob < 0, show progressbar for each job, else suppress it
-    disable = True
-    if ijob < 0:
-        disable = False
-    for ichildren in tqdm.tqdm(range(len(children)),
-                            desc=f'Job',
-                            leave=True,
-                            disable=disable):
+    for ichildren in range(len(children)):
         children[ichildren].get()
 

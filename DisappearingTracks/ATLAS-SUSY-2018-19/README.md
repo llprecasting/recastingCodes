@@ -128,6 +128,6 @@ Examples on how to plot the efficiencies and compute the exclusion curve can be 
 
 Below is a comparison between the exclusion curve obtained for the Wino scenario using the recasting code and the official ATLAS exclusion. *Note that ATLAS uses a model dependent approach which results in slightly stronger limits.*
 
-<img src="validation/wino_exclusion.png" width="400" height="270">
+<img src="validation/wino_exclusion.png" width="550" height="400">
 
 More information about validation can be found in the [validation](./validation/) folder.

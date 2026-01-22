@@ -66,7 +66,7 @@ The options include:
 *  `-l` or `--llpPDG` : LLP PDG [default = 1000024]
 *  `-tauF` or `--tau_file` : CSV file containing the lifetime values (in ns) used for reweighting. If empty or file not found, it will not apply reweighting [default=tau_list.csv].
 *  `-n` or `--ncpus` : number of parallel jobs to run when running over multiple files [default=1].
-*  `-v` or `--verbose` : verbose level (debug, info, warning or error). If debug, it will also print the cutflows [default=warning].
+*  `-v` or `--verbose` : verbose level (debug, info, warning or error). If debug, it will also print the cutflows [default=info].
 
 An example of the lifetime CSV file which can be used for lifetime reweighting can be found [here](./tau_list.csv).
 *One must be careful when applying the lifetime reweighting to lifetime values too far away from the one assumed for event generation,
@@ -122,16 +122,12 @@ The output file will then contain a list of dictionaries contanining the informa
 
 ## Plotting the results
 
-Validation plots similar to the ones in [arXiv:2412.13976](https://arxiv.org/pdf/2412.13976) can be generated running:
-
-```
-./plotEfficiencies.py -f INPUTFILE -M MPHI -m MS -e EFFPLOT -x XSECPLOT
-```
-
-where INPUTFILE is the one of the csv files containing the signal efficiencies, (MPHI,MS) are
-the corresponding ( $m_{\Phi}$ , $m_{S}$ ) mass values assumed by ATLAS (for comparison against the official ATLAS curves) and EFFPLOT and XSECPLOT are the names of the efficiency plot and cross-section upper limit plot, respectively.
-
+Examples on how to plot the efficiencies and compute the exclusion curve can be found in [validation/plotEffs.ipynb](./validation/plotEffs.ipynb) and [validation/plotExclusion.ipynb](./validation/plotExclusion.ipynb).
 
 ## Validation
+
+Below is a comparison between the exclusion curve obtained for the Wino scenario using the recasting code and the official ATLAS exclusion. *Note that ATLAS uses a model dependent approach which results in slightly stronger limits.*
+
+<img src="validation/wino_exclusion.png" width="400" height="270">
 
 More information about validation can be found in the [validation](./validation/) folder.

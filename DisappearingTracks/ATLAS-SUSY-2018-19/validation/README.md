@@ -55,8 +55,8 @@ Below is a comparison between the exclusion curve obtained for the Wino scenario
 <img src="./wino_exclusion.png" width="550" height="400">
 
 
-[^1] : The efficiencies for very small lifetime suffers from large uncertainties.
-For such small lifetimes the charginos only decay within the tracker if they have a large boost (or large $`p_T`$).
-Therefore only the tail of the $p_T$ distribution produces sizeable efficiencies, thus resulting in large uncertainties.
-A way to increase the precision at small lifetimes is to use a weight bias when generating events with MadGraph so the tail of the $p_T$ distribution is better described (i.e. has more MC events).
+[^1]: The efficiencies for very small lifetime suffers from large uncertainties.
+For such small lifetimes the charginos only decay within the tracker if they have a large boost (or large pT).
+Therefore only the tail of the pT distribution produces sizeable efficiencies, thus resulting in large uncertainties.
+A way to increase the precision at small lifetimes is to use a weight bias when generating events with MadGraph so the tail of the pT distribution is better described (i.e. has more MC events).
 In this case, however, care must be taken to unweight the biased events when computing the efficiencies.

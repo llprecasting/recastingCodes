@@ -25,12 +25,16 @@ corresponding analysis and authors:
   * [Displaced Jets](DisplacedJets) (CalRatio)
     * [13 TeV ATLAS Displaced Jets in the calorimeter](DisplacedJets/ATLAS-EXOT-2019-23)
     * [13 TeV ATLAS Displaced Jets plus X in the calorimeter](DisplacedJets/ATLAS-EXOT-2022-04)
-  * [Emerging Jets](EmergingJets/CMS-EXO-18-001)    
+  * [Emerging Jets](EmergingJets)
+    * [13 TeV CMS EJs - 16.1/fb](EmergingJets/CMS-EXO-18-001)
   * [Heavy Stable Charged Particles](HSCPs)
     * [13 TeV ATLAS HSCP - 139/fb](HSCPs/ATLAS-SUSY-2018-42)
     * [13 TeV ATLAS HSCP - 31.6/fb](HSCPs/ATLAS-SUSY-2016-32)
-    * [8 TeV CMS HSCP](HSCPs/CMS-EXO-12-026)    
-  * [Disappearing Tracks](DisappearingTracks/ATLAS-SUSY-2016-06)
+    * [8 TeV CMS HSCP](HSCPs/CMS-EXO-12-026)
+  * [Disappearing Tracks](DisappearingTracks)
+    * [13 TeV ATLAS DT - 36.1/fb](DisappearingTracks/ATLAS-SUSY-2016-06)
+    * [13 TeV CMS DT - 140/fb](DisappearingTracks/CMS-EXO-19-010)
+    * [13 TeV ATLAS DT - 136/fb](DisappearingTracks/ATLAS-SUSY-2018-19)
 
 A README file can be found inside each folder with the required dependencies
 and basic instructions on how to run the recasting codes.

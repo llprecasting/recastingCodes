@@ -2,7 +2,7 @@
 
 
 ## Authors: ##
-[Lucas Magno](mailto:lucas.magno.ramos@usp.br) and [Andre Lessa](mailto:lessa.a.p@gmail.com)
+[Lucas Ramos](mailto:lucas.magno.ramos@usp.br) and [Andre Lessa](mailto:lessa.a.p@gmail.com)
 
 The recast code and results are based on the [recast note](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-19/hepdata_info.pdf) and the [SimpleAnalysis code](https://gitlab.cern.ch/atlas-sa/simple-analysis/-/blob/master/SimpleAnalysisCodes/src/ANA-SUSY-2018-19_TrackletAcc.cxx).
 

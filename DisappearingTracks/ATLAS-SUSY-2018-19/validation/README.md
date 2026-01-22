@@ -44,8 +44,19 @@ These efficiencies can be reproduced through the following steps:
 ## Plotting the exclusion curve
 
 After computing the efficiencies the Jupyter notebook [plotEffs.ipynb](plotEffs.ipynb) shows an example of how to
-analyse them, while the [plotExclusion.ipynb](plotExclusion.ipynb) shows how to obtain the exclusion curve.
+analyse them. For instance the MC uncertainties (using 50k events) are shown below[^1]:
 
+<img src="./wino_effs_uncertainties.png" width="1000" height="300">
+
+
+The [plotExclusion.ipynb](plotExclusion.ipynb) shows how to obtain the exclusion curve.
 Below is a comparison between the exclusion curve obtained for the Wino scenario using the recasting code and the official ATLAS exclusion. *Note that ATLAS uses a model dependent approach which results in slightly stronger limits.*
 
 <img src="./wino_exclusion.png" width="550" height="400">
+
+
+[^1] : The efficiencies for very small lifetime suffers from large uncertainties.
+For such small lifetimes the charginos only decay within the tracker if they have a large boost (or large $`p_T`$).
+Therefore only the tail of the $p_T$ distribution produces sizeable efficiencies, thus resulting in large uncertainties.
+A way to increase the precision at small lifetimes is to use a weight bias when generating events with MadGraph so the tail of the $p_T$ distribution is better described (i.e. has more MC events).
+In this case, however, care must be taken to unweight the biased events when computing the efficiencies.

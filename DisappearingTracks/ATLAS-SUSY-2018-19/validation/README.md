@@ -22,21 +22,21 @@ These efficiencies can be reproduced through the following steps:
 
 2. Compute efficiencies running:
    ```
-   ./computeEfficiencies.py -i pp2chgchg/Events -l 1000024 -tauF tau_list.csv
+   ./computeEfficiencies.py -i pp2chgchg -l 1000024 -tauF tau_list.csv
    ```
    and
    ```
-   ./computeEfficiencies.py -i pp2chgn1/Events -l 1000024 -tauF tau_list.csv
+   ./computeEfficiencies.py -i pp2chgn1 -l 1000024 -tauF tau_list.csv
    ``` 
    The final efficiencies are stored in .json files in the event folders.
 
 3. Collect the results running:
    ```
-   ./collectData.py -i pp2chgchg/Events -o C1C1_effs.json
+   ./collectData.py -i pp2chgchg -o C1C1_effs.json
    ```
    and
    ```
-   ./collectData.py -i pp2chgn1/Events -o C1N1_effs.json
+   ./collectData.py -i pp2chgn1 -o C1N1_effs.json
    ```
    The combined efficiencies are finally stored in the `C1C1_effs.json` and `C1N1_effs.json` files.
 

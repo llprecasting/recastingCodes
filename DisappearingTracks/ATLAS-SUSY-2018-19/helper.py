@@ -14,7 +14,7 @@ np.random.seed(seed=123)
 from ROOT import TFile
 
 class effMap:
-  def __init__(self, mapname: str, filepath: str="DisappearingTrack2018-EfficiencyMaps.root"):
+  def __init__(self, mapname: str, filepath: str="./ATLAS_data/DisappearingTrack2018-EfficiencyMaps.root"):
     
     self.fh = TFile(filepath)
     try:
@@ -200,9 +200,9 @@ class cutFlow(object):
 
 #Initialize efficiency maps
 
-eff_trigger = effMap('eff_trigger_average',filepath='DisappearingTrack2018-EfficiencyMaps.root')
-eff_track_EWK = effMap('h_effmap_average_EWK',filepath='DisappearingTrack2018-EfficiencyMaps.root')
-eff_track_Strong = effMap('h_effmap_average_Strong',filepath='DisappearingTrack2018-EfficiencyMaps.root')
+eff_trigger = effMap('eff_trigger_average',filepath='./ATLAS_data/DisappearingTrack2018-EfficiencyMaps.root')
+eff_track_EWK = effMap('h_effmap_average_EWK',filepath='./ATLAS_data/DisappearingTrack2018-EfficiencyMaps.root')
+eff_track_Strong = effMap('h_effmap_average_Strong',filepath='./ATLAS_data/DisappearingTrack2018-EfficiencyMaps.root')
 
 
 # Create smearing functions for each pT range
@@ -278,7 +278,8 @@ def getLLPDecayTime(llp) -> float:
 
 def getModelInfo(bannerFile : str, llpPDG : int) -> Dict[str, Union[float,int]]:
 
-    modelInfoDict = {'llpPDG' : llpPDG}
+    modelInfoDict : Dict[str, Union[float,int]] = {'llpPDG' : llpPDG}
+    slhaData = None
     with open(bannerFile,'r') as ff:
         data = ff.read()
         if '<slha>' in data:

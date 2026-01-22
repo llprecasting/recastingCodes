@@ -20,16 +20,11 @@ if test $PKG_OK = "0" ; then
   echo "gzip not found. Install it with sudo apt-get install gzip."
   exit
 fi
-PKG_OK=$(dpkg-query -W -f='${Status}' bzr 2>/dev/null | grep -c "ok installed")
-if test $PKG_OK = "0" ; then
-  echo "bzr not found. Install it with sudo apt-get install bzr."
-  exit
-fi
 
 cd $homeDIR
 
 
-madgraph="MG5_aMC_v3.6.5.tar.gz"
+madgraph="MG5_aMC_v3.6.7.tar.gz"
 URL=https://launchpad.net/mg5amcnlo/3.0/3.6.x/+download/$madgraph
 echo -n "Install MadGraph (y/n)? "
 read answer
@@ -42,7 +37,6 @@ if echo "$answer" | grep -iq "^y" ;then
         echo "install hepmc\ninstall lhapdf6\ninstall pythia8\nexit\n" > mad_install.txt;
 	./mg5_aMC -f mad_install.txt
 	cd $homeDIR
-	sed  "s|homeDIR|$homeDIR|g" mg5_configuration.txt > ./MG5/input/mg5_configuration.txt;
 fi
 
 echo -n "Install Delphes (y/n)? "

@@ -46,7 +46,7 @@ These efficiencies can be reproduced through the following steps:
 After computing the efficiencies the Jupyter notebook [plotEffs.ipynb](plotEffs.ipynb) shows an example of how to
 analyse them. For instance the MC uncertainties (using 50k events) are shown below[^1]:
 
-<img src="./wino_effs_uncertainties.png" width="1000" height="300">
+<img src="./wino_effs_uncertainties.png" width="800" height="320">
 
 
 The [plotExclusion.ipynb](plotExclusion.ipynb) shows how to obtain the exclusion curve.

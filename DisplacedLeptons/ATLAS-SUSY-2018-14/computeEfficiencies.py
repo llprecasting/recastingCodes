@@ -4,9 +4,7 @@ import os,sys,glob
 from pathlib import Path
 import logging
 from helper import (filterObjects,getModelInfo,saveOutput, \
-                    overlapRemoval, minDphilist, eff_trigger, \
-                    getLLPDecayRadius,getLLPDecayTime,electronPtSmear,\
-                    eff_track_EWK,eff_track_Strong, cutFlow)
+                    electron_reco, muon_reco, deltaR, cutFlow)
 from numpy import ndarray
 from typing import Any, Dict, List, Tuple, Union
 import multiprocessing
@@ -31,16 +29,17 @@ from ROOT import TFile,Electron, Jet, MissingET, Muon, TTree
 
 
 # Define SRs and Cutflow
-ewk_cutflow = cutFlow(name='EWK_cutflow',levels=['All', 'GRL and Cleaning', 'MET Trigger', 'Lepton Veto', 
-                    'MET > 200 GeV', 'Jet pT > 100 GeV', 'min(DeltaPhi(JetMET)) > 1.0'])
-strong_cutflow = cutFlow(name='Strong_cutflow',levels=['All', 'GRL and Cleaning', 'MET Trigger', 'Lepton Veto',
-                      'MET > 250 GeV', 'Jet pT > 100,20,20 GeV', 'min(DeltaPhi(JetMET)) > 0.4'])
-ewk_SR = cutFlow(name='EWK_SR',levels=['All', 'Kinematic', 'Tracklet Emulation', 'Leading tracklet',
-                                'DeltaR(jet) > 0.4', 'DeltaR(electron) > 0.4', 'DeltaR(muon) > 0.4',
-                                 '0.1 < Eta < 1.9'])
-strong_SR = cutFlow(name='Strong_SR',levels=['All', 'Kinematic', 'Tracklet Emulation', 'Leading tracklet',
-                                'DeltaR(jet) > 0.4', 'DeltaR(electron) > 0.4', 'DeltaR(muon) > 0.4',
-                                 '0.1 < Eta < 1.9'])
+ee_cutflow = cutFlow(name='ee_cutflow',levels=['All', 'PreSelection', 'Trigger', '2e', 
+                    'pT > 65 GeV', '3 mm < d0 < 300 mm', 'DeltaRll > 0.2'])
+mm_cutflow = cutFlow(name='mm_cutflow',levels=['All', 'PreSelection', 'Trigger', '2mu', 
+                    'pT > 65 GeV', '3 mm < d0 < 300 mm', 'DeltaRll > 0.2'])
+em_cutflow = cutFlow(name='em_cutflow',levels=['All', 'PreSelection', 'Trigger', 'emu', 
+                    'pT > 65 GeV', '3 mm < d0 < 300 mm', 'DeltaRll > 0.2'])
+
+ee_SR = cutFlow(name='ee_SR',levels=['All', 'Final Selection' ])
+mm_SR = cutFlow(name='mm_SR',levels=['All', 'Final Selection' ])
+
+em_SR = cutFlow(name='em_SR',levels=['All', 'Final Selection' ])
 
 
 
@@ -50,126 +49,86 @@ def getObjects(DelphesTree: TTree) -> Any:
     minimum requirements on pT, eta and overlap.
     """
 
-    llps = DelphesTree.bsm
-    jets = DelphesTree.Jet
+    llps = DelphesTree.bsmMothers
     bmet = DelphesTree.MissingET
     muons = DelphesTree.Muon
     electrons = DelphesTree.Electron
     
     llps = filterObjects(llps,pTmin=0.0,etaMax=5.0)
     met = bmet.At(0)
-    jets = filterObjects(jets,pTmin=20.0,etaMax=2.8)
-    muons = filterObjects(muons,pTmin=10.0,etaMax=2.7)
-    electrons = filterObjects(electrons, pTmin=10.0, etaMax=2.47)
-    
-    #Overlap Removal
-    electrons = overlapRemoval(electrons, muons, 0.05)
-    electrons = overlapRemoval(electrons, jets, 0.4)
-    muons = overlapRemoval(muons, jets, 0.4)
-    jets.sort(key=lambda j: j.PT,reverse=True)
+    muons = filterObjects(muons,pTmin=25.0,etaMax=5.0)
+    electrons = filterObjects(electrons, pTmin=25.0, etaMax=5.0)
+    for el in electrons:
+        el.PID = 11*el.Charge
+    for mu in muons:
+        mu.PID = 13*mu.Charge
 
-    return llps,muons,electrons,jets,met
+    return llps,muons,electrons,met
 
-def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, Any]],jets: List[Union[Any, Jet]],met: MissingET,weight: float,
-                 ewk_cutflow: cutFlow,strong_cutflow: cutFlow) -> Tuple[float, float]:
+def getSR(leptons: List[Electron | Muon]) -> str:
     """
-    Apply the pre-selection including the trigger efficiency.
-    Returns the pre-selection efficiency for each signal region 
-    (eff = 0 if the event did not pass the cuts)
+    Returns the signal region for a given list of leptons.
     """
- 
-    preSel_eff_EWK = 0.0
-    preSel_eff_Strong = 0.0
+
+    leptonIDs = [abs(lep.PID) for lep in leptons]
+    if leptonIDs == [13, 13]:
+        return "mm"
+    elif leptonIDs == [11, 11]:
+        return "ee"
+    elif leptonIDs == [11, 13]:
+        return "em"
+    elif leptonIDs == [13, 11]:
+        return "me"
+    else:
+        raise ValueError(f"Invalid lepton IDs: {leptonIDs}!")
+
+def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, Any]]) -> Union[None,List[Electron | Muon]]:
+    """
+    Applies the pre-selection requirements for the different SRs and computes the trigger efficiency.
+    """
+
+
+    if len(muons) + len(electrons) < 2:
+        return None
     
-    #Event Cleaning
-    #Clean Bad Jets
-    if any(abs(jet.Eta) > 2.4 for jet in jets):
-        return preSel_eff_EWK,preSel_eff_Strong
+    muons = sorted(muons, key=lambda mu: mu.PT,reverse=True)
+    allLeptons = sorted(muons + electrons, key=lambda lep: lep.PT,reverse=True)
+    leptons = allLeptons[:2]
 
-    ewk_cutflow.fill_next(1.0)
-    strong_cutflow.fill_next(1.0)
+    sr = getSR(leptons)
+    
+     # Different eta cuts for electrons and muons -- based on atlas recommendations
+    if (sr == "ee" or sr == "em") and abs(leptons[0].Eta) > 2.47:
+        return None
+    if (sr == "ee" or sr == "me") and abs(leptons[1].Eta) > 2.47:
+        return None
+    if (sr == "mm" or sr == "me") and abs(leptons[0].Eta) > 2.5: 
+        return None
+    if (sr == "mm" or sr == "em") and abs(leptons[1].Eta) > 2.5: 
+        return None
+    
+    return leptons
 
-    if not jets:
-        return preSel_eff_EWK,preSel_eff_Strong
 
-    jet1pt = jets[0].PT
+def passTrigger(leptons : List[Electron | Muon]) -> bool:
+    """
+    Applies the trigger requirements for the different SRs.
+    """
 
-    if met.MET>500:
-        preSel_eff = 1.0
-    else:
-        preSel_eff = eff_trigger.efficiency(met.MET,min(499.0,jet1pt))
-        if np.isnan(preSel_eff) or preSel_eff==0:
-            return preSel_eff_EWK,preSel_eff_Strong
+    sr = getSR(leptons)
 
-    ewk_cutflow.fill_next(1.0)
-    strong_cutflow.fill_next(1.0)
+    pass_trigger = False
+    if (sr == "ee" or sr == "em") and leptons[0].PT > 160: pass_trigger = True
+    if (sr == "ee" or sr == "me") and leptons[1].PT > 160: pass_trigger = True
+    if sr == "ee" and leptons[0].PT > 60 and leptons[1].PT > 60: pass_trigger = True
+    if (sr == "mm" or sr == "me") and (leptons[0].PT > 60 and abs(leptons[0].Eta) < 1.07): pass_trigger = True
+    if (sr == "mm" or sr == "em") and (leptons[1].PT > 60 and abs(leptons[1].Eta) < 1.07): pass_trigger = True
+    
+    return pass_trigger
 
-    if len(electrons)>0 or len(muons)>0:
-        return preSel_eff_EWK,preSel_eff_Strong
+def getEfficiencies(inputFile: str) -> Dict[str, Any]:
 
-    ewk_cutflow.fill_next(1.0)
-    strong_cutflow.fill_next(1.0)
-
-    #EWK-specific pre-selection
-    passedKinEWK = True
-
-    #MET Cut
-    if met.MET < 200:
-        passedKinEWK=False
-    else:
-        ewk_cutflow.fill_next(1.0)
-
-    if passedKinEWK:
-        if jet1pt < 100:
-            passedKinEWK=False
-        else:
-            ewk_cutflow.fill_next(1.0)
-
-    if passedKinEWK:
-        if minDphilist(met,jets,4,50.0) > 1.0:
-            ewk_cutflow.fill_next(1.0)
-        else:
-            passedKinEWK=False
-
-    #Strong-specific Pre-selection
-    passedKinStrong=True
-
-    #MET Cut
-    if met.MET < 250:
-        passedKinStrong=False
-    else:
-        strong_cutflow.fill_next(1.0)
-
-    #Jet PT Cuts
-    if passedKinStrong:
-        if jet1pt < 100:
-            passedKinStrong=False
-        elif len(jets)<3:
-            passedKinStrong=False
-        elif jets[1].PT<20 or jets[2].PT < 20:
-            passedKinStrong=False
-        else:
-            strong_cutflow.fill_next(1.0)
-
-    #min(DeltaPhi(Jet,MET)) cut
-    if passedKinStrong:
-        if minDphilist(met,jets,4,50.0) > 0.4:
-            strong_cutflow.fill_next(1.0)
-        else:
-            passedKinStrong=False
-
-    #Event must pass at least one preselection
-    preSel_eff_EWK = preSel_eff*float(passedKinEWK)
-    preSel_eff_Strong = preSel_eff*float(passedKinStrong)
-
-    return preSel_eff_EWK,preSel_eff_Strong
-
-def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray) -> Dict[str, Any]:
-
-    tauList = np.array(tauList)
-    eff_SR = cutFlow(name="Efficiencies",levels=['EWK SR', 'Strong SR'],
-                      zero_weight=np.zeros(len(tauList)))
-
+    
     f = TFile(inputFile,'read')
     DelphesTree = f.Get('Delphes')
     nevts = DelphesTree.GetEntries()
@@ -177,151 +136,118 @@ def getEfficiencies(inputFile: str,tau0: float,tauList: ndarray) -> Dict[str, An
     totalweight = 0
     ct=0
 
-
     for entry in range(nevts):
         DelphesTree.GetEntry(entry)
         ct+=1
 
         weight = float(DelphesTree.Weight.At(0).Weight)    
         totalweight += weight
-        llps,muons,electrons,jets,met = getObjects(DelphesTree)
+        llps,muons,electrons,met = getObjects(DelphesTree)
 
         # Reset cutflows to beginning
-        ewk_cutflow.reset()
-        strong_cutflow.reset()
-        ewk_SR.reset()
-        strong_SR.reset()
+        ee_cutflow.reset()
+        mm_cutflow.reset()
+        em_cutflow.reset()
+        
+        ee_SR.reset()
+        mm_SR.reset()
+        em_SR.reset()
 
         # Fill first key (All)
-        ewk_cutflow.fill(1.0)
-        strong_cutflow.fill(1.0)
-        ewk_SR.fill(weight)
-        strong_SR.fill(weight)
+        ee_cutflow.fill(1.0)
+        em_cutflow.fill(1.0)
+        mm_cutflow.fill(1.0)
 
-        preSel_eff_EWK,preSel_eff_Strong = preSelection(muons,electrons,jets,met,weight,
-                                                        ewk_cutflow,strong_cutflow)
-    
-        if (not preSel_eff_EWK) and (not preSel_eff_Strong):
+        ee_SR.fill(weight)
+        mm_SR.fill(weight)
+        em_SR.fill(weight)
+
+        leptons_preSel = preSelection(muons,electrons)
+        if leptons_preSel is None:
             continue
 
-        if not llps:
+        # Fill Pre-selection pass
+        ee_cutflow.fill(1.0)
+        em_cutflow.fill(1.0)
+        mm_cutflow.fill(1.0)
+
+        if not passTrigger(leptons_preSel):
             continue
+        # Fill trigger pass
+        ee_cutflow.fill(1.0)
+        em_cutflow.fill(1.0)
+        mm_cutflow.fill(1.0)
 
-        # Compute relevant LLP variables
-        for llp in llps:
-            llp.daughter = DelphesTree.bsmDirectDaughters.At(llp.D1)
-            llp.decayR = getLLPDecayRadius(llp)
-            llp.decayT = getLLPDecayTime(llp)
-            llp.smearedPt = electronPtSmear(llp.PT, llp.Charge)
-            track_eff_EWK =  eff_track_EWK.efficiency(llp.Eta,llp.decayR)
-            if np.isnan(track_eff_EWK):
-                track_eff_EWK = 0.0
-            track_eff_Strong =  eff_track_Strong.efficiency(llp.Eta,llp.decayR)
-            if np.isnan(track_eff_Strong):
-                track_eff_Strong = 0.0
-                
-            llp.tracklet_eff_EWK = track_eff_EWK
-            llp.tracklet_eff_Strong = track_eff_Strong
-            # Lifetime reweighting:
-            if tau0 > 0.0:
-                # llp.lifetime_reweight = np.exp(llp.decayT0/tau0-llp.decayT0/tauList)
-                gamma = llp.P4().Gamma()
-                llp.lifetime_reweight = (tau0/tauList)*np.exp(-(llp.decayT/gamma)*(1/tauList-1/tau0))
-            else:
-                llp.lifetime_reweight = np.ones(tauList.shape)
+        signal_region = getSR(leptons_preSel)
+        
+        # Selectt cutflow to fill based on SR
+        if signal_region == "ee":
+            cutflow = ee_cutflow
+            eff_SR = ee_SR
+        elif signal_region == "mm":
+            cutflow = mm_cutflow
+            eff_SR = mm_SR
+        else:
+            cutflow = em_cutflow
+            eff_SR = em_SR
+        
+        cutflow.fill(1.0)
+
+
+        ## signal pt and d0 cuts 
+        if leptons_preSel[0].PT < 65 or leptons_preSel[1].PT < 65:
+            continue
+        cutflow.fill(1.0)
+
+        if abs(leptons_preSel[0].D0) < 3 or abs(leptons_preSel[1].D0) < 3:
+            continue
+        if abs(leptons_preSel[0].D0) > 300 or abs(leptons_preSel[1].D0) > 300:
+            continue
+        cutflow.fill(1.0)
     
+        if deltaR(leptons_preSel[0], leptons_preSel[1]) < 0.2:
+            continue
+        cutflow.fill(1.0)
 
-        # Sort by smearedPt:
-        llps = sorted(llps, key=lambda llp: llp.smearedPt,reverse=True)
+        # Get lepton reconstruction efficiencies
+        lepton_effs = []
+        for lep in leptons_preSel:
+            if abs(lep.PID) == 11:
+                lepton_effs.append(electron_reco.efficiency(Lepton_p_textT_GeV=lep.PT, 
+                                                            Lepton_d_0_mm=abs(lep.D0)))
+            elif abs(lep.PID) == 13:
+                lepton_effs.append(muon_reco.efficiency(Lepton_p_textT_GeV=lep.PT, 
+                                                        Lepton_d_0_mm=abs(lep.D0)))
+            
+        recoEff = float(np.prod(lepton_effs))
+        if recoEff == 0:
+            continue
+        eff_SR.fill(weight*recoEff)
 
-        # Add one entry for each llp
-        ewk_SR.fill_next(weight*preSel_eff_EWK*len(llps))
-        strong_SR.fill_next(weight*preSel_eff_Strong*len(llps))
-        
-        # Selected llps with track effciency > 0:
-        llps_EWK = [llp for llp in llps if llp.tracklet_eff_EWK > 0.0]
-        fill_EWK = 0.0
-        if llps_EWK:
-            fill_EWK = weight*preSel_eff_EWK*llps_EWK[0].tracklet_eff_EWK
-        ewk_SR.fill_next(fill_EWK)
-
-        llps_Strong = [llp for llp in llps if llp.tracklet_eff_Strong > 0.0]
-        fill_Strong = 0.0
-        if llps_Strong:
-            fill_Strong = weight*preSel_eff_Strong*llps_Strong[0].tracklet_eff_Strong
-        strong_SR.fill_next(fill_Strong)
-
-        # Select llps with smearedPt > minPT:
-        # minPT = 60 (20) GeV for the model-independent (model-dependent) search strategy
-        minPT = 60.0
-        llps_EWK = [llp for llp in llps_EWK[:] if llp.smearedPt > minPT]
-        if llps_EWK:
-            ewk_SR.fill_next(fill_EWK)
-
-        llps_Strong = [llp for llp in llps_Strong[:] if llp.smearedPt > minPT]
-        if llps_Strong:
-            strong_SR.fill_next(fill_Strong)
-
-        # Remove LLPs with overlap to jets, electrons and muons:
-        for objList in [jets,electrons,muons]:
-            llps_EWK = overlapRemoval(llps_EWK,objList,0.4)
-            if llps_EWK:
-                ewk_SR.fill_next(fill_EWK)
-            llps_Strong = overlapRemoval(llps_Strong,objList,0.4)
-            if llps_Strong:
-                strong_SR.fill_next(fill_Strong)
-        # Apply eta cut: 0.1 < abs(eta) < 1.9
-        llps_EWK = [llp for llp in llps_EWK if 0.1 < abs(llp.Eta) < 1.9]
-        if llps_EWK:
-            ewk_SR.fill_next(fill_EWK)
-        llps_Strong = [llp for llp in llps_Strong if 0.1 < abs(llp.Eta) < 1.9]
-        if llps_Strong:
-            strong_SR.fill_next(fill_Strong)
-        
-        # Finally compute event weight:
-        evt_weight_EWK = np.zeros(len(tauList))
-        evt_weight_Strong = np.zeros(len(tauList))
-
-        if llps_EWK:
-        # Require at least one LLP to be reconstructed and isolated
-            llp_eff = 1.0 - np.prod([(1.0-llp.tracklet_eff_EWK*llp.lifetime_reweight)
-                                    for llp in llps_EWK],axis=0)
-            evt_weight_EWK = weight*preSel_eff_EWK*llp_eff
-        
-        if llps_Strong:
-        # Require at least one LLP to be reconstructed and isolated
-            llp_eff = 1.0 - np.prod([(1.0-llp.tracklet_eff_Strong*llp.lifetime_reweight)
-                                    for llp in llps_Strong],axis=0)   
-            evt_weight_Strong = weight*preSel_eff_Strong*llp_eff
-
-
-        eff_SR.fill_level('EWK SR',evt_weight_EWK)
-        eff_SR.fill_level('Strong SR',evt_weight_Strong)
 
     #End of loop
     logger.info(f"Loop Ended! Evts analysed: {ct}")
-    eff_SR.divide(totalweight)
+    for eff_SR in [ee_SR,mm_SR,em_SR]:
+        eff_SR.divide(totalweight)
     eff_dict = {}
-    eff_dict['Eff SR'] = eff_SR
+    eff_dict['Eff SR(ee)'] = ee_SR
+    eff_dict['Eff SR(mm)'] = mm_SR
+    eff_dict['Eff SR(em)'] = em_SR
     eff_dict['totalweight'] = totalweight
     eff_dict['Nevents'] = ct
     eff_dict['inputFile'] = inputFile
-    eff_dict['tau_ns'] = tauList
-    eff_dict['tau0_ns'] = tau0
 
-    logger.debug(f"{ewk_cutflow.to_string()}\n\n")
-    logger.debug(f"{strong_cutflow.to_string()}\n\n")
+    for cutflow in [ee_cutflow,mm_cutflow,em_cutflow]:
+        logger.debug(f"{cutflow.to_string()}\n\n")
 
-    logger.debug(f"{ewk_SR.to_string()}\n\n")
-    logger.debug(f"{strong_SR.to_string()}\n\n")
+    for eff_SR in [ee_SR,mm_SR,em_SR]:
+        logger.debug(f"{eff_SR.to_string()}\n\n")
 
-    logger.debug("Efficiencies for all lifetimes:")
-    logger.debug(f"{eff_SR.to_string()}\n\n")
     
     return eff_dict
 
 
-def main(inputfile: str,llpPDG :int, tau_file: Union[str,None]):
+def main(inputfile: str,llpPDG :int = 1000011) -> None:
 
     # Read banner file to extract information about LLP mass, LLP lifetime and total cross-section
     bannerFile = None
@@ -335,24 +261,7 @@ def main(inputfile: str,llpPDG :int, tau_file: Union[str,None]):
     modelDict = getModelInfo(bannerFile,llpPDG)
     tau0 = modelDict['tau0_ns']
 
-    tauList = [float(tau0)]
-    if tau_file is not None:
-        if not os.path.isfile(tau_file):
-            raise ValueError(f"Reweighting file {tau_file} not found!")
-        try:
-            import csv
-            with open(tau_file, mode='r', newline='') as file:
-                csv_reader = csv.reader(l for l in file.readlines() 
-                                        if not l.strip().startswith('#'))
-                tauList += [float(row[0]) for row in csv_reader if row]
-            
-        except Exception as e:
-            logger.error(str(e))
-            logger.error(f"Error reding {tau_file}. Reweighting will not be applied.")
-
-    tauList = np.array([float(f"{tau:1.4e}") for tau in tauList[:]])
-    tauList = np.sort(np.unique(tauList))
-    resDict = getEfficiencies(inputfile,tau0,tauList)
+    resDict = getEfficiencies(inputfile)
     resDict.update(modelDict)
     if 'totalweight' in resDict and "Number of Events" in resDict:
         resDict['Cross-Section (pb)'] = resDict['totalweight']/resDict["Number of Events"]
@@ -360,27 +269,27 @@ def main(inputfile: str,llpPDG :int, tau_file: Union[str,None]):
         resDict['Cross-Section (pb)'] = None
 
     outFile = inputfile.split('.root')[0].split('.hepmc')[0]
-    outFile = outFile +'_effs.json'
+    # outFile = outFile +'_effs.json'
 
-    effs = resDict.pop('Eff SR').to_dict()
-    tauList = resDict.pop("tau_ns")
-    effsList = []
-    for itau,tau in enumerate(tauList):
-        effDict = {'tau_ns' : tau}
-        for sr in effs:
-            effDict[sr] = effs[sr][0][itau]
-            effDict[sr+' Error'] = effs[sr][1][itau]
-        effsList.append(effDict)
+    # effs = resDict.pop('Eff SR').to_dict()
+    # tauList = resDict.pop("tau_ns")
+    # effsList = []
+    # for itau,tau in enumerate(tauList):
+    #     effDict = {'tau_ns' : tau}
+    #     for sr in effs:
+    #         effDict[sr] = effs[sr][0][itau]
+    #         effDict[sr+' Error'] = effs[sr][1][itau]
+    #     effsList.append(effDict)
 
-    i, = np.where(np.isclose(tauList, tau0,rtol=1e-3))
-    i = i[0]
-    logger.info(f'tau(ns) = {tauList[i]:1.3g}:')
-    for sr in effs:
-        logger.info(f'  {sr} = {effs[sr][0][i]:1.3e} +- {effs[sr][1][i]:1.3e}')
+    # i, = np.where(np.isclose(tauList, tau0,rtol=1e-3))
+    # i = i[0]
+    # logger.info(f'tau(ns) = {tauList[i]:1.3g}:')
+    # for sr in effs:
+    #     logger.info(f'  {sr} = {effs[sr][0][i]:1.3e} +- {effs[sr][1][i]:1.3e}')
     
     
-    resDict['Efficiencies'] = effsList
-    saveOutput(resDict,outFile)
+    # resDict['Efficiencies'] = effsList
+    # saveOutput(resDict,outFile)
 
 
     
@@ -391,9 +300,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Analyse the Delphes output to produce efficiencies for the ATLAS-SUSY-2019-18 DT search')
     parser.add_argument('-i','--input', help='Path to  Delphes ROOT file or to a folder containing Delphes ROOT files with the event samples to be analysed.')
-    parser.add_argument('-l','--llpPDG',help='LLP PDG [1000024]',type=int, required=False, default=1000024)
-    parser.add_argument('-tauF','--tau_file',metavar='tau_file', help='CSV file containing the lifetime values (in ns) used for reweighting. If empty or file not found, it will not apply reweighting [tau_list.csv].',
-                        type=str, required=False, default='tau_list.csv')
+    parser.add_argument('-l','--llpPDG',help='LLP PDG [1000011]',type=int, required=False, default=1000011)
     parser.add_argument('-n', '--ncpus',type=int,default=1,help='number of parallel jobs to run when running over multiple files [default=1].')
     parser.add_argument('-v', '--verbose', default='info',
                         help='verbose level (debug, info, warning or error). Default is warning')
@@ -421,9 +328,6 @@ if __name__ == "__main__":
 
 
     inputF = args.input
-    tau_file = args.tau_file
-    if not tau_file or not os.path.isfile(tau_file):
-        tau_file = None
     llpPDG = args.llpPDG
 
     if os.path.isfile(inputF):
@@ -449,7 +353,7 @@ if __name__ == "__main__":
     else:
         ijob = 0
     for rootFile in inputFiles:
-        p = pool.apply_async(main, args=(rootFile,args.llpPDG,args.tau_file,))
+        p = pool.apply_async(main, args=(rootFile,llpPDG,))
         children.append(p)
 
     logger.info(f'Running {len(inputFiles)} jobs in {ncpus} instances')

@@ -1,118 +1,50 @@
 #!/usr/bin/env python3
 import numpy as np
-from scipy.stats import rv_continuous,uniform
-from scipy.special import erf
+from scipy.interpolate import NearestNDInterpolator
 from numpy import float64, ndarray
 from typing import Any, Dict, List, Tuple, Union
-from cppyy.gbl import TClonesArray
 import pyslha
 import json
-
 # Fix seed so results are reproducible!
 np.random.seed(seed=123)
 
-from ROOT import TFile
 
 class effMap:
-  def __init__(self, mapname: str, filepath: str="./ATLAS_data/DisappearingTrack2018-EfficiencyMaps.root"):
+  def __init__(self, filepath: str) -> None:
     
-    self.fh = TFile(filepath)
-    try:
-      self.h_eff = self.fh.Get(mapname)
-    except:
-      raise ValueError("No TH2D efficiency map with tag ", mapname," found in file ", filepath)
-
-  def getEff(self,x: float,y: Union[float64, float]) -> float:
-    return self.h_eff.GetBinContent(self.h_eff.FindBin(x,y))
-
-  def passes(self, x: float, y: float) -> bool:
-    eff = self.getEff(x,y)
-    rnd = uniform.rvs()
-    if rnd < eff:
-      return True
-    return False
-
-  def efficiency(self, x: float, y: Union[float64, float]) -> float:
-    return self.getEff(x,y)
-
-
-#Define class for smearing functions
-class smearingFunction(rv_continuous):
+    data = self.load_efficiency_map(filepath)
+    self.setInterp(data)
+    
+  def load_efficiency_map(self, csv_path: str) -> Any:
     """
-    It is extremely slow, unless the _ppf is defined).
-    It has the following useful methods: .pdf (probability density function),
-    .cdf (cumulative density function), .ppf (percent point function or inverse of cdf),
-    .rvs (random number generator).
+    Load (pT, d0) -> efficiency points from the HEPData CSV and return
+    an evaluator function: efficiency(pt, d0, clip=True).
     """
 
-    def __init__(self,*kargs,**kwargs):
-        super().__init__(*kargs,**kwargs)
-        if self.a is None:
-            self.a = -1000.0
-        if self.b is None:
-            self.b = 1000.0
-
-    def setPars(self,alpha: float, sigma: float, mean0: float=0.0):
-        self.alpha = alpha
-        self.sigma = sigma
-        self.mean0 = mean0
-        zmin = (self.a-mean0)/sigma
-        zmax = (self.b-mean0)/sigma      
-        self.norm = np.exp(-alpha**2/2)*(1-np.exp(alpha*(alpha+zmin)))/alpha
-        self.norm += np.exp(-alpha**2/2)*(1-np.exp(alpha*(alpha-zmax)))/alpha
-        self.norm += np.sqrt(2*np.pi)*erf(alpha/np.sqrt(2))
-        self.norm = float(self.norm*sigma)
-
-
-    def _pdf(self, x :float, *args) -> float:
-        sigma = self.sigma
-        alpha = self.alpha
-        mean0 = self.mean0
-        z = (x-mean0)/sigma
-        if z < -alpha:
-          return np.exp(alpha*(z + (alpha/2.0)))/self.norm
-        elif z > alpha:
-          return np.exp(-alpha*(z - (alpha/2.0)))/self.norm
-        else:
-          return np.exp(-z**2/2.0)/self.norm
+    with open(csv_path, 'r') as f:
+      lines = [l for l in f.readlines() if not l.startswith('#')]
+    data = np.genfromtxt(lines, delimiter=",", comments="#",
+                        names=True,   dtype=float)
+    return data
+  
+  def setInterp(self, data: Any) -> Any:
     
-    def _cdf(self,x: ndarray, *args) -> float:
-        sigma = self.sigma
-        alpha = self.alpha
-        mean0 = self.mean0
-        a = (self.a-mean0)/sigma
-        b = (self.b-mean0)/sigma
-        z = (x[0]-mean0)/sigma
-        z = min(b,z)
-        
-        cdf_ret = 0.0
-        if z < a:
-            return cdf_ret
-        
-        i_a = np.exp(alpha**2/2)*np.exp(a*alpha)/alpha
-        i_z1 = np.exp(alpha**2/2)*np.exp(z*alpha)/alpha
-        cdf_ret = i_z1 - i_a           
-        if -alpha <= z <= alpha:
-            i_z1 = np.exp(alpha**2/2)*np.exp(-alpha*alpha)/alpha
-            i_malpha = -np.sqrt(np.pi/2)*erf(alpha/np.sqrt(2))
-            i_z2 = np.sqrt(np.pi/2)*erf(z/np.sqrt(2))
-            cdf_ret = (i_z1 - i_a) + (i_z2 - i_malpha)
-        else:
-            i_z1 = np.exp(alpha**2/2)*np.exp(-alpha*alpha)/alpha
-            i_malpha = -np.sqrt(np.pi/2)*erf(alpha/np.sqrt(2))
-            i_z2 = np.sqrt(np.pi/2)*erf(alpha/np.sqrt(2))
-            i_alpha = np.exp(-alpha**2/2)*(-1.0)/alpha
-            i_z3 = np.exp(-alpha**2/2)*(-np.exp(alpha*(alpha-z)))
-            cdf_ret = (i_z1 - i_a) + (i_z2 - i_malpha) + (i_z3 - i_alpha)
-          
-        cdf_ret = sigma*cdf_ret/self.norm
-        return cdf_ret
+    self.vars_limits = {var: (data[var].min(), data[var].max()) for var in data.dtype.names[:-1]}
+    self.eff_label = data.dtype.names[-1]
+    self.interp = NearestNDInterpolator(list(zip(data[list(self.vars_limits.keys())[0]],
+                                                 data[list(self.vars_limits.keys())[1]])),
+                                                 data[self.eff_label])
     
-    def smear(self, pT: float, charge: int) -> float:
-      QoverPt = charge / (pT*1e-3) # [TeV^-1]
-      QoverPtSmeared = abs(QoverPt + self.rvs())
-      PtSmeared = (1 / QoverPtSmeared) * 1e+3
-      return PtSmeared
+  def efficiency(self,**kwargs) -> float:
+
+    var_values = [kwargs.get(var,None) for var in self.vars_limits.keys()]
+    if any(v is None for v in var_values):
+      raise ValueError(f"Missing variable(s) for efficiency map: {self.vars_limits.keys()}. Got {kwargs.keys()}")
+    if any(v < self.vars_limits[var][0] or v > self.vars_limits[var][1] for var,v in zip(self.vars_limits.keys(),var_values)):
+      return 0.0
+
+    return float(self.interp(*var_values))
+
 
 class cutFlow(object):
 
@@ -200,30 +132,13 @@ class cutFlow(object):
 
 #Initialize efficiency maps
 
-eff_trigger = effMap('eff_trigger_average',filepath='./ATLAS_data/DisappearingTrack2018-EfficiencyMaps.root')
-eff_track_EWK = effMap('h_effmap_average_EWK',filepath='./ATLAS_data/DisappearingTrack2018-EfficiencyMaps.root')
-eff_track_Strong = effMap('h_effmap_average_Strong',filepath='./ATLAS_data/DisappearingTrack2018-EfficiencyMaps.root')
+electron_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0electronefficiency.csv")
+muon_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0muonefficiency.csv")
 
-
-# Create smearing functions for each pT range
-a,b = -800.0,800.0
-pTalphaSigmaPairs = [(10.0,1.86, 20.94),(15.0,1.86, 19.54),(20.0,1.86, 18.33),(25.0,1.86, 17.01),(35.0,1.82, 15.42),(45.0,1.66, 14.49),(60.0,1.54, 13.90),(100.0,1.64, 14.03)]
-electronSmearList = []
-for pT,alpha,sigma in pTalphaSigmaPairs:
-    electronSmearF = smearingFunction(a=a,b=b,momtype=0)
-    electronSmearF.setPars(alpha=alpha,sigma=sigma)
-    electronSmearList.append((pT,electronSmearF))
-
-def electronPtSmear(pT: float, charge: int) -> float:
-  if (pT < 10.0):
-      return -1.0
-  for pT_bin,smearFunc in electronSmearList:
-    if pT > pT_bin:
-      return smearFunc.smear(pT, charge)
-  return -1.0
 
 #Object readers
-def filterObjects(particleList: TClonesArray, pTmin: float, etaMax: float) -> List[Any]:
+def filterObjects(particleList: Any, 
+                  pTmin: float, etaMax: float) -> List[Any]:
   filteredParticles = []
   for ptc in particleList:
     if ptc.PT < pTmin:

@@ -1,0 +1,64 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t21
+#: name: pt-pt smuon acceptance
+#: description: Acceptance as a function of the generator-level $p_\text{T}$ of the leading and subleading lepton in SR-$\mu\mu$ from $\tilde{\mu}$ decays. The plot is made from signal Monte Carlo events with $\tilde{\ell}$ with mass of 400 GeV and lifetime of 1 ns. To be accepted, events are required to have at least 2 truth leptons with $p_\text{T} > 65$ GeV, |$\eta$| $<$ 2.5 for muons, $|d_{0}| > 3$ mm, and $\Delta R_{\ell\ell} > 0.2$. Events are also required to fall into one of the acceptance regions of the triggers used. At generator level, events must have one of the following: one electron with $p_\text{T} >$ 160 GeV, 2 electrons each with $p_\text{T} >$ 60 GeV, or 1 muon with $p_\text{T} >$ 60 GeV and $|\eta| < 1.07$. The overflow is not shown in these plots.
+#: data_file: pt-pt_smuon_acceptance.yaml
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> SLEPTON SLEPTON
+leading lepton $p_\text{T}$ [GeV],subleading lepton $p_\text{T}$ [GeV],Acceptance
+40.0,40.0,0.082141
+120.0,40.0,0.25642
+120.0,120.0,0.69215
+200.0,40.0,0.2715
+200.0,120.0,0.73327
+200.0,200.0,0.7279
+280.0,40.0,0.23265
+280.0,120.0,0.76358
+280.0,200.0,0.77749
+280.0,280.0,0.75542
+360.0,40.0,0.25157
+360.0,120.0,0.77287
+360.0,200.0,0.77469
+360.0,280.0,0.77621
+360.0,360.0,0.76742
+440.0,40.0,0.30481
+440.0,120.0,0.80666
+440.0,200.0,0.84528
+440.0,280.0,0.79015
+440.0,360.0,0.7701
+440.0,440.0,0.85061
+520.0,40.0,0.31662
+520.0,120.0,0.84754
+520.0,200.0,0.8312
+520.0,280.0,0.7997
+520.0,360.0,0.81591
+520.0,440.0,0.86963
+520.0,520.0,0.7848
+600.0,40.0,0.18939
+600.0,120.0,0.79974
+600.0,200.0,0.92091
+600.0,280.0,0.83674
+600.0,360.0,0.8312
+600.0,440.0,0.80728
+600.0,520.0,0.85595
+600.0,600.0,0.73416
+680.0,40.0,0.35085
+680.0,120.0,0.89345
+680.0,200.0,0.89482
+680.0,280.0,0.915
+680.0,360.0,0.75931
+680.0,440.0,0.79997
+680.0,520.0,0.92777
+680.0,600.0,0.99759
+680.0,680.0,0.8125
+760.0,40.0,0.17865
+760.0,120.0,0.9086
+760.0,200.0,0.98009
+760.0,280.0,0.71956
+760.0,360.0,0.95149
+760.0,440.0,0.86975
+760.0,520.0,0.91773
+760.0,600.0,0.84645
+760.0,680.0,1.0067
+760.0,760.0,0.83333
+

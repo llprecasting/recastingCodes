@@ -1,0 +1,45 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t5
+#: name: selectron upper limit on cross section
+#: description: Upper limits on observed signal cross section, $\sigma_\text{obs}^\text{95}$, for the selectron signal model. Selectron ($\tilde{e}_{L, R}$) refers to the scalar superpartners of left- and right-handed electrons. 
+#: data_file: selectron_upper_limit_on_cross_section.yaml
+#: keyword reactions: P P --> SLEPTON SLEPTON
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+" $m(\tilde{e}_{L,R})$  [GeV]", $\tau$  [ns],  $\sigma_\text{obs}^\text{95}$  [pb]
+50,0.01,6.81e-02
+50,0.1,4.22e-03
+50,1.0,3.73e-02
+50,10.0,1.59e+00
+100,0.01,1.42e-02
+100,0.1,6.38e-04
+100,1.0,2.75e-03
+100,10.0,5.08e-02
+200,0.01,4.04e-03
+200,0.1,2.09e-04
+200,1.0,5.47e-04
+200,10.0,1.64e-02
+300,0.01,2.37e-03
+300,0.1,1.43e-04
+300,1.0,3.60e-04
+300,10.0,1.66e-02
+400,0.01,2.24e-03
+400,0.1,1.22e-04
+400,1.0,2.79e-04
+400,10.0,1.35e-02
+500,0.01,2.42e-03
+500,0.1,1.14e-04
+500,1.0,2.47e-04
+500,10.0,1.03e-02
+600,0.01,2.57e-03
+600,0.1,1.11e-04
+600,1.0,2.31e-04
+600,10.0,7.74e-03
+700,0.01,2.22e-03
+700,0.1,1.12e-04
+700,1.0,2.09e-04
+700,10.0,1.11e-02
+800,0.01,2.69e-03
+800,0.1,1.11e-04
+800,1.0,2.01e-04
+800,10.0,1.00e-02
+

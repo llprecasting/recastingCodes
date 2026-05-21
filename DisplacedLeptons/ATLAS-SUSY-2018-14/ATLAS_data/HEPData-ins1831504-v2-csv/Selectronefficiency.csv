@@ -1,0 +1,48 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t18
+#: name: Selectron efficiency
+#: description: Efficiency for $\tilde{e}$ of various masses and lifetimes in SR-$ee$. Efficiency is defined as the number of selected reconstruced events divided by the acceptance. To be accepted, events are required to have at least 2 truth electrons with $p_\text{T} > 65$ GeV, |$\eta$| $<$ 2.47, $|d_{0}| > 3$ mm, and $\Delta R_{\ell\ell} > 0.2$. Events are also required to fall into one of the acceptance regions of the triggers used. At generator level, events must have one of the following: one electron with $p_\text{T} >$ 160 GeV, 2 electrons each with $p_\text{T} >$ 60 GeV, or 1 muon with $p_\text{T} >$ 60 GeV and $|\eta| < 1.07$. To be selected, events must satisfy all signal region requirements.
+#: data_file: selectron_efficiency.yaml
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> SLEPTON SLEPTON
+Mass [GeV],Lifetime [log10(ns)],Efficiency
+75.0,-1.5,0.44414
+75.0,-0.5,0.30071
+75.0,0.5,0.02054
+75.0,1.5,0.002736
+125.0,-1.5,0.44074
+125.0,-0.5,0.295
+125.0,0.5,0.035173
+125.0,1.5,0.0062073
+225.0,-1.5,0.45628
+225.0,-0.5,0.36571
+225.0,0.5,0.074337
+225.0,1.5,0.0057954
+325.0,-1.5,0.52992
+325.0,-0.5,0.40228
+325.0,0.5,0.084804
+325.0,1.5,0.0036783
+425.0,-1.5,0.51734
+425.0,-0.5,0.42186
+425.0,0.5,0.099303
+425.0,1.5,0.0036978
+525.0,-1.5,0.49583
+525.0,-0.5,0.431
+525.0,0.5,0.10568
+525.0,1.5,0.0043113
+625.0,-1.5,0.50606
+625.0,-0.5,0.44278
+625.0,0.5,0.1117
+625.0,1.5,0.0054145
+725.0,-1.5,0.62277
+725.0,-0.5,0.43661
+725.0,0.5,0.122
+725.0,1.5,0.0035079
+825.0,-1.5,0.49424
+825.0,-0.5,0.44372
+825.0,0.5,0.12608
+825.0,1.5,0.0037287
+925.0,-1.5,0.62992
+925.0,-0.5,0.46282
+925.0,0.5,0.12125
+

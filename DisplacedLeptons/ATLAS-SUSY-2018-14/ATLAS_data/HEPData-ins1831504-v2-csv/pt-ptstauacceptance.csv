@@ -1,0 +1,39 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t28
+#: name: pt-pt stau acceptance
+#: description: Acceptance as a function of the generator-level $p_\text{T}$ of the leading and subleading lepton in SR-$e\mu$ from $\tilde{\tau}$ decays. The plot is made from signal Monte Carlo events with $\tilde{\ell}$ with mass of 400 GeV and lifetime of 1 ns. To be accepted, events are required to have at least 2 truth leptons with $p_\text{T} > 65$ GeV, |$\eta$| $<$ 2.5 (2.47) for muons (electrons), $|d_{0}| > 3$ mm, and $\Delta R_{\ell\ell} > 0.2$. Events are also required to fall into one of the acceptance regions of the triggers used. At generator level, events must have one of the following: one electron with $p_\text{T} >$ 160 GeV, 2 electrons each with $p_\text{T} >$ 60 GeV, or 1 muon with $p_\text{T} >$ 60 GeV and $|\eta| < 1.07$. The overflow is not shown in these plots.
+#: data_file: pt-pt_stau_acceptance.yaml
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> SLEPTON SLEPTON
+leading lepton $p_\text{T}$ [GeV],subleading lepton $p_\text{T}$ [GeV],Acceptance
+40.0,40.0,0.0089082
+120.0,40.0,0.08591
+120.0,120.0,0.57575
+200.0,40.0,0.12048
+200.0,120.0,0.79215
+200.0,200.0,1.0215
+280.0,40.0,0.095749
+280.0,120.0,0.75536
+280.0,200.0,0.96388
+280.0,280.0,1.122
+360.0,40.0,0.10398
+360.0,120.0,0.83324
+360.0,200.0,0.94967
+360.0,280.0,0.90086
+360.0,360.0,1.0
+440.0,40.0,0.1
+440.0,120.0,0.87281
+440.0,200.0,0.71669
+440.0,280.0,0.5
+440.0,360.0,0.5
+520.0,40.0,0.125
+520.0,120.0,1.1282
+520.0,200.0,2.0762
+520.0,360.0,1.0
+520.0,440.0,1.0
+600.0,120.0,0.5
+600.0,200.0,1.0
+600.0,280.0,1.0
+600.0,440.0,1.0
+600.0,600.0,1.0
+

@@ -1,0 +1,41 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t10
+#: name: RH smuon upper limit on cross section
+#: description: Upper limits on observed signal cross section, $\sigma_\text{obs}^\text{95}$, for the superpartners of the right-handed muons, $\tilde{\mu}_R$.  
+#: data_file: rh_smuon_upper_limit_on_cross_section.yaml
+#: keyword reactions: P P --> SLEPTON SLEPTON
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+ $m(\tilde{\mu}_R)$  [GeV], $\tau$  [ns],  $\sigma_\text{obs}^\text{95}$  [pb]
+50,0.1,7.10e-03
+50,1.0,2.46e-02
+100,0.1,9.19e-04
+100,1.0,2.08e-03
+200,0.01,5.08e-03
+200,0.1,2.85e-04
+200,1.0,7.09e-04
+200,10.0,4.31e-02
+300,0.01,7.28e-03
+300,0.1,2.15e-04
+300,1.0,3.88e-04
+300,10.0,9.43e-03
+400,0.01,5.54e-03
+400,0.1,1.79e-04
+400,1.0,3.96e-04
+400,10.0,8.95e-03
+500,0.01,6.05e-03
+500,0.1,1.62e-04
+500,1.0,2.98e-04
+500,10.0,1.88e-02
+600,0.01,2.31e-03
+600,0.1,1.40e-04
+600,1.0,2.79e-04
+600,10.0,6.64e-03
+700,0.01,3.42e-03
+700,0.1,1.38e-04
+700,1.0,2.50e-04
+700,10.0,4.66e-03
+800,0.01,3.64e-03
+800,0.1,1.43e-04
+800,1.0,2.06e-04
+800,10.0,5.02e-03
+

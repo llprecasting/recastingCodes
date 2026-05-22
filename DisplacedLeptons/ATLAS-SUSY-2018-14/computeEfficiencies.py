@@ -30,11 +30,11 @@ from ROOT import TFile,Electron, Jet, MissingET, Muon, TTree
 
 # Define SRs and Cutflow
 ee_cutflow = cutFlow(name='ee_cutflow',levels=['All', 'PreSelection', 'Trigger', '2e', 
-                    'pT > 65 GeV', '3 mm < d0 < 300 mm', 'DeltaRll > 0.2'])
+                    'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2'])
 mm_cutflow = cutFlow(name='mm_cutflow',levels=['All', 'PreSelection', 'Trigger', '2mu', 
-                    'pT > 65 GeV', '3 mm < d0 < 300 mm', 'DeltaRll > 0.2'])
+                    'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2'])
 em_cutflow = cutFlow(name='em_cutflow',levels=['All', 'PreSelection', 'Trigger', 'emu', 
-                    'pT > 65 GeV', '3 mm < d0 < 300 mm', 'DeltaRll > 0.2'])
+                    'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2'])
 
 ee_SR = cutFlow(name='ee_SR',levels=['All', 'Final Selection' ])
 mm_SR = cutFlow(name='mm_SR',levels=['All', 'Final Selection' ])
@@ -50,25 +50,30 @@ def getObjects(DelphesTree: TTree) -> Any:
     """
 
     llps = DelphesTree.bsmMothers
-    bmet = DelphesTree.MissingET
+    # muons = DelphesTree.MuonNonIso
+    # electrons = DelphesTree.ElectronNonIso
+    # muons = DelphesTree.MuonSmear
+    # electrons = DelphesTree.ElectronSmear
     muons = DelphesTree.Muon
     electrons = DelphesTree.Electron
     
     llps = filterObjects(llps,pTmin=0.0,etaMax=5.0)
-    met = bmet.At(0)
-    muons = filterObjects(muons,pTmin=25.0,etaMax=5.0)
-    electrons = filterObjects(electrons, pTmin=25.0, etaMax=5.0)
+    muons = filterObjects(muons,pTmin=20.0,etaMax=2.5)
+    electrons = filterObjects(electrons, pTmin=20.0, etaMax=2.5)
     for el in electrons:
-        el.PID = 11*el.Charge
+        el.PID = -11*el.Charge
     for mu in muons:
-        mu.PID = 13*mu.Charge
+        mu.PID = -13*mu.Charge
 
-    return llps,muons,electrons,met
+    return llps,muons,electrons
 
 def getSR(leptons: List[Electron | Muon]) -> str:
     """
     Returns the signal region for a given list of leptons.
     """
+
+    if len(leptons) != 2:
+        raise ValueError(f"Error getting SR, expected 2 leptons (found {len(leptons)})")
 
     leptonIDs = [abs(lep.PID) for lep in leptons]
     if leptonIDs == [13, 13]:
@@ -89,9 +94,9 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
 
 
     if len(muons) + len(electrons) < 2:
+        # logger.debug(f"Event failed pre-selection: less than 2 leptons (muons: {len(muons)}, electrons: {len(electrons)})")
         return None
     
-    muons = sorted(muons, key=lambda mu: mu.PT,reverse=True)
     allLeptons = sorted(muons + electrons, key=lambda lep: lep.PT,reverse=True)
     leptons = allLeptons[:2]
 
@@ -107,6 +112,7 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
     if (sr == "mm" or sr == "em") and abs(leptons[1].Eta) > 2.5: 
         return None
     
+    # logger.debug(f"Event passed pre-selection:  (muons: {len(muons)}, electrons: {len(electrons)})")
     return leptons
 
 
@@ -115,12 +121,13 @@ def passTrigger(leptons : List[Electron | Muon]) -> bool:
     Applies the trigger requirements for the different SRs.
     """
 
+    
     sr = getSR(leptons)
 
     pass_trigger = False
     if (sr == "ee" or sr == "em") and leptons[0].PT > 160: pass_trigger = True
     if (sr == "ee" or sr == "me") and leptons[1].PT > 160: pass_trigger = True
-    if sr == "ee" and leptons[0].PT > 60 and leptons[1].PT > 60: pass_trigger = True
+    if  sr == "ee" and (leptons[0].PT > 60 and leptons[1].PT > 60): pass_trigger = True
     if (sr == "mm" or sr == "me") and (leptons[0].PT > 60 and abs(leptons[0].Eta) < 1.07): pass_trigger = True
     if (sr == "mm" or sr == "em") and (leptons[1].PT > 60 and abs(leptons[1].Eta) < 1.07): pass_trigger = True
     
@@ -142,7 +149,7 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
 
         weight = float(DelphesTree.Weight.At(0).Weight)    
         totalweight += weight
-        llps,muons,electrons,met = getObjects(DelphesTree)
+        _,muons,electrons = getObjects(DelphesTree)
 
         # Reset cutflows to beginning
         ee_cutflow.reset()
@@ -167,16 +174,16 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
             continue
 
         # Fill Pre-selection pass
-        ee_cutflow.fill(1.0)
-        em_cutflow.fill(1.0)
-        mm_cutflow.fill(1.0)
+        ee_cutflow.fill_next(1.0)
+        em_cutflow.fill_next(1.0)
+        mm_cutflow.fill_next(1.0)
 
         if not passTrigger(leptons_preSel):
             continue
         # Fill trigger pass
-        ee_cutflow.fill(1.0)
-        em_cutflow.fill(1.0)
-        mm_cutflow.fill(1.0)
+        ee_cutflow.fill_next(1.0)
+        em_cutflow.fill_next(1.0)
+        mm_cutflow.fill_next(1.0)
 
         signal_region = getSR(leptons_preSel)
         
@@ -191,23 +198,23 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
             cutflow = em_cutflow
             eff_SR = em_SR
         
-        cutflow.fill(1.0)
+        cutflow.fill_next(1.0)
 
 
         ## signal pt and d0 cuts 
         if leptons_preSel[0].PT < 65 or leptons_preSel[1].PT < 65:
             continue
-        cutflow.fill(1.0)
+        cutflow.fill_next(1.0)
 
         if abs(leptons_preSel[0].D0) < 3 or abs(leptons_preSel[1].D0) < 3:
             continue
-        if abs(leptons_preSel[0].D0) > 300 or abs(leptons_preSel[1].D0) > 300:
-            continue
-        cutflow.fill(1.0)
+        # if abs(leptons_preSel[0].D0) > 300 or abs(leptons_preSel[1].D0) > 300:
+            # continue
+        cutflow.fill_next(1.0)
     
         if deltaR(leptons_preSel[0], leptons_preSel[1]) < 0.2:
             continue
-        cutflow.fill(1.0)
+        cutflow.fill_next(1.0)
 
         # Get lepton reconstruction efficiencies
         lepton_effs = []
@@ -222,7 +229,7 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
         recoEff = float(np.prod(lepton_effs))
         if recoEff == 0:
             continue
-        eff_SR.fill(weight*recoEff)
+        eff_SR.fill_next(weight*recoEff)
 
 
     #End of loop
@@ -238,6 +245,7 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
     eff_dict['inputFile'] = inputFile
 
     for cutflow in [ee_cutflow,mm_cutflow,em_cutflow]:
+        cutflow.divide(cutflow.weights[0]) # Normalize to total number of events (first level of cutflow)
         logger.debug(f"{cutflow.to_string()}\n\n")
 
     for eff_SR in [ee_SR,mm_SR,em_SR]:

@@ -120,11 +120,13 @@ class cutFlow(object):
 
     d = self.to_dict()
     lines = [f"==== {self.name} ==="]
+    key_width = max(len(str(k)) for k in d) if d else 0
     for k,(w,wErr) in d.items():
+      key_label = f"{k:<{key_width}}"
       if isinstance(w,(float,int)):
-        lines.append(f"{k} = {w:1.4e} +- {wErr:1.4e}")
+        lines.append(f"{key_label} = {w:1.4e} +- {wErr:1.4e}")
       elif isinstance(w,(list,ndarray)):
-        l = f"{k} = "
+        l = f"{key_label} = "
         l += ' / '.join([f"{wx:1.4e} +- {wErrx:1.4e}" for wx,wErrx in zip(w,wErr)])
         lines.append(l)
     lines.append(f"===" + "="*len(self.name) + "===")
@@ -159,6 +161,16 @@ def deltaR(ptc1,ptc2) -> float:
 
 def DeltaPhi(ptc1, ptc2) -> float:
   return abs(ptc1.P4().DeltaPhi(ptc2.P4()))
+
+def getD0(ptc) -> float:
+  x = ptc.X
+  y = ptc.Y
+  phi = ptc.Phi
+  pT = ptc.PT
+  vTrack = np.array([x,y])
+  pTrack = np.array([pT*np.cos(phi),pT*np.sin(phi)])
+  d0 = np.linalg.norm(np.cross(vTrack,pTrack))/pT  
+  return d0
 
 def minDphilist(ptc1, listptc2, length, cut) -> float:
   if len(listptc2)==0:

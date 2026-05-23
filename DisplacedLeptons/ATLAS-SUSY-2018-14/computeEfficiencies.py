@@ -32,13 +32,13 @@ from ROOT import TFile,Electron, Jet, MissingET, Muon, TTree
 # Define SRs and Cutflow
 ee_cutflow = cutFlow(name='ee_cutflow',levels=['All','PreSelection',
                                                 'Trigger', '2e', 
-                    'pT > 65 GeV', '3 mm < d0 < 300 mm', 'DeltaRll > 0.2','ee SR'])
+                    'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2','ee SR'])
 mm_cutflow = cutFlow(name='mm_cutflow',levels=['All','PreSelection',
                                                'Trigger', '2mu', 
-                    'pT > 65 GeV', '3 mm < d0 < 300 mm', 'DeltaRll > 0.2','mm SR'])
+                    'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2','mm SR'])
 em_cutflow = cutFlow(name='em_cutflow',levels=['All','PreSelection',
                                                 'Trigger', 'emu', 
-                    'pT > 65 GeV', '3 mm < d0 < 300 mm', 'DeltaRll > 0.2','em SR'])
+                    'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2','em SR'])
 
 eff_SRs = cutFlow(name='eff_SRs',levels=['All',
                                          'Acceptance_ee',
@@ -247,8 +247,8 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
 
         if abs(leptons_preSel[0].D0) < 3 or abs(leptons_preSel[1].D0) < 3:
             continue
-        if abs(leptons_preSel[0].D0) > 300 or abs(leptons_preSel[1].D0) > 300:
-            continue
+        # if abs(leptons_preSel[0].D0) > 300 or abs(leptons_preSel[1].D0) > 300:
+            # continue
         sr_cutflow.fill_next(weight)
     
         if deltaR(leptons_preSel[0], leptons_preSel[1]) < 0.2:

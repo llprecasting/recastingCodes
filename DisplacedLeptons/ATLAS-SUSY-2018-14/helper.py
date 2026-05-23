@@ -5,6 +5,7 @@ from numpy import float64, ndarray
 from typing import Any, Dict, List, Tuple, Union
 import pyslha
 import json
+import itertools
 # Fix seed so results are reproducible!
 np.random.seed(seed=123)
 
@@ -12,8 +13,11 @@ np.random.seed(seed=123)
 class effMap:
   def __init__(self, filepath: str) -> None:
     
-    data = self.load_efficiency_map(filepath)
-    self.setInterp(data)
+    self.vars_limits = {}
+    self.data = self.load_efficiency_map(filepath)
+    # self.interp = self.setInterp(self.data)
+    self.interp = self.hist2d_lookup(self.data)
+    
     
   def load_efficiency_map(self, csv_path: str) -> Any:
     """
@@ -27,14 +31,65 @@ class effMap:
                         names=True,   dtype=float)
     return data
   
-  def setInterp(self, data: Any) -> Any:
+
+  def centers_to_edges(self,centers):
+    centers = np.asarray(sorted(np.unique(centers)), dtype=float)
+    if centers.size < 2:
+        raise ValueError("Need at least two distinct centers to infer bin edges.")
+
+    mids = 0.5 * (centers[:-1] + centers[1:])
+    edges = np.empty(centers.size + 1, dtype=float)
+    edges[1:-1] = mids
+    edges[0] = centers[0] - 0.5 * (centers[1] - centers[0])
+    edges[-1] = centers[-1] + 0.5 * (centers[-1] - centers[-2])
+
+    return edges
+  
+  def hist2d_lookup(self, data):
     
+    if len(data.dtype.names) != 3:
+      raise ValueError("data must have shape (N, 3): [x_center, y_center, content]")
+    edgesDict = {}
+    nbinsDict = {}
+    self.eff_label = data.dtype.names[-1]
+    for var in data.dtype.names[:-1]:
+      edgesDict[var] = self.centers_to_edges(data[var])
+      nbinsDict[var] = len(data[var])
+      self.vars_limits[var] = (edgesDict[var][0], edgesDict[var][-1])
+
+    self.contents = np.full(tuple(list(nbinsDict.values())), 
+                            np.nan, dtype=float)
+    for row in data:
+      x = row[data.dtype.names[0]]
+      y = row[data.dtype.names[1]]
+      val = row[self.eff_label]
+      i = np.searchsorted(edgesDict[data.dtype.names[0]], x) - 1
+      j = np.searchsorted(edgesDict[data.dtype.names[1]], y) - 1
+      if 0 <= i < nbinsDict[data.dtype.names[0]] and 0 <= j < nbinsDict[data.dtype.names[1]]:
+        self.contents[i, j] = val
+
+    def get_bin_content(x, y, outside_value=np.nan):
+        i = np.searchsorted(edgesDict[data.dtype.names[0]], 
+                            x, side="right") - 1
+        j = np.searchsorted(edgesDict[data.dtype.names[1]], y, side="right") - 1
+
+        if i < 0 or i >= nbinsDict[data.dtype.names[0]] or j < 0 or j >= nbinsDict[data.dtype.names[1]]:
+            return outside_value
+
+        return self.contents[i, j]
+    
+    return get_bin_content
+    
+  
+  def setInterp(self, data: Any) -> Any:
+
     self.vars_limits = {var: (data[var].min(), data[var].max()) for var in data.dtype.names[:-1]}
     self.eff_label = data.dtype.names[-1]
-    self.interp = NearestNDInterpolator(list(zip(data[list(self.vars_limits.keys())[0]],
+    interp = NearestNDInterpolator(list(zip(data[list(self.vars_limits.keys())[0]],
                                                  data[list(self.vars_limits.keys())[1]])),
                                                  data[self.eff_label])
-    
+    return interp
+
   def efficiency(self,**kwargs) -> float:
 
     var_values = [kwargs.get(var,None) for var in self.vars_limits.keys()]
@@ -42,8 +97,11 @@ class effMap:
       raise ValueError(f"Missing variable(s) for efficiency map: {self.vars_limits.keys()}. Got {kwargs.keys()}")
     if any(v < self.vars_limits[var][0] or v > self.vars_limits[var][1] for var,v in zip(self.vars_limits.keys(),var_values)):
       return 0.0
+    eff = float(self.interp(*var_values))
+    if np.isnan(eff):
+      return 0.0
 
-    return float(self.interp(*var_values))
+    return eff
 
 
 class cutFlow(object):
@@ -136,6 +194,9 @@ class cutFlow(object):
 
 electron_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0electronefficiency.csv")
 muon_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0muonefficiency.csv")
+ee_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptselectronacceptance.csv")
+mm_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptsmuonacceptance.csv")
+em_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptstauacceptance.csv")
 
 
 #Object readers

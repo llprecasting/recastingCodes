@@ -19,8 +19,8 @@ if __name__ == "__main__":
             "Merge individual json files generated with computeEfficiencies.py.")
     ap.add_argument('-i','--input', help='Path to the folder containing the json files.')
 
-    ap.add_argument('-o', '--outputFile', required=False, help='output file [atlas_susy_2018_19_effs.json].',
-                    default='atlas_susy_2018_19_effs.json')
+    ap.add_argument('-o', '--outputFile', required=False, help='output file [atlas_susy_2018_14_effs.json].',
+                    default='atlas_susy_2018_14_effs.json')
 
 
     args = ap.parse_args()

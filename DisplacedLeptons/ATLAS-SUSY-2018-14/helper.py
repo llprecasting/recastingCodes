@@ -185,7 +185,7 @@ class effMap:
 
 
     interp = RegularGridInterpolator(
-        (xcenters, ycenters),
+        (xedges[1:], ycenters),
         z_smooth,
         method=method,
         bounds_error=False,
@@ -212,7 +212,7 @@ class effMap:
 
     return f
   
-  def efficiency(self,method='binned',**kwargs) -> float:
+  def efficiency(self,method='smooth',**kwargs) -> float:
 
     var_values = [kwargs.get(var,None) for var in self.vars_limits.keys()]
     if any(v is None for v in var_values):

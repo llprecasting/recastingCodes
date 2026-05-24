@@ -6,6 +6,8 @@ from typing import Any, Dict, List, Tuple, Union
 import pyslha
 import json
 import itertools
+from scipy.interpolate import RegularGridInterpolator
+from scipy.ndimage import gaussian_filter
 # Fix seed so results are reproducible!
 np.random.seed(seed=123)
 
@@ -13,10 +15,14 @@ np.random.seed(seed=123)
 class effMap:
   def __init__(self, filepath: str) -> None:
     
-    self.vars_limits = {}
     self.data = self.load_efficiency_map(filepath)
-    # self.interp = self.setInterp(self.data)
-    self.interp = self.hist2d_lookup(self.data)
+    self.eff_label = self.data.dtype.names[-1]
+    self.vars_limits = self.setLimits(self.data)
+    self.interp_nearest = self.setInterp(self.data)
+    self.interp_hist2d = self.hist2d_lookup(self.data)
+    self.interp_smooth = self.smooth_interpolator_2d(self.data, 
+                                              sigma=0.0, 
+                                              method='linear')
     
     
   def load_efficiency_map(self, csv_path: str) -> Any:
@@ -31,8 +37,8 @@ class effMap:
                         names=True,   dtype=float)
     return data
   
-
-  def centers_to_edges(self,centers):
+  @classmethod
+  def centers_to_edges(cls,centers):
     centers = np.asarray(sorted(np.unique(centers)), dtype=float)
     if centers.size < 2:
         raise ValueError("Need at least two distinct centers to infer bin edges.")
@@ -45,18 +51,29 @@ class effMap:
 
     return edges
   
-  def hist2d_lookup(self, data):
-    
+  def setLimits(self,data):
+    """
+    Defines the allowed limits for computing efficiencies
+    """
+
     if len(data.dtype.names) != 3:
       raise ValueError("data must have shape (N, 3): [x_center, y_center, content]")
-    edgesDict = {}
-    nbinsDict = {}
-    self.eff_label = data.dtype.names[-1]
+    
+    vars_limits = {}
     for var in data.dtype.names[:-1]:
-      edgesDict[var] = self.centers_to_edges(data[var])
+      edges = effMap.centers_to_edges(data[var])
+      vars_limits[var] = (edges[0], edges[-1])
+  
+    return vars_limits
+  
+  def hist2d_lookup(self, data):
+    
+    nbinsDict = {}
+    edgesDict = {}
+    for var in self.vars_limits.keys():
       nbinsDict[var] = len(data[var])
-      self.vars_limits[var] = (edgesDict[var][0], edgesDict[var][-1])
-
+      edgesDict[var] = effMap.centers_to_edges(data[var])
+    
     self.contents = np.full(tuple(list(nbinsDict.values())), 
                             np.nan, dtype=float)
     for row in data:
@@ -83,25 +100,138 @@ class effMap:
   
   def setInterp(self, data: Any) -> Any:
 
-    self.vars_limits = {var: (data[var].min(), data[var].max()) for var in data.dtype.names[:-1]}
-    self.eff_label = data.dtype.names[-1]
     interp = NearestNDInterpolator(list(zip(data[list(self.vars_limits.keys())[0]],
                                                  data[list(self.vars_limits.keys())[1]])),
                                                  data[self.eff_label])
     return interp
 
-  def efficiency(self,**kwargs) -> float:
+  def smooth_interpolator_2d(self, data, sigma=0.8, method='linear'):
+    """
+    Build a smooth interpolating function f(x, y) from 2D histogram bin contents.
+
+    Parameters
+    ----------
+    xedges, yedges : array-like
+        Bin edges for x and y with lengths Nx+1 and Ny+1.
+    bin_values : array-like, shape (Nx, Ny)
+        Bin contents defined on each 2D bin.
+    sigma : float, optional
+        Gaussian smoothing strength in bin units. Use 0 for no smoothing.
+    method : {'linear', 'nearest'}, optional
+        Interpolation mode for RegularGridInterpolator.
+    fill_value : float or None, optional
+        Value outside range. If None, performs extrapolation.
+
+    Returns
+    -------
+    f : callable
+        Function f(x, y) that accepts scalars or numpy arrays.
+    """
+
+    if len(data.dtype.names) != 3:
+      raise ValueError("data must have shape (N, 3): [x_center, y_center, content]")
+    
+    # Define bin centers
+    xcenters = np.unique(data[data.dtype.names[0]]).tolist()
+    ycenters = np.unique(data[data.dtype.names[1]]).tolist()
+    xedges = effMap.centers_to_edges(xcenters)
+    yedges = effMap.centers_to_edges(ycenters)
+    # The highest y edge (d0 = 300 mm) should have zero eff,
+    # so add a point at last y edge so the interpolator interpolates to zero
+    ycenters.append(yedges[-1])
+    # The efficiency at very low y values (d0 < 25 mmm) grows much
+    # faster than the linear behavior. Therefore we need to add a point
+    # at the lowest y value with a larger efficiency to mimic this behavior
+    ycenters.insert(0,yedges[0])
+
+    mean_eff = np.zeros((len(xcenters), len(ycenters)))
+
+    # Build a fast lookup from (pT, d0) -> row index in electron_reco.data
+    centers = list(zip(data[data.dtype.names[0]], data[data.dtype.names[1]]))
+    center_to_index = {center: idx for idx, center in enumerate(centers)}
+
+    for i, j in itertools.product(range(len(xcenters)), range(len(ycenters))):
+        idx = center_to_index.get((xcenters[i], ycenters[j]),None)
+        if idx is None:
+            continue
+        mean_eff[i, j] = data[self.eff_label][idx]
+
+    # Set the efficiency at the highest y value to zero
+    # and a the lowest y value to 38% larger than the previous bin
+    # to mimic the increase at low d0 
+    # (the factor was estimated comparing the efficiencies from Fig.1 of 2011.07812 
+    # to the efficiencies from FigAux_19a at the lowest d0 value)
+    for i in range(mean_eff.shape[0]):
+      mean_eff[i,-1] = 0.0
+      mean_eff[i,0] = 1.5*mean_eff[i,1]
+
+    
+    z = mean_eff
+
+    if z.shape != (len(xcenters), len(ycenters)):
+        raise ValueError(
+            f"bin_values shape {z.shape} is incompatible with edges "
+            f"({len(xcenters)}, {len(ycenters)})."
+        )
+
+
+    # Fill NaNs before smoothing/interpolating to avoid artifacts.
+    z_filled = np.nan_to_num(z, nan=0.0)
+
+    if sigma and sigma > 0:
+        z_smooth = gaussian_filter(z_filled, sigma=sigma, mode='nearest')
+    else:
+        z_smooth = z_filled
+
+
+    interp = RegularGridInterpolator(
+        (xcenters, ycenters),
+        z_smooth,
+        method=method,
+        bounds_error=False,
+        fill_value=None,
+    )
+
+    def f(x, y):
+        x_arr, y_arr = np.broadcast_arrays(np.asarray(x, dtype=float), np.asarray(y, dtype=float))
+
+        # Treat the histogram edge box as in-domain: clamp to nearest center
+        # so points between edge and first/last center are not forced to fill_value.
+        inside_edges = (
+            (x_arr >= xedges[0]) & (x_arr <= xedges[-1]) &
+            (y_arr >= yedges[0]) & (y_arr <= yedges[-1])
+        )
+
+        pts = np.column_stack([x_arr.ravel(), y_arr.ravel()])
+        out = interp(pts).reshape(x_arr.shape)
+
+        # Preserve fill_value behavior for points truly outside histogram edges.
+        out = np.where(inside_edges, out, 0.0)
+
+        return float(out) if out.ndim == 0 else out
+
+    return f
+  
+  def efficiency(self,method='binned',**kwargs) -> float:
 
     var_values = [kwargs.get(var,None) for var in self.vars_limits.keys()]
     if any(v is None for v in var_values):
       raise ValueError(f"Missing variable(s) for efficiency map: {self.vars_limits.keys()}. Got {kwargs.keys()}")
     if any(v < self.vars_limits[var][0] or v > self.vars_limits[var][1] for var,v in zip(self.vars_limits.keys(),var_values)):
       return 0.0
-    eff = float(self.interp(*var_values))
+    if method == 'binned':
+      eff = float(self.interp_hist2d(*var_values))
+    elif method == 'nearest':
+      eff = float(self.interp_nearest(*var_values))
+    elif method == 'smooth':
+      eff = float(self.interp_smooth(*var_values))
+    else:
+      raise ValueError(f"Method {method} not found!")
     if np.isnan(eff):
       return 0.0
 
     return eff
+
 
 
 class cutFlow(object):

@@ -4,8 +4,7 @@ import os,sys,glob
 from pathlib import Path
 import logging
 from helper import (filterObjects,getModelInfo,saveOutput, \
-                    electron_reco, muon_reco, deltaR, cutFlow, \
-                    ee_acceptance, mm_acceptance, em_acceptance, getD0)
+                    effMap, deltaR, cutFlow, getD0)
 from numpy import ndarray
 from typing import Any, Dict, List, Tuple, Union
 import multiprocessing
@@ -27,6 +26,16 @@ ROOT.gInterpreter.Declare('#include "classes/SortableObject.h"')
 ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
 from ROOT import TFile,Electron, Jet, MissingET, Muon, TTree
+
+
+#Initialize efficiency maps
+electron_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0electronefficiency.csv")
+electron_reco = effMap(filepath="./ATLAS_data/recoEffs_from_1Deffs.csv")
+muon_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0muonefficiency.csv")
+ee_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptselectronacceptance.csv")
+mm_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptsmuonacceptance.csv")
+em_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptstauacceptance.csv")
+
 
 
 # Define SRs and Cutflow

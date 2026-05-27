@@ -29,8 +29,13 @@ from ROOT import TFile,Electron, Muon, TTree
 
 
 #Initialize efficiency maps
-# electron_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0electronefficiency.csv")
-electron_reco = effMap(filepath="./ATLAS_data/recoEffs_from_1Deffs.csv")
+electron_reco_smooth = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0electronefficiency.csv")
+electron_reco_1D = effMap(filepath="./ATLAS_data/recoEffs_from_1Deffs.csv")
+
+electron_reco = electron_reco_smooth # Use smoothed 2D binned data for electrons from https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/figaux_19a.png
+# electron_reco = electron_reco_1D # Use 1D efficiencies generated as product of interpolated 1D efficiencies for d0 and pT from Fig1. in https://arxiv.org/pdf/2011.07812 and Fig.17 in https://arxiv.org/pdf/1908.00005, respectively
+
+
 muon_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0muonefficiency.csv")
 ee_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptselectronacceptance.csv")
 mm_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptsmuonacceptance.csv")
@@ -38,30 +43,6 @@ em_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptsta
 
 
 
-# Define SRs and Cutflow
-ee_cutflow = cutFlow(name='ee_cutflow',levels=['All','PreSelection',
-                                                'Trigger', '2e', 
-                    'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2','ee SR'])
-mm_cutflow = cutFlow(name='mm_cutflow',levels=['All','PreSelection',
-                                               'Trigger', '2mu', 
-                    'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2','mm SR'])
-em_cutflow = cutFlow(name='em_cutflow',levels=['All','PreSelection',
-                                                'Trigger', 'emu', 
-                    'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2','em SR'])
-
-eff_SRs = cutFlow(name='eff_SRs',levels=['All',
-                                         'Acceptance_ee',
-                                         'AcceptanceCuts_ee',
-                                         'AccEff_ee',
-                                         'AccEffCuts_ee',
-                                         'Acceptance_mm',
-                                         'AcceptanceCuts_mm',
-                                         'AccEff_mm',
-                                         'AccEffCuts_mm',
-                                         'Acceptance_em',
-                                         'AcceptanceCuts_em',
-                                         'AccEff_em',
-                                         'AccEffCuts_em'])
 
 def getObjects(DelphesTree: TTree) -> Any:
     """
@@ -166,6 +147,32 @@ def passTrigger(leptons : List[Electron | Muon]) -> bool:
 
 def getEfficiencies(inputFile: str) -> Dict[str, Any]:
 
+
+    # Define SRs and Cutflow
+    ee_cutflow = cutFlow(name='ee_cutflow',levels=['All','PreSelection',
+                                                    'Trigger', '2e', 
+                        'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2','ee SR'])
+    mm_cutflow = cutFlow(name='mm_cutflow',levels=['All','PreSelection',
+                                                'Trigger', '2mu', 
+                        'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2','mm SR'])
+    em_cutflow = cutFlow(name='em_cutflow',levels=['All','PreSelection',
+                                                    'Trigger', 'emu', 
+                        'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2','em SR'])
+
+    eff_SRs = cutFlow(name='eff_SRs',levels=['All',
+                                            'Acceptance_ee',
+                                            'AcceptanceCuts_ee',
+                                            'AccEff_ee',
+                                            'AccEffCuts_ee',
+                                            'Acceptance_mm',
+                                            'AcceptanceCuts_mm',
+                                            'AccEff_mm',
+                                            'AccEffCuts_mm',
+                                            'Acceptance_em',
+                                            'AcceptanceCuts_em',
+                                            'AccEff_em',
+                                            'AccEffCuts_em'])
+
     
     f = TFile(inputFile,'read')
     DelphesTree = f.Get('Delphes')
@@ -228,7 +235,7 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
         lepton_effs = []
         for lep in leptons_preSel:
             if abs(lep.PID) == 11:
-                lepton_effs.append(electron_reco.efficiency(Lepton_p_textT_GeV=lep.PT, 
+                lepton_effs.append(electron_reco_smooth.efficiency(Lepton_p_textT_GeV=lep.PT, 
                                                             Lepton_d_0_mm=abs(lep.D0)))
             elif abs(lep.PID) == 13:
                 lepton_effs.append(muon_reco.efficiency(Lepton_p_textT_GeV=lep.PT, 
@@ -298,6 +305,8 @@ def main(inputfile: str,llpPDG :int = 1000011) -> None:
     if not b_files:
         logger.error(f"No banner files found in {d}!")
         raise ValueError()
+
+    logger.debug(f'\nRunning over input file {inputfile}')
     
     bannerFile = b_files[0]
     modelDict = getModelInfo(bannerFile,llpPDG)
@@ -372,6 +381,7 @@ if __name__ == "__main__":
         logger.error(f"File/Folder {args.input} not found!")
         raise ValueError()
     
+    inputFiles = sorted(inputFiles)
     logger.info(f"Running over {len(inputFiles)} files")
     ncpus = min(len(inputFiles),args.ncpus)
     pool = multiprocessing.Pool(processes=ncpus)

@@ -356,6 +356,18 @@ def getD0(ptc) -> float:
   d0 = np.linalg.norm(np.cross(vTrack,pTrack))/pT  
   return d0
 
+def getZ0(ptc) -> float:
+  x = ptc.X
+  y = ptc.Y
+  z = ptc.Z
+  phi = ptc.Phi
+  pT = ptc.PT
+  pz = pT*np.sinh(ptc.Eta)
+  vTrack = np.array([x,y])
+  pTrack = np.array([pT*np.cos(phi),pT*np.sin(phi)])
+  z0 = z - (pz/pT)*np.dot(vTrack,pTrack)/pT
+  return z0
+
 def minDphilist(ptc1, listptc2, length, cut) -> float:
   if len(listptc2)==0:
     return 0

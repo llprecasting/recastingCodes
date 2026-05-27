@@ -4,7 +4,7 @@ import os,sys,glob
 from pathlib import Path
 import logging
 from helper import (filterObjects,getModelInfo,saveOutput, \
-                    effMap, deltaR, cutFlow, getD0)
+                    effMap, deltaR, cutFlow, getD0, getZ0)
 from numpy import ndarray
 from typing import Any, Dict, List, Tuple, Union
 import multiprocessing
@@ -69,13 +69,15 @@ def getObjects(DelphesTree: TTree) -> Any:
     for el in electrons:
         if not hasattr(el,'PID'):
             el.PID = -11*el.Charge
-        if not hasattr(el,'D0'):
-            el.D0 = getD0(el)
+        # if not hasattr(el,'D0'):
+        el.D0 = getD0(el)
+        el.Z0 = getZ0(el)
     for mu in muons:
         if not hasattr(mu,'PID'):
             mu.PID = -13*mu.Charge
-        if not hasattr(mu,'D0'):
-            mu.D0 = getD0(mu)
+        # if not hasattr(mu,'D0'):
+        mu.D0 = getD0(mu)
+        mu.Z0 = getZ0(mu)
 
     return llps,muons,electrons
 
@@ -108,6 +110,8 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
     if len(muons) + len(electrons) < 2:
         # logger.debug(f"Event failed pre-selection: less than 2 leptons (muons: {len(muons)}, electrons: {len(electrons)})")
         return None
+    
+    # electrons = [el for el in electrons[:] if createdBeforeECAL(el)]
     
     allLeptons = sorted(muons + electrons, key=lambda lep: lep.PT,reverse=True)
     leptons = allLeptons[:2]
@@ -144,6 +148,24 @@ def passTrigger(leptons : List[Electron | Muon]) -> bool:
     if (sr == "mm" or sr == "em") and (leptons[1].PT > 60 and abs(leptons[1].Eta) < 1.07): pass_trigger = True
     
     return pass_trigger
+
+def createdBeforeECAL(ptc)-> bool:
+    """
+    Returns True if the particle has been created before the ECAL, False otherwise. 
+    Since the triggers require the electrons to deposit their energy in the ECAL, we must impose
+    these requirement for electrons.
+    """
+
+    zmax = 3700.0
+    rhomax = 1400.0
+    rho = np.sqrt(ptc.X**2 + ptc.Y**2)
+    z = np.abs(ptc.Z)
+    if rho > rhomax:
+        return False
+    elif z > zmax:
+        return False
+    else:
+        return True
 
 def getEfficiencies(inputFile: str) -> Dict[str, Any]:
 
@@ -272,6 +294,12 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
         sr_cutflow.fill_next(weight)
 
         eff_SRs.fill_level(f'AcceptanceCuts_{signal_region}', weight)
+
+        # Apply large Z0 cut imposed by the large radius tracking
+        # (see Table 1 in https://cds.cern.ch/record/2275635/files/ATL-PHYS-PUB-2017-014.pdf)
+        if any(abs(lep.Z0) > 1500. for lep in leptons_preSel):
+            continue
+
         if recoEff == 0.0:
             continue
         sr_cutflow.fill_next(weight*recoEff)
@@ -281,6 +309,7 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
 
 
     #End of loop
+    f.Close()
     logger.info(f"Loop Ended! Evts analysed: {ct}")
     for cutflow in [ee_cutflow,mm_cutflow,em_cutflow]:
         cutflow.divide(cutflow.weights[0]) # Normalize to total number of events (first level of cutflow)

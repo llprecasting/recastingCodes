@@ -185,7 +185,7 @@ class effMap:
 
 
     interp = RegularGridInterpolator(
-        (xedges[1:], ycenters),
+        (xcenters, ycenters),
         z_smooth,
         method=method,
         bounds_error=False,
@@ -320,13 +320,6 @@ class cutFlow(object):
     lines.append(f"===" + "="*len(self.name) + "===")
     return '\n'.join(lines)
 
-#Initialize efficiency maps
-
-electron_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0electronefficiency.csv")
-muon_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0muonefficiency.csv")
-ee_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptselectronacceptance.csv")
-mm_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptsmuonacceptance.csv")
-em_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptstauacceptance.csv")
 
 
 #Object readers

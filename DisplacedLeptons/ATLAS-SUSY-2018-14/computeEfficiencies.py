@@ -25,11 +25,11 @@ ROOT.gSystem.Load(os.path.join(DelphesLLP_path,"libDelphes.so"))
 ROOT.gInterpreter.Declare('#include "classes/SortableObject.h"')
 ROOT.gInterpreter.Declare('#include "classes/DelphesClasses.h"')
 ROOT.gInterpreter.Declare('#include "external/ExRootAnalysis/ExRootTreeReader.h"')
-from ROOT import TFile,Electron, Jet, MissingET, Muon, TTree
+from ROOT import TFile,Electron, Muon, TTree
 
 
 #Initialize efficiency maps
-electron_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0electronefficiency.csv")
+# electron_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0electronefficiency.csv")
 electron_reco = effMap(filepath="./ATLAS_data/recoEffs_from_1Deffs.csv")
 muon_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0muonefficiency.csv")
 ee_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptselectronacceptance.csv")

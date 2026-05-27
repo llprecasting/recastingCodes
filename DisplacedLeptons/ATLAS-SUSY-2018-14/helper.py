@@ -368,6 +368,11 @@ def getZ0(ptc) -> float:
   z0 = z - (pz/pT)*np.dot(vTrack,pTrack)/pT
   return z0
 
+def getR(ptc) -> float:
+  x = ptc.X
+  y = ptc.Y
+  return np.sqrt(x**2 + y**2)
+
 def minDphilist(ptc1, listptc2, length, cut) -> float:
   if len(listptc2)==0:
     return 0

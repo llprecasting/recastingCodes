@@ -4,7 +4,7 @@ import os,sys,glob
 from pathlib import Path
 import logging
 from helper import (filterObjects,getModelInfo,saveOutput, \
-                    effMap, deltaR, cutFlow, getD0, getZ0)
+                    effMap, deltaR, cutFlow, getD0, getZ0, getR)
 from numpy import ndarray
 from typing import Any, Dict, List, Tuple, Union
 import multiprocessing
@@ -72,12 +72,14 @@ def getObjects(DelphesTree: TTree) -> Any:
         # if not hasattr(el,'D0'):
         el.D0 = getD0(el)
         el.Z0 = getZ0(el)
+        el.R = getR(el)
     for mu in muons:
         if not hasattr(mu,'PID'):
             mu.PID = -13*mu.Charge
         # if not hasattr(mu,'D0'):
         mu.D0 = getD0(mu)
         mu.Z0 = getZ0(mu)
+        mu.R = getR(mu)
 
     return llps,muons,electrons
 
@@ -106,12 +108,10 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
     Applies the pre-selection requirements for the different SRs and computes the trigger efficiency.
     """
 
-
+    
     if len(muons) + len(electrons) < 2:
         # logger.debug(f"Event failed pre-selection: less than 2 leptons (muons: {len(muons)}, electrons: {len(electrons)})")
         return None
-    
-    # electrons = [el for el in electrons[:] if createdBeforeECAL(el)]
     
     allLeptons = sorted(muons + electrons, key=lambda lep: lep.PT,reverse=True)
     leptons = allLeptons[:2]
@@ -299,6 +299,13 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
         # (see Table 1 in https://cds.cern.ch/record/2275635/files/ATL-PHYS-PUB-2017-014.pdf)
         if any(abs(lep.Z0) > 1500. for lep in leptons_preSel):
             continue
+        # Since the trigger requires the electrons to deposit their energy in the ECAL, we must impose that they are created before the ECAL.
+        if any((not createdBeforeECAL(lep) and abs(lep.PID) == 11) for lep in leptons_preSel):
+            continue
+        # In order to have enough hits in the inner detector for the large radius tracking, we must impose that the leptons are created within R ~ 440 mm from the beamline (see Table 3 in https://cds.cern.ch/record/2275635/files/ATL-PHYS-PUB-2017-014.pdf)
+        if any(lep.R > 300. for lep in leptons_preSel):
+            continue
+
 
         if recoEff == 0.0:
             continue

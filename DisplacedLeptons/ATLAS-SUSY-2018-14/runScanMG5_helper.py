@@ -236,6 +236,9 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
     delphescard = os.path.abspath(pars['delphescard'])
     shutil.copyfile(delphescard,delphesFile)
 
+    if not os.path.isdir(runFolder):
+        logger.error(f'Run folder {runFolder} not found. Cannot run Delphes.')
+        return runInfo
     
     delphesDir = os.path.abspath(pars['delphesDir'])
     delphescard = os.path.abspath(pars['delphescard'])
@@ -244,7 +247,9 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
     eventsFolder = os.path.join(runFolder,'Events',runInfo['run number'])
     lheFile = os.path.join(eventsFolder,'unweighted_events.lhe.gz')        
     hepmcFiles = list(glob.glob(os.path.join(eventsFolder,'*hepmc*')))
-    logger.info
+    if not os.path.isdir(eventsFolder):
+        logger.error(f'Events folder {eventsFolder} not found. Cannot run Delphes.')
+        return runInfo
 
 
     if runDelphesPythia:

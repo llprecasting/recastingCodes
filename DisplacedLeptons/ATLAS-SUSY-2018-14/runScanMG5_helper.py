@@ -244,6 +244,7 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
     eventsFolder = os.path.join(runFolder,'Events',runInfo['run number'])
     lheFile = os.path.join(eventsFolder,'unweighted_events.lhe.gz')        
     hepmcFiles = list(glob.glob(os.path.join(eventsFolder,'*hepmc*')))
+    logger.info
 
 
     if runDelphesPythia:
@@ -278,7 +279,7 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
         if len(hepmcFiles) > 1:
             logger.warning(f'Found {len(hepmcFiles)} candidate files for the HEPMC file. Using {hepmcFiles[0]}.')
         elif not hepmcFiles:
-            logger.error(f'HEPMC file not found in {runFolder}')
+            logger.error(f'HEPMC file not found in {eventsFolder}. Cannot run Delphes.')
             return runInfo
         
         hepmcFile = hepmcFiles[0]

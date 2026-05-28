@@ -6,7 +6,7 @@
 from __future__ import print_function
 import sys
 from configParserWrapper import ConfigParserExt
-from runScanMG5_helper import generateEvents
+from runScanMG5_helper import generateEvents,logger
 import time
 
 
@@ -17,6 +17,8 @@ if __name__ == "__main__":
             "Runs a single job defined by a config file for running MadGraph scans with condor." )
     ap.add_argument('-c', '--configfile', required=True,
             help='path to the config file for this job, i.e. config.ini')
+    ap.add_argument('-v', '--verbose', required=False, default='info',
+            help='verbose level [info]')
     
     t0 = time.time()
     args = ap.parse_args()
@@ -29,6 +31,6 @@ if __name__ == "__main__":
         sys.exit(1)
     parserDict = parser.toDict(raw=False,abspath_existing=True)
 
+    logger.info(f"Running job with config file: {configFile}")
     output = generateEvents(parserDict)
-
-    print("\n\nDone in %3.2f min" %((time.time()-t0)/60.))
+    logger.info(f"Done running with config file: {configFile}")

@@ -4,7 +4,6 @@
 # (the proc_card.dat, parameter_card.dat and run_card.dat...).
 
 from __future__ import print_function
-from copyreg import pickle
 import sys,os,glob
 from configParserWrapper import ConfigParserExt
 from runScanMG5_helper import generateProcess
@@ -12,7 +11,6 @@ import logging
 import subprocess
 import tempfile
 import time,datetime
-import pickle
 from typing import Set
 
 FORMAT = '%(levelname)s: %(message)s at %(asctime)s'
@@ -73,11 +71,14 @@ def generate_configFiles(parfile,verbose) -> Set[str]:
         newParser.set('MadGraphPars','runFolder',runFolder)
         newParser.set('MadGraphPars','runNumber','%02d' %(run0+irun))
 
-        parserDict = newParser.toDict(raw=False)
-        # Create config file to store the dictionary of parameters used for this run:
-        outfile = f"{configFolder}/job_{irun:05d}.pkl"
-        with open(outfile, "wb") as f:
-            pickle.dump(parserDict, f)
+        parserDict = newParser.toDict(raw=False,abspath_existing=True)
+        # Create text config file to store the dictionary of parameters for this run.
+        # This file can be read again by ConfigParserExt in the worker.
+        outfile = f"{configFolder}/job_{irun:05d}.ini"
+        parserOut = ConfigParserExt()
+        parserOut.read_dict(parserDict)
+        with open(outfile, "w") as f:
+            parserOut.write(f)
             
         configFolders.add(configFolder)
     logger.info(f"Created {len(parserList)} config files at {now.strftime('%Y-%m-%d %H:%M')}")
@@ -105,7 +106,7 @@ def generate_condorSubmitFile(configFolder,subFile,worker_file='runScanMG5_worke
         f.write(f"log = {configFolder}/job.$(Cluster).$(Process).log\n")
         f.write("should_transfer_files = YES\n")
         f.write("when_to_transfer_output = ON_EXIT\n")
-        f.write(f"queue config matching {configFolder}/*pkl\n")
+        f.write(f"queue config matching {configFolder}/*ini\n")
 
     return submitFile
 

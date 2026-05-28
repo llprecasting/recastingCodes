@@ -6,6 +6,7 @@
 
 
 from math import *
+import os
 import re, itertools
 import numpy as np
 import logging
@@ -26,11 +27,14 @@ class ConfigParserExt(RawConfigParser):
         self.MAX_INTERPOLATION_DEPTH=100
         self.optionxform=str    #Preserve string cases    
 
-    def toDict(self,raw=True):
+    def toDict(self,raw=True,abspath_existing=False):
         """
         Convert parser to dictionary.
         If raw=True, will return the raw values, otherwise it will
         try to evaluate them.
+
+        :parameter abspath_existing: If True, string values that point
+            to existing filesystem paths are converted to absolute paths.
         """
         
         parserDict = {}
@@ -38,8 +42,28 @@ class ConfigParserExt(RawConfigParser):
             parserDict[s] = {}
             for var in self.options(s):
                 parserDict[s][var] = self.get(s,var,raw=raw)
+
+        if abspath_existing:
+            parserDict = self._absolutize_existing_paths(parserDict)
         
         return parserDict
+
+    def _absolutize_existing_paths(self, obj):
+        """
+        Recursively convert string values to absolute paths only when
+        they refer to existing files or directories.
+        """
+
+        if isinstance(obj, dict):
+            return {k: self._absolutize_existing_paths(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [self._absolutize_existing_paths(v) for v in obj]
+        if isinstance(obj, tuple):
+            return tuple(self._absolutize_existing_paths(v) for v in obj)
+        if isinstance(obj, str) and os.path.exists(obj):
+            return os.path.abspath(obj)
+
+        return obj
     
     def read_dict(self,parserDict):
         """

@@ -4,11 +4,17 @@
 # (the proc_card.dat, parameter_card.dat and run_card.dat...).
 
 from __future__ import print_function
-import sys
+import sys,os
 from configParserWrapper import ConfigParserExt
 from runScanMG5_helper import generateEvents,logger
 import time, logging
 
+
+def compressOutputFolder(outputFolder):
+    import shutil
+    compactOutputFolder = outputFolder + '.tar.gz'
+    shutil.make_archive(outputFolder, 'gztar', outputFolder)
+    return compactOutputFolder
 
 if __name__ == "__main__":
     
@@ -40,4 +46,6 @@ if __name__ == "__main__":
 
     logger.info(f"Running job with config file: {configFile}")
     output = generateEvents(parserDict)
+    runFolder = os.path.abspath(output['runFolder'])
+    compactOutputFolder = compressOutputFolder(runFolder)
     logger.info(f"Done in {(time.time()-t0)/60.0:.2f} minutes.")

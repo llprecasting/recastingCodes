@@ -229,7 +229,7 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
     cleanOutput = parser['options']['cleanOutput']
     pars = parser["DelphesPars"]
 
-    runFolder = parser['MadGraphPars']['runFolder']
+    runFolder = os.path.abspath(parser['MadGraphPars']['runFolder'])
     nevts = parser["MadGraphSet"]["nevents"]
     rootFile = os.path.join(runFolder,'Events',runInfo['run number'], '%s_delphes_events.root'  %runInfo['run tag'])
     delphesFile = os.path.join(runFolder,'Events',runInfo['run number'],'delphes_card.dat')
@@ -297,6 +297,8 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
                                 cwd=delphesDir)
 
     output,errorMsg = run.communicate()
+    logger.debug('Delphes error:\n %s \n' %errorMsg.decode())
+    logger.debug('Delphes output:\n %s \n' %output.decode())
 
     runInfo.update({'DelphesOutput' : output, 'DelphesError' : errorMsg})
 

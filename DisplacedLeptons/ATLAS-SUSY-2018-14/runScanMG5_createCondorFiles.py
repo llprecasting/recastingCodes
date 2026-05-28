@@ -95,15 +95,17 @@ def generate_condorSubmitFile(configFolder,subFile,worker_file='runScanMG5_worke
     configFolder = os.path.abspath(configFolder)
     submitFile = os.path.abspath(os.path.join(configFolder,subFile))
     with open(submitFile, 'w') as f:
-        f.write(f"executable = python3\n")
+        f.write(f"executable = /usr/bin/python3\n")
         f.write(f"arguments =  {worker} -c $(config)\n")
         f.write("getenv = True\n")
         f.write("request_memory = 2GB\n")
 #        f.write("request_cpus = 1\n")
-        f.write("output = condor_output/job.$(Cluster).$(Process).out\n")
-        f.write("error = condor_output/job.$(Cluster).$(Process).err\n")
-        f.write("log = condor_output/job.$(Cluster).$(Process).log\n")
-        f.write(f"queue config matching {configFolder}/*pkl'\n")
+        f.write(f"output = {configFolder}/job.$(Cluster).$(Process).out\n")
+        f.write(f"error = {configFolder}/job.$(Cluster).$(Process).err\n")
+        f.write(f"log = {configFolder}/job.$(Cluster).$(Process).log\n")
+        f.write("should_transfer_files = YES\n")
+        f.write("when_to_transfer_output = ON_EXIT\n")
+        f.write(f"queue config matching {configFolder}/*pkl\n")
 
     return submitFile
 

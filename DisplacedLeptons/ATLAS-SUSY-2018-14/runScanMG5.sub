@@ -1,0 +1,17 @@
+executable = runScanMG5.sh
+
+arguments = $(config)
+
+getenv = True
+
+request_cpus = 1
+request_memory = 2GB
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+output = runScanMG5_logs/out.$(Cluster).$(Process)
+error  = runScanMG5_logs/err.$(Cluster).$(Process)
+log    = runScanMG5_logs/condor.log
+
+queue config matching configs/job_*.pkl

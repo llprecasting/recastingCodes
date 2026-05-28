@@ -235,13 +235,16 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
     delphesFile = os.path.join(runFolder,'Events',runInfo['run number'],'delphes_card.dat')
     delphescard = os.path.abspath(pars['delphescard'])
     shutil.copyfile(delphescard,delphesFile)
+    delphesDir = os.path.abspath(pars['delphesDir'])
 
     if not os.path.isdir(runFolder):
         logger.error(f'Run folder {runFolder} not found. Cannot run Delphes.')
         return runInfo
+    if not os.path.isdir(delphesDir):
+        logger.error(f'Delphes directory {delphesDir} not found. Cannot run Delphes.')
+        return runInfo
     
-    delphesDir = os.path.abspath(pars['delphesDir'])
-    delphescard = os.path.abspath(pars['delphescard'])
+    
     
     # Get possible input files:
     eventsFolder = os.path.join(runFolder,'Events',runInfo['run number'])
@@ -277,7 +280,7 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
                 f.write('JetMatching:nJetMax      = %i \n' %njet)
 
         logger.debug("Running DelphesPythia8 with config files %s and %s" %(pythiaFile,delphesFile))
-        run = subprocess.Popen('./DelphesPythia8 %s %s %s' %(delphescard,pythiaFile,rootFile),shell=True,
+        run = subprocess.Popen('./DelphesPythia8 %s %s %s' %(delphesFile,pythiaFile,rootFile),shell=True,
                                 stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,
                                 cwd=delphesDir)
     else:   
@@ -289,7 +292,7 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
         
         hepmcFile = hepmcFiles[0]
         logger.debug("Running DelphesHepMC2 with files %s and %s" %(delphesFile,hepmcFile))
-        run = subprocess.Popen('./DelphesHepMC2 %s %s %s' %(delphescard,rootFile,hepmcFile),shell=True,
+        run = subprocess.Popen('./DelphesHepMC2 %s %s %s' %(delphesFile,rootFile,hepmcFile),shell=True,
                                 stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,
                                 cwd=delphesDir)
 

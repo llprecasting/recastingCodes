@@ -7,7 +7,7 @@ from __future__ import print_function
 import sys
 from configParserWrapper import ConfigParserExt
 from runScanMG5_helper import generateEvents,logger
-import time
+import time, logging
 
 
 if __name__ == "__main__":
@@ -23,6 +23,13 @@ if __name__ == "__main__":
     t0 = time.time()
     args = ap.parse_args()
     configFile = args.configfile
+
+    level = args.verbose
+    levels = { "debug": logging.DEBUG, "info": logging.INFO,
+               "warn": logging.WARNING,
+               "warning": logging.WARNING, "error": logging.ERROR }
+    if level in levels:       
+        logger.setLevel(level = levels[level])
 
     parser = ConfigParserExt(inline_comment_prefixes="#")
     ret = parser.read(configFile)

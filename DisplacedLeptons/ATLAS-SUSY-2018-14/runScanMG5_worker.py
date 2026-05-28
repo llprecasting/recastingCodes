@@ -40,4 +40,4 @@ if __name__ == "__main__":
 
     logger.info(f"Running job with config file: {configFile}")
     output = generateEvents(parserDict)
-    logger.info(f"Done running with config file: {configFile}")
+    logger.info(f"Done in {(time.time()-t0)/60.0:.2f} minutes.")

@@ -291,8 +291,8 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
             return runInfo
         
         hepmcFile = hepmcFiles[0]
-        logger.debug("Running DelphesHepMC2 with files %s and %s" %(delphesFile,hepmcFile))
-        run = subprocess.Popen('./DelphesHepMC2 %s %s %s' %(delphesFile,rootFile,hepmcFile),shell=True,
+        logger.debug(f"Running ./DelphesHepMC2 {delphesFile} {rootFile} {hepmcFile} at {delphesDir}")
+        run = subprocess.Popen(f'./DelphesHepMC2 {delphesFile} {rootFile} {hepmcFile}',shell=True,
                                 stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,
                                 cwd=delphesDir)
 

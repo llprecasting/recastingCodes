@@ -8,10 +8,9 @@ import sys,os
 from configParserWrapper import ConfigParserExt
 from runScanMG5_helper import generateEvents,logger
 import time, logging
-
+import shutil
 
 def compressOutputFolder(outputFolder):
-    import shutil
     compactOutputFolder = outputFolder + '.tar.gz'
     shutil.make_archive(outputFolder, 'gztar', outputFolder)
     return compactOutputFolder

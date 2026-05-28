@@ -15,7 +15,7 @@ import time,datetime
 import pickle
 from typing import Set
 
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s(): %(message)s at %(asctime)s'
+FORMAT = '%(levelname)s: %(message)s at %(asctime)s'
 logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger("MG5Scan")
     
@@ -115,6 +115,8 @@ if __name__ == "__main__":
             "Creates a series of config files for running MadGraph scans with condor." )
     ap.add_argument('-o', '--outputFile', default='runScanMG5_condor.sub',
             help='name for the the condor submit file [runScanMG5_condor.sub].')
+    ap.add_argument('-w', '--workerFile', default='runScanMG5_worker.py',
+            help='path to the the worker file [runScanMG5_worker.py].')
     ap.add_argument('-p', '--parfile', default='scan_parameters.ini',
             help='path to the parameters file [scan_parameters.ini].')
     ap.add_argument('-v', '--verbose', default='info',
@@ -142,7 +144,7 @@ if __name__ == "__main__":
         logger.warning(f"Multiple config folders created: {configFolders}. Make sure to submit condor jobs for all folders.")
         
     for configFolder in configFolders:
-        subFile = generate_condorSubmitFile(configFolder,args.outputFile)
+        subFile = generate_condorSubmitFile(configFolder,args.outputFile,args.workerFile)
         logger.info(f"Submit file {subFile} created for config folder {configFolder}")
             
     print("\n\nDone in %3.2f min" %((time.time()-t0)/60.))

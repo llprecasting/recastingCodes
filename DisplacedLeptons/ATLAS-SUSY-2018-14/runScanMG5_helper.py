@@ -4,16 +4,14 @@
 # (the proc_card.dat, parameter_card.dat and run_card.dat...).
 
 from __future__ import print_function
-import sys,os,glob
-from configParserWrapper import ConfigParserExt
+import os,glob
 import logging,shutil
 import subprocess
-import multiprocessing
 import tempfile
-import time,datetime
+import time
 from typing import Dict
 
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s(): %(message)s at %(asctime)s'
+FORMAT = '%(levelname)s: %(message)s at %(asctime)s'
 logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger("MG5Scan")
 

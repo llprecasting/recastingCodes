@@ -6,7 +6,7 @@
 from __future__ import print_function
 import sys
 from configParserWrapper import ConfigParserExt
-from runScanMG5_helper import generateEvents, moveFolders
+from runScanMG5_helper import generateEvents
 import time
 
 
@@ -30,7 +30,5 @@ if __name__ == "__main__":
     parserDict = parser.toDict(raw=False,abspath_existing=True)
 
     output = generateEvents(parserDict)
-
-    moveFolders(output)
 
     print("\n\nDone in %3.2f min" %((time.time()-t0)/60.))

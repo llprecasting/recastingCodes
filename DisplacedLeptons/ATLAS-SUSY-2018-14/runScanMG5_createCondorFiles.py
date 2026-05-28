@@ -68,7 +68,7 @@ def generate_configFiles(parfile,verbose) -> Set[str]:
         else:
             runFolder = processFolder
 
-        newParser.set('MadGraphPars','runFolder',runFolder)
+        newParser.set('MadGraphPars','runFolder',os.path.basename(runFolder))
         newParser.set('MadGraphPars','runNumber','%02d' %(run0+irun))
 
         parserDict = newParser.toDict(raw=False,abspath_existing=True)

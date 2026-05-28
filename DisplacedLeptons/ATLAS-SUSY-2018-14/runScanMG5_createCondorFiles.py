@@ -18,17 +18,8 @@ logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger("MG5Scan")
     
  
-def generate_configFiles(parfile,verbose) -> Set[str]:
+def generate_configFiles(parfile) -> Set[str]:
    
-    level = verbose
-    levels = { "debug": logging.DEBUG, "info": logging.INFO,
-               "warn": logging.WARNING,
-               "warning": logging.WARNING, "error": logging.ERROR }
-    if not level in levels:
-        logger.error ( "Unknown log level ``%s'' supplied!" % level )
-        sys.exit()
-    logger.setLevel(level = levels[level])    
-
     parser = ConfigParserExt(inline_comment_prefixes="#")   
     ret = parser.read(parfile)
     if ret == []:
@@ -86,7 +77,7 @@ def generate_configFiles(parfile,verbose) -> Set[str]:
     return configFolders
     
 
-def generate_condorSubmitFile(configFolder,subFile,worker_file='runScanMG5_worker.py'):
+def generate_condorSubmitFile(configFolder,subFile,worker_file='runScanMG5_worker.py', verbose='info'):
 
     worker = os.path.abspath(worker_file)
     if not os.path.isfile(worker):
@@ -97,7 +88,7 @@ def generate_condorSubmitFile(configFolder,subFile,worker_file='runScanMG5_worke
     submitFile = os.path.abspath(os.path.join(configFolder,subFile))
     with open(submitFile, 'w') as f:
         f.write(f"executable = /usr/bin/python3\n")
-        f.write(f"arguments =  {worker} -c $(config)\n")
+        f.write(f"arguments =  {worker} -c $(config) -v {verbose} \n")
         f.write("getenv = True\n")
         f.write("request_memory = 2GB\n")
 #        f.write("request_cpus = 1\n")
@@ -139,7 +130,15 @@ if __name__ == "__main__":
     t0 = time.time()
 
     args = ap.parse_args()
-    configFolders = generate_configFiles(args.parfile,args.verbose)
+
+    level = args.verbose
+    levels = { "debug": logging.DEBUG, "info": logging.INFO,
+               "warn": logging.WARNING,
+               "warning": logging.WARNING, "error": logging.ERROR }
+    if level in levels:       
+        logger.setLevel(level = levels[level])
+
+    configFolders = generate_configFiles(args.parfile)
     if len(configFolders) == 0:
         logger.error("No config files created. Exiting.")
         sys.exit()
@@ -147,7 +146,7 @@ if __name__ == "__main__":
         logger.warning(f"Multiple config folders created: {configFolders}. Make sure to submit condor jobs for all folders.")
         
     for configFolder in configFolders:
-        subFile = generate_condorSubmitFile(configFolder,args.outputFile,args.workerFile)
+        subFile = generate_condorSubmitFile(configFolder,args.outputFile,args.workerFile,args.verbose)
         logger.info(f"Submit file {subFile} created for config folder {configFolder}")
             
     print("\n\nDone in %3.2f min" %((time.time()-t0)/60.))

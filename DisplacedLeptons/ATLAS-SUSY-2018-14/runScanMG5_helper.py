@@ -297,8 +297,8 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
                                 cwd=delphesDir)
 
     output,errorMsg = run.communicate()
-    logger.debug('Delphes error:\n %s \n' %errorMsg.decode())
-    logger.debug('Delphes output:\n %s \n' %output.decode())
+    logger.debug('Delphes error:\n %s \n' %errorMsg)
+    logger.debug('Delphes output:\n %s \n' %output)
 
     runInfo.update({'DelphesOutput' : output, 'DelphesError' : errorMsg})
 

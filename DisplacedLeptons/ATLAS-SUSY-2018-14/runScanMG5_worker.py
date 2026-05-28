@@ -48,4 +48,6 @@ if __name__ == "__main__":
     output = generateEvents(parserDict)
     runFolder = os.path.abspath(output['runFolder'])
     compactOutputFolder = compressOutputFolder(runFolder)
+    shutil.rmtree(runFolder)
+    logger.info(f"Output folder {runFolder} compressed to {compactOutputFolder}")
     logger.info(f"Done in {(time.time()-t0)/60.0:.2f} minutes.")

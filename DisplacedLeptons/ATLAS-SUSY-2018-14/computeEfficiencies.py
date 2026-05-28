@@ -4,7 +4,7 @@ import os,sys,glob
 from pathlib import Path
 import logging
 from helper import (filterObjects,getModelInfo,saveOutput, \
-                    effMap, deltaR, cutFlow, getD0, getZ0, getR)
+                    effMap, deltaR, cutFlow, getD0, getZ0, getR, count_tracker_layer_crossings)
 from numpy import ndarray
 from typing import Any, Dict, List, Tuple, Union
 import multiprocessing
@@ -166,6 +166,46 @@ def createdBeforeECAL(ptc)-> bool:
         return False
     else:
         return True
+    
+def createdBeforeSCT(ptc)-> bool:
+    """
+    Returns True if the particle has been created before the SCT, False otherwise. 
+    Since the tracking reconstruction algorithm requires several hits in the SCT, we must impose
+    these requirement for electrons.
+    """
+
+    zmax = 750.0
+    rhomax = 500.0
+    rho = np.sqrt(ptc.X**2 + ptc.Y**2)
+    z = np.abs(ptc.Z)
+    if rho > rhomax:
+        return False
+    elif z > zmax:
+        return False
+    else:
+        return True
+    
+def numberOfHits(ptc) -> int:
+    """
+    Returns the number of hits for a given particle in the pixel and/or SCT layers of the tracker. Since the tracking algorithm requires hits in these layers, we must impose these requirement for electrons.
+    """
+
+    # Production vertex coordinates
+    R = np.sqrt(ptc.X**2 + ptc.Y**2)
+    Z = ptc.Z
+    # Velocity components in cylindrical coordinates
+    # (only the direction is relevant)
+    vR = np.sqrt(ptc.Px**2 + ptc.Py**2)
+    vz = ptc.Pz
+    vtot = np.sqrt(ptc.Px**2 + ptc.Py**2 + ptc.Pz**2)
+    vR = vR/vtot
+    vz = vz/vtot
+    hits = count_tracker_layer_crossings(R,Z,vR,vz)
+    n_total = hits['total']
+
+    return n_total
+
+
 
 def getEfficiencies(inputFile: str) -> Dict[str, Any]:
 
@@ -295,20 +335,23 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
 
         eff_SRs.fill_level(f'AcceptanceCuts_{signal_region}', weight)
 
+        if recoEff == 0.0:
+            continue
+
         # Apply large Z0 cut imposed by the large radius tracking
         # (see Table 1 in https://cds.cern.ch/record/2275635/files/ATL-PHYS-PUB-2017-014.pdf)
         if any(abs(lep.Z0) > 1500. for lep in leptons_preSel):
             continue
         # Since the trigger requires the electrons to deposit their energy in the ECAL, we must impose that they are created before the ECAL.
-        if any((not createdBeforeECAL(lep) and abs(lep.PID) == 11) for lep in leptons_preSel):
-            continue
+        # if any((not createdBeforeECAL(lep) and abs(lep.PID) == 11) for lep in leptons_preSel):
+            # continue
         # In order to have enough hits in the inner detector for the large radius tracking, we must impose that the leptons are created within R ~ 440 mm from the beamline (see Table 3 in https://cds.cern.ch/record/2275635/files/ATL-PHYS-PUB-2017-014.pdf)
-        if any(lep.R > 300. for lep in leptons_preSel):
+        # if any(lep.R > 300. for lep in leptons_preSel):
+            # continue
+        nhits = [numberOfHits(lep) for lep in leptons_preSel]
+        if any(nh < 3 for nh in nhits):
             continue
 
-
-        if recoEff == 0.0:
-            continue
         sr_cutflow.fill_next(weight*recoEff)
         eff_SRs.fill_level(f'AccEffCuts_{signal_region}', recoEff*weight)
 

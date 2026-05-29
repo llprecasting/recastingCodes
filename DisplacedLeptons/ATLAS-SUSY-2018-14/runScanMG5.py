@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 
-# 1) Run MadGraph using the options set in the input file 
-# (the proc_card.dat, parameter_card.dat and run_card.dat...).
-
 from __future__ import print_function
 import sys,os,glob
 from configParserWrapper import ConfigParserExt
-from runScanMG5_helper import generateProcess, generateEvents, moveFolders
+from runScanMG5_helper import generateInputFiles,logger
+from runScanMG5_worker import runSingleJob
 import logging
 import subprocess
 import multiprocessing
-import tempfile
 import time,datetime
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s(): %(message)s at %(asctime)s'
@@ -18,24 +15,29 @@ logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger("MG5Scan")
 
 def main(parfile,verbose):
-   
+
     level = verbose
     levels = { "debug": logging.DEBUG, "info": logging.INFO,
                "warn": logging.WARNING,
                "warning": logging.WARNING, "error": logging.ERROR }
-    if not level in levels:
-        logger.error ( "Unknown log level ``%s'' supplied!" % level )
-        sys.exit()
-    logger.setLevel(level = levels[level])    
-
+    if level in levels:       
+        logger.setLevel(level = levels[level])
+   
     parser = ConfigParserExt(inline_comment_prefixes="#")   
     ret = parser.read(parfile)
     if ret == []:
-        logger.error( "No such file or directory: '%s'" % args.parfile)
-        sys.exit()
-            
-    #Get a list of parsers (in case loops have been defined)    
-    parserList = parser.expandLoops()
+        logger.error( f"No such file or directory: {parfile}")
+        sys.exit(1)
+
+    scanFolders = generateInputFiles(parfile)
+    if len(scanFolders) == 0:
+        logger.error( f"No valid input files generated from {parfile}.")
+        sys.exit(1)
+
+    # Get a list of all generated input config files
+    allInputFiles = []
+    for folderTuple in scanFolders:
+        allInputFiles += list(glob.glob(os.path.join(folderTuple.inputFolder, '*.ini')))
 
     # Start multiprocessing pool
     ncpus = -1
@@ -43,54 +45,25 @@ def main(parfile,verbose):
         ncpus = int(parser.get("options","ncpu"))
     if ncpus  < 0:
         ncpus =  multiprocessing.cpu_count()
-    ncpus = min(ncpus,len(parserList))
+    ncpus = min(ncpus,len(allInputFiles))
     pool = multiprocessing.Pool(processes=ncpus)
     if ncpus > 1:
-        logger.info('Running %i jobs in parallel with %i processes' %(len(parserList),ncpus))
+        logger.info('Running %i jobs in parallel with %i processes' %(len(allInputFiles),ncpus))
     else:
-        logger.info('Running %i jobs in series with a single process' %(len(parserList)))
+        logger.info('Running %i jobs in series with a single process' %(len(allInputFiles)))
 
     now = datetime.datetime.now()
     children = []
-    for irun,newParser in enumerate(parserList):
-        processFolder = newParser.get('MadGraphPars','processFolder')
-        processFolder = os.path.abspath(processFolder)
-        if processFolder[-1] == '/':
-            processFolder = processFolder[:-1]
-        if not os.path.isdir(processFolder):
-            logger.info('Folder %s not found. Running MG5 to create folder.' %processFolder)
-            generateProcess(newParser)
-
-        # Get largest existing events folder:
-        run0 = 1
-        eventsFolder = os.path.join(processFolder,'Events')
-        if os.path.isdir(eventsFolder):
-            for runF in glob.glob(os.path.join(eventsFolder,'run*')):
-                run0 = max(run0,int(os.path.basename(runF).replace('run_',''))+1)
-
-        # Create temporary folder names if running in parallel
-        if ncpus > 1:
-            # Create temporary folders
-            runFolder = tempfile.mkdtemp(prefix='%s_'%(processFolder),suffix='_run_%02d' %(run0+irun))
-            os.removedirs(runFolder)
-        else:
-            runFolder = processFolder
-
-        newParser.set('MadGraphPars','runFolder',runFolder)
-        newParser.set('MadGraphPars','runNumber','%02d' %(run0+irun))
-
-        parserDict = newParser.toDict(raw=False)
-        logger.debug('submitting with pars:\n %s \n' %parserDict)
-        p = pool.apply_async(generateEvents, args=(parserDict,), callback=moveFolders)                       
+    for inputFile in allInputFiles:
+        logger.debug(f'submitting with input file: {inputFile}')
+        p = pool.apply_async(runSingleJob, args=(inputFile,verbose,))
         children.append(p)
 
 #     Wait for jobs to finish:
     output = [p.get() for p in children]
-    logger.info("Finished all runs (%i) at %s" %(len(parserList),now.strftime("%Y-%m-%d %H:%M")))
+    logger.info("Finished all runs (%i) at %s" %(len(allInputFiles),now.strftime("%Y-%m-%d %H:%M")))
 
     return output
-    
-
 
 if __name__ == "__main__":
     
@@ -102,14 +75,13 @@ if __name__ == "__main__":
     ap.add_argument('-v', '--verbose', default='info',
             help='verbose level (debug, info, warning or error). Default is info')
 
-
     # First make sure the correct env variables have been set:
     LDPATH = subprocess.check_output('echo $LD_LIBRARY_PATH',shell=True,text=True)
     ROOTINC = subprocess.check_output('echo $ROOT_INCLUDE_PATH',shell=True,text=True)
     pythiaDir = os.path.abspath('./MG5/HEPTools/pythia8/lib')
     delphesDir = os.path.abspath('./DelphesLLP/external')
     if pythiaDir not in LDPATH or delphesDir not in ROOTINC:
-        print('Enviroment variables not properly set. Run source setenv.sh first.')
+        logger.error('Environment variables not properly set. Run source setenv.sh first.')
         sys.exit()
 
     t0 = time.time()
@@ -117,4 +89,4 @@ if __name__ == "__main__":
     args = ap.parse_args()
     output = main(args.parfile,args.verbose)
             
-    print("\n\nDone in %3.2f min" %((time.time()-t0)/60.))
+    logger.info("\n\nDone in %3.2f min" %((time.time()-t0)/60.))

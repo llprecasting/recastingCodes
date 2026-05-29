@@ -8,12 +8,95 @@ import os,glob
 import logging,shutil
 import subprocess
 import tempfile
-import time
-from typing import Dict
+import time,sys,datetime
+from configParserWrapper import ConfigParserExt
+from typing import Dict,Set,Union, NamedTuple
+from collections import namedtuple
+folderTuple = namedtuple('folderTuple', ['inputFolder', 'outputFolder'])
 
 FORMAT = '%(levelname)s: %(message)s at %(asctime)s'
 logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger("MG5Scan")
+
+def generateInputFiles(parfile) -> Set[folderTuple]:
+   
+    parser = ConfigParserExt(inline_comment_prefixes="#")   
+    ret = parser.read(parfile)
+    if ret == []:
+        logger.error( f"No such file or directory: {parfile}")
+        return set([])
+            
+    #Get a list of parsers (in case loops have been defined)    
+    parserList = parser.expandLoops()
+    now = datetime.datetime.now()
+    scanFolders = set([])
+    for irun,newParser in enumerate(parserList):
+        processFolder = newParser.get('MadGraphPars','processFolder')
+        processFolder = os.path.abspath(processFolder)
+        inputFolder = os.path.join(processFolder,'scan_inputFiles')
+        outputFolder = os.path.join(processFolder,'scan_results')
+        if not os.path.isdir(processFolder):
+            logger.info('Folder %s not found. Running MG5 to create folder.' %processFolder)
+            generateProcess(newParser)
+        if not os.path.isdir(inputFolder):
+            os.makedirs(inputFolder, exist_ok=True)
+        if not os.path.isdir(outputFolder):
+            os.makedirs(outputFolder, exist_ok=True)
+
+        # Get largest existing events folder:
+        run0 = 1
+        eventsFolder = os.path.join(processFolder,'Events')
+        if os.path.isdir(eventsFolder):
+            for runF in glob.glob(os.path.join(eventsFolder,'run*')):
+                run0 = max(run0,int(os.path.basename(runF).replace('run_',''))+1)
+
+        # Create temporary folder
+        runFolder = tempfile.mkdtemp(prefix='%s_'%(processFolder),suffix='_run_%02d' %(run0+irun))
+        os.removedirs(runFolder)
+        
+        newParser.set('MadGraphPars','runFolder',os.path.abspath(runFolder))
+        newParser.set('MadGraphPars','runNumber','%02d' %(run0+irun))
+        newParser.set('MadGraphPars','resultsFolder',os.path.abspath(outputFolder))
+
+        parserDict = newParser.toDict(raw=False,abspath_existing=True)
+        # Create text config file to store the dictionary of parameters for this run.
+        # This file can be read again by ConfigParserExt in the worker.
+        outfile = f"{inputFolder}/job_{irun:05d}.ini"
+        parserOut = ConfigParserExt()
+        parserOut.read_dict(parserDict)
+        with open(outfile, "w") as f:
+            parserOut.write(f)
+            
+        scanFolders.add(folderTuple(inputFolder,outputFolder))
+    logger.info(f"Created {len(parserList)} input files at {now.strftime('%Y-%m-%d %H:%M')}")
+
+    return scanFolders
+
+def generateCondorFile(configFolder,resultsFolder,subFile,worker_file='runScanMG5_worker.py', verbose='info'):
+
+    worker = os.path.abspath(worker_file)
+    if not os.path.isfile(worker):
+        logger.error(f"Worker file {worker} not found. Make sure the file exists and the path is correct.")
+        sys.exit()
+    
+    configFolder = os.path.abspath(configFolder)
+    resultsFolder = os.path.abspath(resultsFolder)
+    submitFile = os.path.abspath(os.path.join(configFolder,subFile))
+    with open(submitFile, 'w') as f:
+        f.write(f"executable = /usr/bin/python3\n")
+        f.write(f"arguments =  {worker} -c $(config) -v {verbose} \n")
+        f.write("getenv = True\n")
+        f.write("request_memory = 2GB\n")
+#        f.write("request_cpus = 1\n")
+        f.write(f"initialdir = {resultsFolder}\n")
+        f.write(f"output = {configFolder}/job.$(Cluster).$(Process).out\n")
+        f.write(f"error = {configFolder}/job.$(Cluster).$(Process).err\n")
+        f.write(f"log = {configFolder}/job.$(Cluster).$(Process).log\n")
+        f.write("should_transfer_files = YES\n")
+        f.write("when_to_transfer_output = ON_EXIT\n")
+        f.write(f"queue config matching {configFolder}/*ini\n")
+
+    return submitFile
 
 def generateProcess(parser):
     """
@@ -197,7 +280,7 @@ def runMG5(parser,runPythia=False, runMadSpin=False) -> Dict:
     ncore = parser['options']['ncore']
     
     logger.debug("Generating MG5 events with command file %s" %commandsFile)
-    run = subprocess.Popen('./bin/generate_events --multicore --nb_core=%i < %s' %(ncore,commandsFile),
+    run = subprocess.Popen(f'./bin/generate_events --multicore --nb_core={ncore} < {commandsFile}',
                            shell=True,stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE,cwd=runFolder)
       
@@ -316,11 +399,11 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
 
     return runInfo
 
-def generateEvents(parser):
+def generateEvents(parser : Union[str,Dict]) -> Dict:
     """
-    Run MadGraph5 to generate LHE events and then DelphesPythia8.
+    Generate events with MG5 and optionally run Pythia, Delphes and MadSpin.
 
-    :param parser: Dictionary with parser sections.
+    :param parser: Dictionary with parser sections or path to a config file containing the parser sections.
     
     :return: Dictionary with run info. False if failed.
     """
@@ -332,22 +415,33 @@ def generateEvents(parser):
     run_delphes = False
     run_madgraph = False
     run_madspin = False
+    runInfo = {}
 
-    if 'runMadGraph' in parser['options']:
-        run_madgraph = parser["options"]["runMadGraph"]
-    if 'runPythia' in parser['options']:
-        run_pythia = parser["options"]["runPythia"]
-    if 'runDelphes' in parser['options']:
-        run_delphes = parser["options"]["runDelphes"]
-    if 'runDelphesPythia' in parser['options']:
-        run_delphespythia = parser["options"]["runDelphesPythia"]
-    if 'runMadSpin' in parser['options']:
-        run_madspin = parser["options"]["runMadSpin"]
+    if isinstance(parser,str):
+        configFile = parser
+        parser = ConfigParserExt(inline_comment_prefixes="#")
+        ret = parser.read(configFile)
+        if ret == []:
+            logger.error(f"Could not read config file: {configFile}")
+            return runInfo
+        parserDict = parser.toDict(raw=False,abspath_existing=True)
+    elif isinstance(parser,Dict):
+        parserDict = parser
+    else:
+        logger.error(f"Parser should be either a file path or a dictionary and not  {type(parser).__name__}.")
+        return runInfo
+
+    assert isinstance(parserDict,Dict), f"Parser should be a dictionary and not {type(parserDict).__name__}."
+    if isinstance(parserDict['options'], dict):        
+        run_madgraph = parserDict["options"].get("runMadGraph", False)    
+        run_pythia = parserDict["options"].get("runPythia", False)
+        run_delphes = parserDict["options"].get("runDelphes", False)
+        run_delphespythia = parserDict["options"].get("runDelphesPythia", False)
+        run_madspin = parserDict["options"].get("runMadSpin", False)
 
     if run_pythia and run_delphespythia:
         logger.warning('Both runPythia and runDelphesPythia set to True. Setting runDelphesPythia to False')
         run_delphespythia = False
-    
 
     if run_madgraph:
         runInfo = runMG5(parser,runPythia=run_pythia,
@@ -357,12 +451,12 @@ def generateEvents(parser):
                              runDelphesPythia=run_delphespythia)
         
         runInfo.update({'time (s)' : time.time()-t0})
-        return runInfo
     elif run_delphes or run_delphespythia or run_pythia:
         logger.error("Pythia and Delphes can only run if runMadGraph = True")
-        return {}  
+    
+    return runInfo
 
-def moveFolders(runInfo):
+def moveFolders(runInfo : Dict) -> None:
     """
     Move the run folders from the temporary running folder
     to the process folder.
@@ -373,20 +467,20 @@ def moveFolders(runInfo):
 
     # Get run folder:
     runFolder = os.path.abspath(runInfo['runFolder'])
+    resultsFolder = os.path.abspath(runInfo['resultsFolder'])
     runNumber = int(runInfo['runNumber'])
     processFolder = os.path.abspath(runInfo['processFolder'])
     # If run folder and process folder are the same, do nothing
     if runFolder == processFolder:
         return
     
-    # Move run folder results to process folder
-    eventFolder = os.path.join(processFolder,'Events')
+    # Move run folder results to results folder
     runDirs = list(glob.glob(os.path.join(runFolder,'Events','run_*')))
     if len(runDirs) != 1:
         logger.error('Something went wrong. Found %i run folders in %s' %(len(runDirs),runFolder))
-        return False
+        return
     runDir = runDirs[0]
-    finalRunDir = os.path.join(eventFolder,'run_%02d' %runNumber)
+    finalRunDir = os.path.join(resultsFolder,'run_%02d' %runNumber)
     logger.info('Moving %s to %s' %(runDir,finalRunDir))
     shutil.move(runDir,finalRunDir)
     logger.info('Deleting temporary folder %s' %(runFolder))

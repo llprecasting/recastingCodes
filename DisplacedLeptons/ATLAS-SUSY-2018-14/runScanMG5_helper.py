@@ -39,10 +39,14 @@ def generateInputFiles(parfile) -> Set[folderTuple]:
         if not os.path.isdir(processFolder):
             logger.info('Folder %s not found. Running MG5 to create folder.' %processFolder)
             generateProcess(newParser)
-        if not os.path.isdir(inputFolder):
-            os.makedirs(inputFolder, exist_ok=True)
-        if not os.path.isdir(outputFolder):
-            os.makedirs(outputFolder, exist_ok=True)
+        if os.path.isdir(inputFolder):
+            logger.warning(f'Input folder {inputFolder} already exists. It will be overwritten.')
+            shutil.rmtree(inputFolder)
+        os.makedirs(inputFolder, exist_ok=True)
+        if os.path.isdir(outputFolder):
+            logger.warning(f'Output folder {outputFolder} already exists. It will be overwritten.')
+            shutil.rmtree(outputFolder)
+        os.makedirs(outputFolder, exist_ok=True)
 
         # Get largest existing events folder:
         run0 = 1

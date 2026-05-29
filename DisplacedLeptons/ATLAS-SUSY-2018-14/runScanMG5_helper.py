@@ -35,6 +35,7 @@ def generateInputFiles(parfile) -> Set[folderTuple]:
         processFolder = os.path.abspath(processFolder)
         inputFolder = os.path.join(processFolder,'scan_inputFiles')
         outputFolder = os.path.join(processFolder,'scan_results')
+        outputFolder = os.path.abspath(outputFolder)
         if not os.path.isdir(processFolder):
             logger.info('Folder %s not found. Running MG5 to create folder.' %processFolder)
             generateProcess(newParser)
@@ -51,12 +52,20 @@ def generateInputFiles(parfile) -> Set[folderTuple]:
                 run0 = max(run0,int(os.path.basename(runF).replace('run_',''))+1)
 
         # Create temporary folder
-        runFolder = tempfile.mkdtemp(prefix='%s_'%(processFolder),suffix='_run_%02d' %(run0+irun))
+        runFolder = tempfile.mkdtemp(suffix='_run_%02d' %(run0+irun),
+                                     dir=outputFolder)
         os.removedirs(runFolder)
+        runFolder = shutil.copytree(processFolder,runFolder,
+                                    ignore=shutil.ignore_patterns('Events','*.lhe',
+                                                                  'scan_inputFiles','scan_results'),
+                                    symlinks=True)
+        os.makedirs(os.path.join(runFolder,'Events'))       
+        logger.debug(f"Created temporary folder {runFolder}") 
+        
         
         newParser.set('MadGraphPars','runFolder',os.path.abspath(runFolder))
         newParser.set('MadGraphPars','runNumber','%02d' %(run0+irun))
-        newParser.set('MadGraphPars','resultsFolder',os.path.abspath(outputFolder))
+        newParser.set('MadGraphPars','resultsFolder',outputFolder)
 
         parserDict = newParser.toDict(raw=False,abspath_existing=True)
         # Create text config file to store the dictionary of parameters for this run.
@@ -249,7 +258,7 @@ def runMG5(parser,runPythia=False, runMadSpin=False) -> Dict:
             return {}
         else:
             madspinFile = os.path.join(runFolder,'Cards/madspin_card.dat')
-            shutil.copyfile(pars['madspincard'],madspinFile)   
+            shutil.copyfile(pars['madspincard'],madspinFile)
         
     #Generate commands file:       
     commandsFile = tempfile.mkstemp(suffix='.txt', prefix='MG5_commands_', dir=runFolder)

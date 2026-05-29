@@ -51,6 +51,6 @@ if __name__ == "__main__":
             help='verbose level [info]')
     
     args = ap.parse_args()
-    main(args.configfile,args.verbose)
+    runSingleJob(args.configfile,args.verbose)
 
     

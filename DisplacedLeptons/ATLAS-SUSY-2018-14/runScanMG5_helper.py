@@ -68,93 +68,11 @@ def generateInputFiles(parfile) -> Set[folderTuple]:
         parserOut.read_dict(parserDict)
         with open(outfile, "w") as f:
             parserOut.write(f)
-        # Create run folder and copy necessary files
-        setupRunFolder(outfile)
             
         scanFolders.add(folderTuple(inputFolder,outputFolder))
     logger.info(f"Created {len(parserList)} input files at {now.strftime('%Y-%m-%d %H:%M')}")
 
     return scanFolders
-
-def setupRunFolder(configFile : str) -> str:
-    """
-    Set up the run folder for a given input file. 
-    This is needed to make sure the run folder is created before submitting jobs.
-    """
-
-    # Defaul settings:
-    run_pythia = False
-    run_madgraph = False
-    run_madspin = False
-    run_delphes = False
-    run_delphes_pythia = False
-    
-    parser = ConfigParserExt(inline_comment_prefixes="#")
-    ret = parser.read(configFile)
-    if ret == []:
-        logger.error(f"Could not read config file: {configFile}")
-        return ""
-    parserDict = parser.toDict(raw=False,abspath_existing=True)
-    assert isinstance(parserDict,Dict), f"Parser should be a dictionary and not {type(parserDict).__name__}."
-    if not 'MadGraphPars' in parserDict:
-        logger.error(f"MadGraphPars section not found in {configFile}. Cannot set up run folder.")
-        return ""
-    
-    if isinstance(parserDict['options'], dict):        
-        run_madgraph = parserDict["options"].get("runMadGraph", False)    
-        run_pythia = parserDict["options"].get("runPythia", False)
-        run_madspin = parserDict["options"].get("runMadSpin", False)
-        run_delphes = parserDict["options"].get("runDelphes", False)
-        run_delphes_pythia = parserDict["options"].get("runDelphesPythia", False)
-    
-    pars = parserDict['MadGraphPars']
-    assert isinstance(pars,Dict), f"MadGraphPars should be a dictionary and not {type(pars).__name__}."
-    runFolder = pars['runFolder']
-    processFolder = pars['processFolder']
-    if not os.path.isdir(runFolder):
-        # To avoid recursion when copying the process folder, we first copy the process folder 
-        # to a temporary location and then move it to the results folder.
-        run_tmp = shutil.copytree(processFolder,os.path.basename(runFolder),
-                                    ignore=shutil.ignore_patterns('Events','*.lhe','scan_inputFiles',
-                                                                  'scan_results','*.root','*.hepmc'),
-                                    symlinks=True)
-        os.makedirs(os.path.join(run_tmp,'Events'))
-        shutil.move(run_tmp, runFolder)
-        logger.debug(f"Created temporary folder {runFolder}")
- 
-
-    if run_madgraph:
-        if 'runcard' in pars:
-            if os.path.isfile(pars['runcard']):    
-                shutil.copyfile(pars['runcard'],os.path.join(runFolder,'Cards/run_card.dat'))
-            else:
-                raise ValueError("Run card %s not found" %pars['runcard'])
-        if 'paramcard' in pars:
-            if os.path.isfile(pars['paramcard']):
-                shutil.copyfile(pars['paramcard'],os.path.join(runFolder,'Cards/param_card.dat'))    
-            else:
-                raise ValueError("Param card %s not found" %pars['paramcard'])
-
-    if run_pythia and 'pythia8card' in pars:
-        pythia8File = os.path.join(runFolder,'Cards/pythia8_card.dat')
-        if os.path.isfile(pars['pythia8card']):
-            shutil.copyfile(pars['pythia8card'],pythia8File) 
-
-    if run_madspin:
-        if not 'madspincard' in pars or not os.path.isfile(pars['madspincard']):
-            logger.error("MadSpin file not defined or not found.")
-            return ""
-        else:
-            madspinFile = os.path.join(runFolder,'Cards/madspin_card.dat')
-            shutil.copyfile(pars['madspincard'],madspinFile)
-
-    if run_delphes or run_delphes_pythia:
-        delphesFile = os.path.join(runFolder,'Cards/delphes_card.dat')
-        delphescard = os.path.abspath(pars['delphescard'])
-        shutil.copyfile(delphescard,delphesFile)   
-    
-
-    return runFolder
 
 def generateCondorFile(configFolder,resultsFolder,subFile,worker_file='runScanMG5_worker.py', verbose='info'):
 
@@ -296,11 +214,50 @@ def runMG5(parser,runPythia=False, runMadSpin=False) -> Dict:
         processFolder = pars['processFolder']
         if not os.path.isdir(processFolder):
             logger.error('Process folder %s not found.' %processFolder)
-            return {}
+            return {}            
+
+    # If run folder does not exist, create it using processFolder as a template:
+    if not os.path.isdir(runFolder):
+    # To avoid recursion when copying the process folder, we first copy the process folder 
+    # to a temporary location and then move it to the results folder.
+        run_tmp = shutil.copytree(processFolder,os.path.basename(runFolder),
+                                    ignore=shutil.ignore_patterns('Events','*.lhe','scan_inputFiles',
+                                                                  'scan_results','*.root','*.hepmc'),
+                                    symlinks=True)
+        os.makedirs(os.path.join(run_tmp,'Events'))
+        shutil.move(run_tmp, runFolder)
+       
+        logger.info("Created temporary folder %s" %runFolder) 
             
     if not os.path.isdir(runFolder):
         logger.error('Run folder %s not found.' %runFolder)
         return {}
+
+    if 'runcard' in pars:
+        if os.path.isfile(pars['runcard']):    
+            shutil.copyfile(pars['runcard'],os.path.join(runFolder,'Cards/run_card.dat'))
+        else:
+            raise ValueError("Run card %s not found" %pars['runcard'])
+    if 'paramcard' in pars:
+        if os.path.isfile(pars['paramcard']):
+            shutil.copyfile(pars['paramcard'],os.path.join(runFolder,'Cards/param_card.dat'))    
+        else:
+            raise ValueError("Param card %s not found" %pars['paramcard'])
+    
+
+    # By default do not run Pythia or Delphes
+    if runPythia and 'pythia8card' in pars:
+        pythia8File = os.path.join(runFolder,'Cards/pythia8_card.dat')
+        if os.path.isfile(pars['pythia8card']):
+            shutil.copyfile(pars['pythia8card'],pythia8File) 
+
+    if runMadSpin:
+        if not 'madspincard' in pars or not os.path.isfile(pars['madspincard']):
+            logger.error("MadSpin file not defined or not found.")
+            return {}
+        else:
+            madspinFile = os.path.join(runFolder,'Cards/madspin_card.dat')
+            shutil.copyfile(pars['madspincard'],madspinFile)   
         
     #Generate commands file:       
     commandsFile = tempfile.mkstemp(suffix='.txt', prefix='MG5_commands_', dir=runFolder)
@@ -366,7 +323,9 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
     runFolder = os.path.abspath(parser['MadGraphPars']['runFolder'])
     nevts = parser["MadGraphSet"]["nevents"]
     rootFile = os.path.join(runFolder,'Events',runInfo['run number'], '%s_delphes_events.root'  %runInfo['run tag'])
-    delphesFile = os.path.join(runFolder,'Cards/delphes_card.dat')
+    delphesFile = os.path.join(runFolder,'Events',runInfo['run number'],'delphes_card.dat')
+    delphescard = os.path.abspath(pars['delphescard'])
+    shutil.copyfile(delphescard,delphesFile)
     delphesDir = os.path.abspath(pars['delphesDir'])
 
     if not os.path.isdir(runFolder):
@@ -386,11 +345,14 @@ def runDelphes(parser,runInfo,runDelphesPythia=True) -> Dict:
         logger.error(f'Events folder {eventsFolder} not found. Cannot run Delphes.')
         return runInfo
 
+
     if runDelphesPythia:
         if not os.path.isfile(lheFile):
             logger.error(f'LHE file {lheFile} not found.')
             return runInfo
-        pythiaFile = os.path.join(runFolder,'Cards/pythia8_card.dat')
+        pythiaCard = os.path.abspath(pars['pythia8card'])
+        pythiaFile = os.path.join(runFolder,'Events',runInfo['run number'],'pythia8_card.dat')
+        shutil.copyfile(pythiaCard,pythiaFile)    
         #Generate pythia card with additional info
         with open(pythiaFile,'a') as f:
             f.write('\n\n')

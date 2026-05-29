@@ -74,33 +74,6 @@ def generateInputFiles(parfile) -> Set[folderTuple]:
 
     return scanFolders
 
-def generateCondorFile(configFolder,resultsFolder,subFile,worker_file='runScanMG5_worker.py', verbose='info'):
-
-    worker = os.path.abspath(worker_file)
-    if not os.path.isfile(worker):
-        logger.error(f"Worker file {worker} not found. Make sure the file exists and the path is correct.")
-        sys.exit()
-    
-    configFolder = os.path.abspath(configFolder)
-    resultsFolder = os.path.abspath(resultsFolder)
-    submitFile = os.path.abspath(os.path.join(configFolder,subFile))
-    with open(submitFile, 'w') as f:
-        f.write(f"executable = /usr/bin/python3\n")
-        f.write(f"arguments =  {worker} -c $(config) -v {verbose} \n")
-        f.write("getenv = True\n")
-        f.write("request_memory = 2GB\n")
-        f.write('requirements = Machine == "fmahep.if.usp.br"')
-#        f.write("request_cpus = 1\n")
-        f.write(f"initialdir = {resultsFolder}\n")
-        f.write(f"output = {configFolder}/job.$(Cluster).$(Process).out\n")
-        f.write(f"error = {configFolder}/job.$(Cluster).$(Process).err\n")
-        f.write(f"log = {configFolder}/job.$(Cluster).$(Process).log\n")
-        f.write("should_transfer_files = YES\n")
-        f.write("when_to_transfer_output = ON_EXIT\n")
-        f.write(f"queue config matching {configFolder}/*ini\n")
-
-    return submitFile
-
 def generateProcess(parser):
     """
     Runs the madgraph process generation.

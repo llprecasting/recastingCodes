@@ -111,7 +111,6 @@ def setupRunFolder(configFile : str) -> str:
     assert isinstance(pars,Dict), f"MadGraphPars should be a dictionary and not {type(pars).__name__}."
     runFolder = pars['runFolder']
     processFolder = pars['processFolder']
-    resultsFolder = pars['resultsFolder']
     if not os.path.isdir(runFolder):
         # To avoid recursion when copying the process folder, we first copy the process folder 
         # to a temporary location and then move it to the results folder.
@@ -172,6 +171,7 @@ def generateCondorFile(configFolder,resultsFolder,subFile,worker_file='runScanMG
         f.write(f"arguments =  {worker} -c $(config) -v {verbose} \n")
         f.write("getenv = True\n")
         f.write("request_memory = 2GB\n")
+        f.write('requirements = Machine == "fmahep.if.usp.br"')
 #        f.write("request_cpus = 1\n")
         f.write(f"initialdir = {resultsFolder}\n")
         f.write(f"output = {configFolder}/job.$(Cluster).$(Process).out\n")

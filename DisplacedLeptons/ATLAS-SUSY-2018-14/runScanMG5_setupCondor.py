@@ -52,7 +52,7 @@ if __name__ == "__main__":
         sys.exit()
     elif len(scanFolders) > 1:
         logger.warning(f"Multiple scan folders created: {scanFolders}. Make sure to submit condor jobs for all folders.")
-        
+
     for folderTuple in scanFolders:
         inputFolder = folderTuple.inputFolder
         resultsFolder = folderTuple.outputFolder

@@ -83,7 +83,7 @@ def getObjects(DelphesTree: TTree) -> Any:
 
     return llps,muons,electrons
 
-def getSR(leptons: List[Electron | Muon]) -> str:
+def getSR(leptons: List[Union[Electron, Muon]]) -> str:
     """
     Returns the signal region for a given list of leptons.
     """
@@ -103,7 +103,7 @@ def getSR(leptons: List[Electron | Muon]) -> str:
     else:
         raise ValueError(f"Invalid lepton IDs: {leptonIDs}!")
 
-def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, Any]]) -> Union[None,List[Electron | Muon]]:
+def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, Any]]) -> Union[None, List[Union[Electron, Muon]]]:
     """
     Applies the pre-selection requirements for the different SRs and computes the trigger efficiency.
     """
@@ -132,7 +132,7 @@ def preSelection(muons: List[Union[Any, Muon]],electrons: List[Union[Electron, A
     return leptons
 
 
-def passTrigger(leptons : List[Electron | Muon]) -> bool:
+def passTrigger(leptons : List[Union[Electron, Muon]]) -> bool:
     """
     Applies the trigger requirements for the different SRs.
     """

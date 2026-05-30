@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 import numpy as np
-import os,sys,glob
+import os,sys,glob, time
 from pathlib import Path
 import logging
 from helper import (filterObjects,getModelInfo,saveOutput, \
-                    effMap, deltaR, cutFlow, getD0, getZ0, getR, count_tracker_layer_crossings)
+                    effMap, deltaR, cutFlow, getD0, getZ0, getR, count_tracker_layer_crossings,logger)
 from numpy import ndarray
 from typing import Any, Dict, List, Tuple, Union
 import multiprocessing
 import subprocess
 
-FORMAT = '%(levelname)s: %(message)s'
-logging.basicConfig(format=FORMAT,datefmt='%m/%d/%Y %I:%M:%S %p')
-logger = logging.getLogger()   
 
 # Fix seed so results are reproducible!
 np.random.seed(seed=123)
@@ -372,8 +369,9 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
     return eff_dict
 
 
-def main(inputfile: str,llpPDG :int = 1000011) -> None:
+def main(inputfile: str,llpPDG :int = 1000011, computeUL : bool = True) -> None:
 
+    t0 = time.time()
     # Read banner file to extract information about LLP mass, LLP lifetime and total cross-section
     bannerFile = None
     d = os.path.dirname(inputfile)
@@ -382,10 +380,10 @@ def main(inputfile: str,llpPDG :int = 1000011) -> None:
         logger.error(f"No banner files found in {d}!")
         raise ValueError()
 
-    logger.debug(f'\nRunning over input file {inputfile}')
-    
     bannerFile = b_files[0]
     modelDict = getModelInfo(bannerFile,llpPDG)
+    logger.info(f'\nRunning over input file {inputfile}')
+    logger.info(f'tau(ns) = {modelDict["tau0_ns"]:1.3g}, mLLP(GeV) = {modelDict["mLLP"]:1.3g}')
 
     resDict = getEfficiencies(inputfile)
     resDict.update(modelDict)
@@ -401,9 +399,16 @@ def main(inputfile: str,llpPDG :int = 1000011) -> None:
         resDict[key] = val
         resDict[key+'_err'] = val_err
 
-    logger.info(f'tau(ns) = {modelDict["tau0_ns"]:1.3g}, mLLP(GeV) = {modelDict["mLLP"]:1.3g}')
-    saveOutput(resDict,outFile)
+    if computeUL:
+        from helper import compute_poi_ul
+        # Compute upper limit on the signal strength using the combined SRs
+        logger.debug('Computing upper limits on the signal strength')
+        resDict['muUL_observed'] = compute_poi_ul(resDict,expected='observed')
+        resDict['muUL_expected'] = compute_poi_ul(resDict,expected='expected')
 
+    saveOutput(resDict,outFile)
+    t1 = time.time()
+    logger.info(f'Done in = {(t1-t0)/60.0:1.3g} m\n')
 
     
 
@@ -415,6 +420,8 @@ if __name__ == "__main__":
     parser.add_argument('-i','--input', help='Path to  Delphes ROOT file or to a folder containing Delphes ROOT files with the event samples to be analysed.')
     parser.add_argument('-l','--llpPDG',help='LLP PDG [1000011]',type=int, required=False, default=1000011)
     parser.add_argument('-n', '--ncpus',type=int,default=1,help='number of parallel jobs to run when running over multiple files [default=1].')
+    parser.add_argument('--noUL', action='store_true', help='Do not compute upper limits on the cross-section (default is to compute ULs).', 
+                        default=False)
     parser.add_argument('-v', '--verbose', default='info',
                         help='verbose level (debug, info, warning or error). Default is warning')
 
@@ -442,6 +449,7 @@ if __name__ == "__main__":
 
     inputF = args.input
     llpPDG = args.llpPDG
+    computeUL = not args.noUL
 
     if os.path.isfile(inputF):
         inputFiles = [os.path.abspath(inputF)]
@@ -467,7 +475,7 @@ if __name__ == "__main__":
     else:
         ijob = 0
     for rootFile in inputFiles:
-        p = pool.apply_async(main, args=(rootFile,llpPDG,))
+        p = pool.apply_async(main, args=(rootFile,llpPDG,computeUL,))
         children.append(p)
 
     logger.info(f'Running {len(inputFiles)} jobs in {ncpus} instances')

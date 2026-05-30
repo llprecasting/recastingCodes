@@ -313,11 +313,11 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
 
 
         ## signal pt and d0 cuts 
-        if leptons_preSel[0].PT < 65 or leptons_preSel[1].PT < 65:
+        if any(lep.PT < 65.0 for lep in leptons_preSel):
             continue
         sr_cutflow.fill_next(weight)
 
-        if abs(leptons_preSel[0].D0) < 3 or abs(leptons_preSel[1].D0) < 3:
+        if any(abs(lep.D0) < 3.0 for lep in leptons_preSel):
             continue
         # if abs(leptons_preSel[0].D0) > 300 or abs(leptons_preSel[1].D0) > 300:
             # continue
@@ -336,12 +336,6 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
         # (see Table 1 in https://cds.cern.ch/record/2275635/files/ATL-PHYS-PUB-2017-014.pdf)
         if any(abs(lep.Z0) > 1500. for lep in leptons_preSel):
             continue
-        # Since the trigger requires the electrons to deposit their energy in the ECAL, we must impose that they are created before the ECAL.
-        # if any((not createdBeforeECAL(lep) and abs(lep.PID) == 11) for lep in leptons_preSel):
-            # continue
-        # In order to have enough hits in the inner detector for the large radius tracking, we must impose that the leptons are created within R ~ 440 mm from the beamline (see Table 3 in https://cds.cern.ch/record/2275635/files/ATL-PHYS-PUB-2017-014.pdf)
-        # if any(lep.R > 300. for lep in leptons_preSel):
-            # continue
         nhits = [numberOfHits(lep) for lep in leptons_preSel]
         if any(nh < 3 for nh in nhits):
             continue

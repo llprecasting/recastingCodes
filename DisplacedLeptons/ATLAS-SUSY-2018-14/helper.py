@@ -9,7 +9,6 @@ import json
 import itertools
 from scipy.interpolate import RegularGridInterpolator
 from scipy.ndimage import gaussian_filter
-import spey
 
 # Fix seed so results are reproducible!
 np.random.seed(seed=123)
@@ -568,9 +567,13 @@ def saveOutput(resultsDict: Dict[str, Any],outputFile: str):
 
 def get_poi_upper_limit(signal_yields: Dict[str, float], 
                          bg_json_file : Path = Path('./ATLAS_data/likelihood/Comb_bkgonly.json'),
-                         expected=spey.ExpectationType.observed) -> float:
+                         expected=None) -> float:
 
+    import spey
     from spey_pyhf.helper_functions import WorkspaceInterpreter
+
+    if expected is None:
+       expected = spey.ExpectationType.observed
 
     pdf_wrapper = spey.get_backend('pyhf')
     with open(bg_json_file, "r") as f:

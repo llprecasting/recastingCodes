@@ -294,7 +294,7 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
         lepton_effs = []
         for lep in leptons_preSel:
             if abs(lep.PID) == 11:
-                lepton_effs.append(electron_reco_smooth.efficiency(Lepton_p_textT_GeV=lep.PT, 
+                lepton_effs.append(electron_reco.efficiency(Lepton_p_textT_GeV=lep.PT, 
                                                             Lepton_d_0_mm=abs(lep.D0)))
             elif abs(lep.PID) == 13:
                 lepton_effs.append(muon_reco.efficiency(Lepton_p_textT_GeV=lep.PT, 

@@ -36,16 +36,19 @@ def generateInputFiles(parfile) -> Set[folderTuple]:
         inputFolder = os.path.join(processFolder,'scan_inputFiles')
         outputFolder = os.path.join(processFolder,'scan_results')
         outputFolder = os.path.abspath(outputFolder)
+        fTuple = folderTuple(inputFolder,outputFolder)
         if not os.path.isdir(processFolder):
             logger.info('Folder %s not found. Running MG5 to create folder.' %processFolder)
             generateProcess(newParser)
-        if os.path.isdir(inputFolder):
-            logger.warning(f'Input folder {inputFolder} already exists. It will be overwritten.')
-            shutil.rmtree(inputFolder)
+        # If it is the first time going through this process folder, create the input and output folders. 
+        # Otherwise, skip this step to avoid overwriting existing input files.
+        if fTuple not in scanFolders:
+            if os.path.isdir(inputFolder):
+                logger.warning(f'Input folder {inputFolder} already exists. It will be overwritten.')
+            if os.path.isdir(outputFolder):
+                logger.warning(f'Output folder {outputFolder} already exists. It will be overwritten.')
+                shutil.rmtree(outputFolder)
         os.makedirs(inputFolder, exist_ok=True)
-        if os.path.isdir(outputFolder):
-            logger.warning(f'Output folder {outputFolder} already exists. It will be overwritten.')
-            shutil.rmtree(outputFolder)
         os.makedirs(outputFolder, exist_ok=True)
 
         # Get largest existing events folder:
@@ -73,7 +76,7 @@ def generateInputFiles(parfile) -> Set[folderTuple]:
         with open(outfile, "w") as f:
             parserOut.write(f)
             
-        scanFolders.add(folderTuple(inputFolder,outputFolder))
+        scanFolders.add(fTuple)
     logger.info(f"Created {len(parserList)} input files at {now.strftime('%Y-%m-%d %H:%M')}")
 
     return scanFolders

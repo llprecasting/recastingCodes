@@ -546,7 +546,14 @@ def getModelInfo(bannerFile : str, llpPDG : int) -> Dict[str, Union[float,int]]:
     modelInfoDict['mLLP'] = slhaData.blocks['MASS'][llpPDG]
     if slhaData.decays:
         modelInfoDict['tau0_ns'] = (6.58212e-16/slhaData.decays[llpPDG].totalwidth)
-    
+        # Add the masses of all the BSM LLP daughters.
+        for decay in slhaData.decays[llpPDG].decays:
+           for pid in decay.ids:
+              if abs(pid) < 1000:
+                 continue
+              if abs(pid) in slhaData.blocks['MASS']:
+                 modelInfoDict.setdefault(f'm{int(abs(pid))}', 
+                                          slhaData.blocks['MASS'][abs(pid)])
     return modelInfoDict
 
 def saveOutput(resultsDict: Dict[str, Any],outputFile: str):

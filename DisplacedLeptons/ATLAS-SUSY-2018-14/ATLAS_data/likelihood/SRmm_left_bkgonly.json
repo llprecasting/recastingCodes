@@ -1,0 +1,75 @@
+{
+    "channels": [
+        {
+            "name": "SRmm_cuts",
+            "samples": [
+                {
+                    "data": [
+                        0.10999999940395355
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi": 2.82,
+                                "lo": 0.01
+                            },
+                            "name": "ucbSRmm",
+                            "type": "normsys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        }
+    ],
+    "measurements": [
+        {
+            "config": {
+                "parameters": [
+                    {
+                        "auxdata": [
+                            1.0
+                        ],
+                        "bounds": [
+                            [
+                                0.915,
+                                1.085
+                            ]
+                        ],
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "lumi",
+                        "sigmas": [
+                            0.017
+                        ]
+                    },
+                    {
+                        "bounds": [
+                            [
+                                0.0,
+                                10.0
+                            ]
+                        ],
+                        "fixed": false,
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "mu_Sig"
+                    }
+                ],
+                "poi": "mu_Sig"
+            },
+            "name": "NormalMeasurement"
+        }
+    ],
+    "observations": [
+        {
+            "data": [
+                9.99999993922529e-09
+            ],
+            "name": "SRmm_cuts"
+        }
+    ],
+    "version": "1.0.0"
+}

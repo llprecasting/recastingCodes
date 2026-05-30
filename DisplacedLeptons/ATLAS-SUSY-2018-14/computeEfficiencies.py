@@ -29,13 +29,10 @@ from ROOT import TFile,Electron, Muon, TTree
 
 
 #Initialize efficiency maps
-electron_reco_smooth = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0electronefficiency.csv")
-electron_reco_1D = effMap(filepath="./ATLAS_data/recoEffs_from_1Deffs.csv")
+# Use smoothed 2D binned data for electrons from https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/figaux_19a.png
+electron_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0electronefficiency.csv")
 
-electron_reco = electron_reco_smooth # Use smoothed 2D binned data for electrons from https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/figaux_19a.png
-# electron_reco = electron_reco_1D # Use 1D efficiencies generated as product of interpolated 1D efficiencies for d0 and pT from Fig1. in https://arxiv.org/pdf/2011.07812 and Fig.17 in https://arxiv.org/pdf/1908.00005, respectively
-
-
+# Use smoothed 2D binned data for muons from https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/figaux_19b.png
 muon_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0muonefficiency.csv")
 ee_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptselectronacceptance.csv")
 mm_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptsmuonacceptance.csv")

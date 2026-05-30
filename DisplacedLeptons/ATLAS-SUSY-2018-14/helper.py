@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 import numpy as np
+from pathlib import Path
 from scipy.interpolate import NearestNDInterpolator
-from numpy import float64, ndarray
+from numpy import ndarray
 from typing import Any, Dict, List, Tuple, Union
 import pyslha
 import json
 import itertools
 from scipy.interpolate import RegularGridInterpolator
 from scipy.ndimage import gaussian_filter
+import spey
+
 # Fix seed so results are reproducible!
 np.random.seed(seed=123)
+
 
 
 class effMap:
@@ -562,3 +566,24 @@ def saveOutput(resultsDict: Dict[str, Any],outputFile: str):
   with open(outputFile, 'w') as f:
     json.dump(saveDict,f,indent=4)
 
+def get_poi_upper_limit(signal_yields: Dict[str, float], 
+                         bg_json_file : Path = Path('./ATLAS_data/likelihood/Comb_bkgonly.json'),
+                         expected=spey.ExpectationType.observed) -> float:
+
+    from spey_pyhf.helper_functions import WorkspaceInterpreter
+
+    pdf_wrapper = spey.get_backend('pyhf')
+    with open(bg_json_file, "r") as f:
+        bkg_only = json.load(f)
+    interpreter = WorkspaceInterpreter(bkg_only)
+    for channel in interpreter.channels:
+        ns = signal_yields.get(channel,0.)
+        interpreter.inject_signal(channel, [ns])
+    statistical_model = pdf_wrapper(
+        analysis="simple_pyhf",
+        background_only_model=interpreter.background_only_model,
+        signal_patch=interpreter.make_patch(),
+    )
+    mu_UL = statistical_model.poi_upper_limit(expected=expected)
+
+    return mu_UL

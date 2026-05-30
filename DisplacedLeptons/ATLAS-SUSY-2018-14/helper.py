@@ -428,9 +428,9 @@ def _iter_tracker_segments(layers, tol=1e-9):
         if not np.isclose(zmin, 0.0, atol=tol) or not np.isclose(zmax, 0.0, atol=tol):
             yield (rmin, rmax, -zmax, -zmin)
 
-def cross_layer(R0, z0, vR, vz, segment, tol=1e-9) -> bool:
+def cross_layer(R0, z0, vR, vz, segment, tol=1e-9) -> Union[float,bool]:
     """
-    Returns True if a track created at (R0, z0) and with velocity (vR, vz) crosses the layer defined by (rmin, rmax, zmin, zmax), and False otherwise.
+    Returns the time to cross the layer if a track created at (R0, z0) and with velocity (vR, vz) crosses the layer defined by (rmin, rmax, zmin, zmax), and False otherwise.
     """
     rmin, rmax, zmin, zmax = segment
 
@@ -451,7 +451,7 @@ def cross_layer(R0, z0, vR, vz, segment, tol=1e-9) -> bool:
         if (z_cross > zmax + tol) or (z_cross < zmin - tol):
             return False
         else:
-            return True
+            return t_cross
 
     # Check if is is an horizontal layer   
     elif np.isclose(zmin, zmax, atol=tol):
@@ -470,7 +470,7 @@ def cross_layer(R0, z0, vR, vz, segment, tol=1e-9) -> bool:
         if (r_cross < rmin - tol) or (r_cross > rmax + tol):
             return False
         else:
-            return True
+            return t_cross
     else:
         raise ValueError('Only axis-aligned tracker layers are supported.')
 
@@ -480,8 +480,8 @@ def count_crossed_layers(R0, z0, vR, vz, layers, tol=1e-9):
     """
     ncrossings = 0
     for segment in _iter_tracker_segments(layers, tol=tol):
-        cross = cross_layer(R0, z0, vR, vz, segment, tol=tol)
-        if cross:
+        t_cross = cross_layer(R0, z0, vR, vz, segment, tol=tol)
+        if t_cross is not False:
             ncrossings += 1
     return ncrossings
 
@@ -490,6 +490,9 @@ def count_crossed_layers(R0, z0, vR, vz, layers, tol=1e-9):
 pixelLayers = np.array([(33.5,33.5,0.,400.), (50.5,50.5,0.,400.), (88.5,88.5,0.,400.), (122.5,122.5,0.,400.),(88.5,130.,495.,495.),(88.5,130.,580.,580.),(88.5,130.,650.,650.)],dtype=np.dtype([('Rmin_mm', float),('Rmax_mm', float),('Zmin_mm', float),('Zmax_mm',float)]))
 # ATLAS SCT layers: 
 sctLayers = np.array([(299.0,299.0,0.,749.),(371.0,371.0,0.,749.),(443.0,443.0,0.,749.),(514.0,514.0,0.,749.),(337.6,560.0,853.8,853.8),(275.0,560.0,934.,934.0),(275.0,560.0,1091.5,1091.5),(275.0,560.0,1299.9,1299.9),(275.0,560.0,1399.7,1399.7),(275.0,560.0,1771.4,1771.4),(337.6,560.0,2115.2,2115.2),(408.0,560.0,2505.0,2505.0),(438.8,560.0,2720.2,2720.2)],dtype=np.dtype([('Rmin_mm', float),('Rmax_mm', float),('Zmin_mm', float),('Zmax_mm',float)]))
+
+# ATLAS Muon Spectrometer inner layers
+msLayers = np.array([(4.5e3,4.5e3,0.,7e3),(0.,4.5e3,7e3,7e3)],dtype=np.dtype([('Rmin_mm', float),('Rmax_mm', float),('Zmin_mm', float),('Zmax_mm',float)]))
 
 def count_tracker_layer_crossings(R0, z0, vR, vz, tol=1e-9):
     """
@@ -504,6 +507,22 @@ def count_tracker_layer_crossings(R0, z0, vR, vz, tol=1e-9):
         'total': pixel_hits + sct_hits,
     }
 
+def get_time_to_ms(R0, z0, vR, vz, tol=1e-9) -> float:
+    """
+    Returns the time (in ns) spent for a particle to reach the muon spectrometer
+    after its production, if it was created at (R0, z0) and with velocity (vR, vz).
+    """
+
+    dtList = [np.inf] # Set infinite time as default value in case the track does not cross any MS layer
+    for segment in _iter_tracker_segments(msLayers, tol=tol):
+        t_cross = cross_layer(R0, z0, vR, vz, segment, tol=tol)
+        if t_cross is False:
+            continue
+        else:
+            t_cross_ns = (float(t_cross)/3e8)*1e9 # t_cross is given in mm, convert to ns
+        dtList.append(t_cross_ns)
+
+    return min(t_cross_ns)
 
 def getModelInfo(bannerFile : str, llpPDG : int) -> Dict[str, Union[float,int]]:
 

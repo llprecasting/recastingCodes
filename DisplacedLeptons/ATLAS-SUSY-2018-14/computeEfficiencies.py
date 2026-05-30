@@ -4,7 +4,8 @@ import os,sys,glob, time
 from pathlib import Path
 import logging
 from helper import (filterObjects,getModelInfo,saveOutput, \
-                    effMap, deltaR, cutFlow, getD0, getZ0, getR, count_tracker_layer_crossings,logger)
+                    effMap, deltaR, cutFlow, getD0, getZ0, getR,\
+                    get_time_to_ms, count_tracker_layer_crossings,logger)
 from numpy import ndarray
 from typing import Any, Dict, List, Tuple, Union
 import multiprocessing
@@ -181,24 +182,46 @@ def createdBeforeSCT(ptc)-> bool:
     
 def numberOfHits(ptc) -> int:
     """
-    Returns the number of hits for a given particle in the pixel and/or SCT layers of the tracker. Since the tracking algorithm requires hits in these layers, we must impose these requirement for electrons.
+    Returns the number of hits for a given particle in the pixel and/or SCT layers of the tracker. 
+    Since the tracking algorithm requires hits in these layers, we must impose these requirement for electrons.
     """
 
     # Production vertex coordinates
     R = np.sqrt(ptc.X**2 + ptc.Y**2)
     Z = ptc.Z
-    # Velocity components in cylindrical coordinates
-    # (only the direction is relevant)
-    vR = np.sqrt(ptc.Px**2 + ptc.Py**2)
-    vz = ptc.Pz
-    vtot = np.sqrt(ptc.Px**2 + ptc.Py**2 + ptc.Pz**2)
-    vR = vR/vtot
-    vz = vz/vtot
+    # Velocity components in cylindrical coordinates in units of c
+    p = ptc.PT*np.cosh(ptc.Eta)
+    vx = ptc.PT*np.cos(ptc.Phi)/p
+    vy = ptc.PT*np.sin(ptc.Phi)/p
+    vz = ptc.PT*np.sinh(ptc.Eta)/p
+    vR = np.sqrt(vx**2 + vy**2)
+    vz = vz
     hits = count_tracker_layer_crossings(R,Z,vR,vz)
     n_total = hits['total']
 
     return n_total
 
+def getMSArrivalTime(ptc) -> float:
+    """
+    Returns the delay in ns for a particle to reach the muon spectrometer after its production
+    with respect to a relativistc particle produced at the primary vertex.
+    Assumes the particle is massless.
+    """
+
+    # Production vertex coordinates
+    R = np.sqrt(ptc.X**2 + ptc.Y**2)
+    Z = ptc.Z
+    # Velocity components in cylindrical coordinates in units of c
+    p = ptc.PT*np.cosh(ptc.Eta)
+    vx = ptc.PT*np.cos(ptc.Phi)/p
+    vy = ptc.PT*np.sin(ptc.Phi)/p
+    vz = ptc.PT*np.sinh(ptc.Eta)/p
+    vR = np.sqrt(vx**2 + vy**2)
+    vz = vz
+
+    timeToMS = ptc.T + get_time_to_ms(R, Z, vR, vz)
+
+    return timeToMS
 
 
 def getEfficiencies(inputFile: str) -> Dict[str, Any]:
@@ -339,6 +362,14 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
         nhits = [numberOfHits(lep) for lep in leptons_preSel]
         if any(nh < 3 for nh in nhits):
             continue
+
+        # Apply cut on the arrival time to the muon spectrometer?
+        # for GenParticles T is the production time, but for Electron/Muon objects, it is the
+        # time of arrival?
+        # timeToMS = [getMSArrivalTime(lep) 
+        #             for lep in leptons_preSel if abs(lep.PID) == 13]
+        # if any(t > 30.0 for t in timeToMS):
+        #     continue
 
         sr_cutflow.fill_next(weight*recoEff)
         eff_SRs.fill_level(f'AccEffCuts_{signal_region}', recoEff*weight)

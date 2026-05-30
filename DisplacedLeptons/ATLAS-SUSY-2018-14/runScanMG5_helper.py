@@ -45,11 +45,14 @@ def generateInputFiles(parfile) -> Set[folderTuple]:
         if fTuple not in scanFolders:
             if os.path.isdir(inputFolder):
                 logger.warning(f'Input folder {inputFolder} already exists. It will be overwritten.')
+                shutil.rmtree(inputFolder)
             if os.path.isdir(outputFolder):
                 logger.warning(f'Output folder {outputFolder} already exists. It will be overwritten.')
                 shutil.rmtree(outputFolder)
-        os.makedirs(inputFolder, exist_ok=True)
-        os.makedirs(outputFolder, exist_ok=True)
+
+            logger.debug(f'Creating input folder {inputFolder} and output folder {outputFolder}')
+            os.makedirs(inputFolder, exist_ok=True)
+            os.makedirs(outputFolder, exist_ok=True)
 
         # Get largest existing events folder:
         run0 = 1
@@ -61,7 +64,7 @@ def generateInputFiles(parfile) -> Set[folderTuple]:
         # Create temporary folder
         runFolder = tempfile.mkdtemp(suffix='_run_%02d' %(run0+irun),
                                      dir=outputFolder)
-        os.removedirs(runFolder)        
+        os.rmdir(runFolder)
         
         newParser.set('MadGraphPars','runFolder',os.path.abspath(runFolder))
         newParser.set('MadGraphPars','runNumber','%02d' %(run0+irun))

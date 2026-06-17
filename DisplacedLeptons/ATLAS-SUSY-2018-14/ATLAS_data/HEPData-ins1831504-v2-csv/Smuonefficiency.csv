@@ -1,0 +1,48 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t19
+#: name: Smuon efficiency
+#: description: Efficiency for $\tilde{\mu}$ of various masses and lifetimes in SR-$\mu\mu$. Efficiency is defined as the number of selected reconstruced events divided by the acceptance. To be accepted, events are required to have at least 2 truth muons with $p_\text{T} > 65$ GeV, |$\eta$| $<$ 2.5, $|d_{0}| > 3$ mm, and $\Delta R_{\ell\ell} > 0.2$. Events are also required to fall into one of the acceptance regions of the triggers used. At generator level, events must have one of the following: one electron with $p_\text{T} >$ 160 GeV, 2 electrons each with $p_\text{T} >$ 60 GeV, or 1 muon with $p_\text{T} >$ 60 GeV and $|\eta| < 1.07$. To be selected, events must satisfy all signal region requirements.
+#: data_file: smuon_efficiency.yaml
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> SLEPTON SLEPTON
+Mass [GeV],Lifetime [log10(ns)],Efficiency
+75.0,-1.5,0.16053
+75.0,-0.5,0.33046
+75.0,0.5,0.035118
+75.0,1.5,0.0013837
+125.0,-1.5,0.25615
+125.0,-0.5,0.30451
+125.0,0.5,0.064031
+125.0,1.5,0.0021084
+225.0,-1.5,0.39861
+225.0,-0.5,0.34653
+225.0,0.5,0.077654
+225.0,1.5,0.0038507
+325.0,-1.5,0.33567
+325.0,-0.5,0.36039
+325.0,0.5,0.098624
+325.0,1.5,0.0052751
+425.0,-1.5,0.35621
+425.0,-0.5,0.35519
+425.0,0.5,0.097433
+425.0,1.5,0.0065709
+525.0,-1.5,0.39666
+525.0,-0.5,0.37524
+525.0,0.5,0.10554
+525.0,1.5,0.0039575
+625.0,-1.5,0.40096
+625.0,-0.5,0.37607
+625.0,0.5,0.11134
+625.0,1.5,0.0054544
+725.0,-1.5,0.47124
+725.0,-0.5,0.37096
+725.0,0.5,0.11616
+725.0,1.5,0.0069603
+825.0,-1.5,0.41575
+825.0,-0.5,0.36757
+825.0,0.5,0.13032
+825.0,1.5,0.0063952
+925.0,-1.5,0.39273
+925.0,-0.5,0.35141
+925.0,0.5,0.13279
+

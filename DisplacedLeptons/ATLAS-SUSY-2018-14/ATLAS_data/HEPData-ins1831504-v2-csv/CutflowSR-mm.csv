@@ -1,0 +1,92 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t3
+#: name: Cutflow SR-mm
+#: description: Cutflow for SR-$\mu\mu$ for 5 representative signal points. For the following $\tilde{\mu}$ mass and lifetime points, the number of Monte Carlo events generated are: 24,000 for (100 GeV, 0.01 ns), 16,000 for (300 GeV, 1 ns), and 12,000 for (500 GeV, 0.1 ns). For the $\tilde{\tau}$ mass and lifetime points, the number of Monte Carlo events generated are: 30,000 for (200 GeV, 0.1 ns), and 104,000 for (300 GeV, 0.1 ns).
+#: data_file: cutflow_sr-mm.yaml
+#: keyword reactions: P P --> SLEPTON SLEPTON
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+,"$\tilde{e}$ (mass, lifetime) = (100 GeV, 0.01 ns)"
+initial number of events ($\mathcal{L} \times \sigma$),50830.0
+pass trigger and at least 2 baseline leptons ,736.0
+2 leading leptons are muons ,339.0
+$p_\text{T}> 65$ GeV ,215.0
+$3$ mm $ < |d_{0}| < 300$ mm ,46.0
+both muons pass isolation ,46.0
+muons pass cosmic veto ,35.7
+$|t_0^\text{avg}|$$ < 30$ ns,35.7
+ID track $\chi^2/n_{\mathrm{DOF}} <  2$ ,35.7
+number of missing layers $\leq 1$ ,35.7
+number of precision hits $\geq 3$ ,33.3
+ combined track $\chi^2/n_{\mathrm{DOF}} < $ 3,33.3
+number of $\phi$ layers $> 0$ ,25.0
+$\Delta R_{\ell\ell}$ $ > 0.2$ ,25.0
+no additional cosmic muons ,25.0
+
+,"$\tilde{e}$ (mass, lifetime) = (300 GeV, 1 ns)"
+initial number of events ($\mathcal{L} \times \sigma$),870.0
+pass trigger and at least 2 baseline leptons ,238.0
+2 leading leptons are muons ,95.0
+$p_\text{T}> 65$ GeV ,86.3
+$3$ mm $ < |d_{0}| < 300$ mm ,79.4
+both muons pass isolation ,78.6
+muons pass cosmic veto ,74.8
+$|t_0^\text{avg}|$$ < 30$ ns,74.2
+ID track $\chi^2/n_{\mathrm{DOF}} <  2$ ,74.2
+number of missing layers $\leq 1$ ,69.8
+number of precision hits $\geq 3$ ,54.1
+ combined track $\chi^2/n_{\mathrm{DOF}} < $ 3,53.3
+number of $\phi$ layers $> 0$ ,49.9
+$\Delta R_{\ell\ell}$ $ > 0.2$ ,49.9
+no additional cosmic muons ,49.9
+
+,"$\tilde{e}$ (mass, lifetime)=(500 GeV, 0.1 ns)"
+initial number of events ($\mathcal{L} \times \sigma$),93.6
+pass trigger and at least 2 baseline leptons ,66.3
+2 leading leptons are muons ,25.7
+$p_\text{T}> 65$ GeV ,24.9
+$3$ mm $ < |d_{0}| < 300$ mm ,20.2
+both muons pass isolation ,20.1
+muons pass cosmic veto ,19.2
+$|t_0^\text{avg}|$$ < 30$ ns,19.1
+ID track $\chi^2/n_{\mathrm{DOF}} <  2$ ,19.1
+number of missing layers $\leq 1$ ,18.3
+number of precision hits $\geq 3$ ,14.5
+ combined track $\chi^2/n_{\mathrm{DOF}} < $ 3,14.3
+number of $\phi$ layers $> 0$ ,13.6
+$\Delta R_{\ell\ell}$ $ > 0.2$ ,13.6
+no additional cosmic muons ,13.6
+
+,"$\tilde{\tau}$ (mass, lifetime) = (200 GeV, 0.1 ns)"
+initial number of events ($\mathcal{L} \times \sigma$),4210.0
+pass trigger and at least 2 baseline leptons ,37.1
+2 leading leptons are muons ,5.91
+$p_\text{T}> 65$ GeV ,4.17
+$3$ mm $ < |d_{0}| < 300$ mm ,3.12
+both muons pass isolation ,3.12
+muons pass cosmic veto ,3.12
+$|t_0^\text{avg}|$$ < 30$ ns,3.12
+ID track $\chi^2/n_{\mathrm{DOF}} <  2$ ,3.12
+number of missing layers $\leq 1$ ,3.12
+number of precision hits $\geq 3$ ,2.31
+ combined track $\chi^2/n_{\mathrm{DOF}} < $ 3,2.31
+number of $\phi$ layers $> 0$ ,2.01
+$\Delta R_{\ell\ell}$ $ > 0.2$ ,2.01
+no additional cosmic muons ,2.01
+
+,"$\tilde{\tau}$ (mass, lifetime)= (300 GeV, 0.1 ns)"
+initial number of events ($\mathcal{L} \times \sigma$),870.0
+pass trigger and at least 2 baseline leptons ,15.7
+2 leading leptons are muons ,1.65
+$p_\text{T}> 65$ GeV ,1.37
+$3$ mm $ < |d_{0}| < 300$ mm ,1.18
+both muons pass isolation ,1.16
+muons pass cosmic veto ,1.05
+$|t_0^\text{avg}|$$ < 30$ ns,1.05
+ID track $\chi^2/n_{\mathrm{DOF}} <  2$ ,1.05
+number of missing layers $\leq 1$ ,1.04
+number of precision hits $\geq 3$ ,0.96
+ combined track $\chi^2/n_{\mathrm{DOF}} < $ 3,0.96
+number of $\phi$ layers $> 0$ ,0.94
+$\Delta R_{\ell\ell}$ $ > 0.2$ ,0.94
+no additional cosmic muons ,0.94
+

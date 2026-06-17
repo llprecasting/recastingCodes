@@ -1,0 +1,25 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t13
+#: name: yields
+#: description: The expected and observed yields in the signal regions. Combined statistical and systematic uncertainties are presented. Estimates are truncated at 0 if the size of measured systematic uncertainties would yield a negative result.
+#: data_file: yields.yaml
+#: keyword reactions: P P --> SLEPTON SLEPTON
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+Region,SR-$ee$ 
+Fake + Heavy-Flavor , $0.46 \pm 0.10$ 
+Cosmics , 
+Expected Background , $0.46 \pm 0.10$ 
+Observed events , 0 
+
+Region,SR-$\mu\mu$ 
+Fake + Heavy-Flavor , $< 10^{-4}$  
+Cosmics , $0.11^{+0.20}_{-0.11}$ 
+Expected Background , $0.11 ^{+0.20}_{-0.11}$ 
+Observed events , 0 
+
+Region,SR-$e\mu$ 
+Fake + Heavy-Flavor , $0.007^{+0.019}_{-0.007}$
+Cosmics , 
+Expected Background , $0.007^{+0.019}_{-0.007}$
+Observed events , 0 
+

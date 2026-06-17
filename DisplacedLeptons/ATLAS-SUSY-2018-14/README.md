@@ -74,37 +74,39 @@ If running over multiple files, the code allows to run the efficiency calculatio
 
 For each ROOT file, the output is stored in a JSON file in the same folder containing the input ROOT file, with the suffix `_effs.json`. 
 This file contains basic information about the input file as well as the efficiencies for each signal region and each lifetime.
-An example is shown below:
+An example is shown below displaying the acceptances and efficiency times acceptances for all three signal regions (`ee`, `mm` and `em`) and well
+as their uncertainties:
 
 ```json
 {
-    "totalweight": 1179718.542,
-    "Nevents": 54986,
-    "inputFile": "pp2chgchg/Events/run_08/wino_100GeV_10.000ns_delphes_events.root",
-    "tau0_ns": 10.0,
-    "llpPDG": 1000024,
-    "Number of Events": 125000.0,
-    "Integrated weight (pb)": 21.45489,
-    "Matched Integrated weight (pb)": 9.43774971,
-    "mLLP": 100.0,
-    "Cross-Section (pb)": 9.4377,
-    "Efficiencies": [
-        {
-            "tau_ns": 0.01,
-            "EWK SR": 8.740e-09,
-            "EWK SR Error": 7.02719e-09,
-            "Strong SR": 6.0124e-15,
-            "Strong SR Error": 6.01235e-15
-        },
-        {
-            "tau_ns": 0.012,
-            "EWK SR": 7.771599e-08,
-            "EWK SR Error": 5.84265e-08,
-            "Strong SR": 5.00076e-13,
-            "Strong SR Error": 5.000444e-13
-        }
-    ]
-}
+        "totalweight": 1247.2,
+        "Nevents": 28103,
+        "inputFile": "pp2selsel_scan/Events/run_54/selectron_200GeV_0.050ns_delphes_events.root",
+        "llpPDG": 1000011,
+        "Number of Events": 50000.0,
+        "Integrated weight (pb)": 0.04438,
+        "Matched Integrated weight (pb)": 0.0249,
+        "mLLP": 200.0,
+        "tau0_ns": 0.05,
+        "m1000039": 1e-07,
+        "Cross-Section (pb)": 0.024944,
+        "All": 1.0,
+        "All_err": 0.005965181445161283,
+        "AcceptanceCuts_ee": 0.13820588549265203,
+        "AcceptanceCuts_ee_err": 0.0022176189660723313,
+        "AccEffCuts_ee": 0.06147946652030812,
+        "AccEffCuts_ee_err": 0.0010112085594687706,
+        "AcceptanceCuts_mm": 0.0,
+        "AcceptanceCuts_mm_err": 0.0,
+        "AccEffCuts_mm": 0.0,
+        "AccEffCuts_mm_err": 0.0,
+        "AcceptanceCuts_em": 0.0,
+        "AcceptanceCuts_em_err": 0.0,
+        "AccEffCuts_em": 0.0,
+        "AccEffCuts_em_err": 0.0,
+        "muUL_observed": 0.01030301668556053,
+        "muUL_expected": 0.013218244161515279
+    },
 
 ```
 

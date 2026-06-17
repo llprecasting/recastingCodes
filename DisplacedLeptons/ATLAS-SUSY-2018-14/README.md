@@ -1,14 +1,12 @@
-# Displaced Lepton Recast ([ATLAS-SUSY-2018-19](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-1/))
+# Displaced Lepton Recast ([ATLAS-SUSY-2018-14](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/))
 
 
 ## Authors: ##
-[Lucas Ramos](mailto:lucas.magno.ramos@usp.br) and [Andre Lessa](mailto:lessa.a.p@gmail.com)
+[Andre Lessa](mailto:lessa.a.p@gmail.com)
 
-The recast code and results are based on the 
+The recast code and results are based on the auxiliary material provided in [ATLAS-SUSY-2018-14](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/).
 
 Validation of the results can be found in the [validation folder](./validation).
-
-**Important Note**: *the recasting code implements only the model-independent signal regions, which includes a pT > 60 GeV cut on the LLPs. As a result the efficiencies are slightly smaller than the model dependent approach used to constrain the wino scenario.*
 
 ## Pre-Requisites and Installation ##
 
@@ -32,9 +30,12 @@ A ROOT installation must already be present in the system.
 For running the recast code or reproducing the results in the [validation folder](./validation/) one must first:
 
  1. Generate HepMC events with MadGraph5 plus Pythia8.
- 2. Run Delphes on the HepMC events using a [modified version of Delphes](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP), which stores LLPs and their decays in the output ROOT file. **The PDG codes of the LLP(s) need to explicitly defined in the BSMFilter module of the delphes card**. See [delphes_card_chargino.dat](validation/Cards/delphes_card_chargino.dat) for an example where the LLP has PDG `1000024`.
+ 2. Run Delphes on the HepMC events using a [modified version of Delphes](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP), which stores LLPs and their decays in the output ROOT file. **The PDG codes of the LLP(s) need to explicitly defined in the BSMFilter module of the delphes card**. See [delphes_card_slepton.dat](validation/Cards/delphes_card_slepton.dat) for an example where the LLPs are sleptons and have PDG codes `1000011-1000013` and `1000011-2000013`.
 
-Examples of cards for generating events for the wino model can be found in the [validation/Cards](./validation/Cards/) folder.
+ Note that Delphes is used for extracting the required (truth-level) event information and storing it in a compact (ROOT file) format.
+ The Delphes detector simulation modules are not used.
+
+Examples of cards for generating events for the long-lived slepton model can be found in the [validation/Cards](./validation/Cards/) folder.
 
 #### Running a scan over model space
 

@@ -32,9 +32,6 @@ electron_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0ele
 
 # Use smoothed 2D binned data for muons from https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/figaux_19b.png
 muon_reco = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-d0muonefficiency.csv")
-ee_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptselectronacceptance.csv")
-mm_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptsmuonacceptance.csv")
-em_acceptance = effMap(filepath="./ATLAS_data/HEPData-ins1831504-v2-csv/pt-ptstauacceptance.csv")
 
 
 
@@ -239,17 +236,11 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
                         'pT > 65 GeV', '3 mm < d0', 'DeltaRll > 0.2','em SR'])
 
     eff_SRs = cutFlow(name='eff_SRs',levels=['All',
-                                            'Acceptance_ee',
                                             'AcceptanceCuts_ee',
-                                            'AccEff_ee',
                                             'AccEffCuts_ee',
-                                            'Acceptance_mm',
                                             'AcceptanceCuts_mm',
-                                            'AccEff_mm',
                                             'AccEffCuts_mm',
-                                            'Acceptance_em',
                                             'AcceptanceCuts_em',
-                                            'AccEff_em',
                                             'AccEffCuts_em'])
 
     
@@ -293,21 +284,12 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
         if signal_region == "me": 
             signal_region = "em" # collapse me and em for cutflow filling
         # Get acceptance for event
-        acc = 0.0
         if signal_region == "ee":
-            acc = ee_acceptance.efficiency(leading_lepton_p_textT_GeV=leptons_preSel[0].PT, 
-                                           subleading_lepton_p_textT_GeV=leptons_preSel[1].PT)
             sr_cutflow = ee_cutflow
         elif signal_region == "mm":
-            acc = mm_acceptance.efficiency(leading_lepton_p_textT_GeV=leptons_preSel[0].PT, 
-                                           subleading_lepton_p_textT_GeV=leptons_preSel[1].PT)
             sr_cutflow = mm_cutflow
         else:
-            acc = em_acceptance.efficiency(leading_lepton_p_textT_GeV=leptons_preSel[0].PT, 
-                                           subleading_lepton_p_textT_GeV=leptons_preSel[1].PT)
             sr_cutflow = em_cutflow
-        
-        eff_SRs.fill_level(f'Acceptance_{signal_region}', acc*weight)
         # Get efficiency for event
         recoEff = 0.0
         # Get lepton reconstruction efficiencies
@@ -321,8 +303,7 @@ def getEfficiencies(inputFile: str) -> Dict[str, Any]:
                                                         Lepton_d_0_mm=abs(lep.D0)))
             
         recoEff = float(np.prod(lepton_effs))
-        eff_SRs.fill_level(f'AccEff_{signal_region}', recoEff*acc*weight)
-
+        
         if not passTrigger(leptons_preSel):
             continue
         # Fill trigger pass

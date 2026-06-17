@@ -5,6 +5,7 @@
 [Andre Lessa](mailto:lessa.a.p@gmail.com)
 
 The recast code and results are based on the auxiliary material provided in [ATLAS-SUSY-2018-14](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/).
+The parametrized efficiencies provided in [Figure 19a](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/figaux_19a.png) and [Figure 19b](https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/figaux_19b.png) are applied to truth-level leptons to reproduce the analysis reconstruction efficiency.
 
 Validation of the results can be found in the [validation folder](./validation).
 
@@ -14,6 +15,7 @@ The following pre-requisites must be installed before running the main code:
 
   * [DelphesLLP](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP)
   * [pyROOT](https://root.cern.ch/)
+  * [Spey](https://github.com/SpeysideHEP/spey), [Spey-Pyhf plugin](https://github.com/SpeysideHEP/spey-pyhf) and [Pyhf](https://github.com/scikit-hep/pyhf) (required for computing upper limits using Pyhf)
 
 It might also be necessary to set environment variables, so the required libraries can be found (see [setenv.sh](./setenv.sh)).
 
@@ -48,7 +50,7 @@ The usage of the scan code is:
 ./runScanMG5.py -p <parameters_file>
 ```
 
-where the parameter defines all the necessary input and options. Examples of parameter files can be found [here](./validation/scan_parameters_wino_chgchg.ini) for generating events for chargino pair production and [here](./validation/scan_parameters_wino_chgn1.ini) for chargino-neutralino associated production.
+where the parameter defines all the necessary input and options. Examples of parameter files can be found [here](./validation/scan_parameters_ee.ini) for generating events for selectron pair production.
 
 
 ### Computing efficiencies
@@ -56,26 +58,22 @@ where the parameter defines all the necessary input and options. Examples of par
 After generating ROOT file(s) using the modified Delphes code (see above),  the efficiencies can be computed running:
 
 ```
-./computeEfficiencies.py -i <input> -l <LLP PDG> -tauF <lifetime reweighting file> -n <number of parallel jobs> -v <verbose>
+./computeEfficiencies.py -i <input> -l <LLP PDG> -n <number of parallel jobs> -v <verbose>
 ```
 
 The options include:
 
 *  `-h` or `--help` : show the help message and exit
 *  `-i` or `--input` : Path to Delphes ROOT file or to a folder containing Delphes ROOT files with the event samples to be analysed.
-*  `-l` or `--llpPDG` : LLP PDG [default = 1000024]
-*  `-tauF` or `--tau_file` : CSV file containing the lifetime values (in ns) used for reweighting. If empty or file not found, it will not apply reweighting [default=tau_list.csv].
+*  `-l` or `--llpPDG` : LLP PDG [default = 1000011]
 *  `-n` or `--ncpus` : number of parallel jobs to run when running over multiple files [default=1].
 *  `-v` or `--verbose` : verbose level (debug, info, warning or error). If debug, it will also print the cutflows [default=info].
-
-An example of the lifetime CSV file which can be used for lifetime reweighting can be found [here](./tau_list.csv).
-*One must be careful when applying the lifetime reweighting to lifetime values too far away from the one assumed for event generation,
-since it may result in large uncertainties.*
+*  `--noUL`: if set only efficiencies are computed and no upper limit on the production cross-section is computed.
 
 If running over multiple files, the code allows to run the efficiency calculation in parallel (the number of parallel runs is set by the `ncpus` option).
 
-For each ROOT file, the output is stored in a JSON file in the same folder containing the input ROOT file, with the suffix `_effs.json`. This file contains basic information about the input file as
-well as the efficiencies for each signal region and each lifetime.
+For each ROOT file, the output is stored in a JSON file in the same folder containing the input ROOT file, with the suffix `_effs.json`. 
+This file contains basic information about the input file as well as the efficiencies for each signal region and each lifetime.
 An example is shown below:
 
 ```json
@@ -110,24 +108,24 @@ An example is shown below:
 
 ```
 
-These efficiencies can then be used to constrain the model.
+These efficiencies and upper limit (if computed) can then be used to constrain the model.
 For convenience a script ([collectData.py](./collectData.py)) is provided to collect all the results from a set of json files into a single output file, which can then be used to analyse the parameter space. The usage is:
 
 ```
-./collectData.py -i <folder containing json files> -o output file [default=atlas_susy_2018_19_effs.json]
+./collectData.py -i <folder containing json files> -o output file [default=atlas_susy_2018_14_effs.json]
 ```
 
-The output file will then contain a list of dictionaries contanining the information of each `*_effs.json` file found in the input folder (or its subfolders).
+The output file will then contain a list of entries contanining the information of each `*_effs.json` file found in the input folder (or its subfolders).
 
 
 ## Plotting the results
 
-Examples on how to plot the efficiencies and compute the exclusion curve can be found in [validation/plotEffs.ipynb](./validation/plotEffs.ipynb) and [validation/plotExclusion.ipynb](./validation/plotExclusion.ipynb).
+Examples on how to plot the efficiencies and compute the exclusion curve can be found in [validation/plotEffs.ipynb](./validation/plotEffs_ee.ipynb).
 
 ## Validation
 
-Below is a comparison between the exclusion curve obtained for the Wino scenario using the recasting code and the official ATLAS exclusion. *Note that ATLAS uses a model dependent approach which results in slightly stronger limits.*
+Below is a comparison between the exclusion curve obtained for the slepton scenarios considered by ATLAS using the recasting code and the official ATLAS exclusion.
 
-<img src="validation/wino_exclusion.png" width="550" height="400">
+<img src="validation/Exclusion_SR_ee.png" width="550" height="400">
 
 More information about validation can be found in the [validation](./validation/) folder.

@@ -44,6 +44,8 @@ def getObjects(DelphesTree: TTree) -> Any:
 
     llps = DelphesTree.bsmMothers
     
+    # Here are some other possibilities for the lepton objects, however
+    # we will use the truth-level leptons (after showering) from bsmFinalDaughters.
     # muons = list(DelphesTree.MuonNonIso)
     # electrons = list(DelphesTree.ElectronNonIso)
     # muons = list(DelphesTree.MuonSmear)

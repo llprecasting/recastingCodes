@@ -126,6 +126,6 @@ Examples on how to plot the efficiencies and compute the exclusion curve can be 
 
 Below is a comparison between the exclusion curve obtained for the slepton scenarios considered by ATLAS using the recasting code and the official ATLAS exclusion.
 
-<img src="validation/Exclusion_SR_ee.png" width="550" height="400">
+<img src="validation/Exclusion_SR_ee.png" width="550" height="450">
 
 More information about validation can be found in the [validation](./validation/) folder.

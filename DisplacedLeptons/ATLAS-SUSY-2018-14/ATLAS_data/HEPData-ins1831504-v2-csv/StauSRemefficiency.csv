@@ -1,0 +1,24 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t26
+#: name: Stau SRem efficiency
+#: description: Efficiency for $\tilde{\tau}$ of various masses and lifetimes in SR-$e\mu$. Efficiency is defined as the number of selected reconstruced events divided by the acceptance. To be accepted, events are required to have at least 2 truth leptons with $p_\text{T} > 65$ GeV, |$\eta$| $<$ 2.5 (2.47) for muons (electrons), $|d_{0}| > 3$ mm, and $\Delta R_{\ell\ell} > 0.2$. Events are also required to fall into one of the acceptance regions of the triggers used. At generator level, events must have one of the following: one electron with $p_\text{T} >$ 160 GeV, 2 electrons each with $p_\text{T} >$ 60 GeV, or 1 muon with $p_\text{T} >$ 60 GeV and $|\eta| < 1.07$. To be selected, events must satisfy all signal region requirements.
+#: data_file: stau_srem_efficiency.yaml
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> SLEPTON SLEPTON
+Mass [GeV],Lifetime [log10(ns)],Efficiency
+75.0,-1.5,0.75622
+75.0,-0.5,0.18334
+75.0,0.5,0.0022002
+125.0,-1.5,0.22062
+125.0,-0.5,0.24705
+125.0,0.5,0.018879
+225.0,-1.5,0.55715
+225.0,-0.5,0.3269
+225.0,0.5,0.094161
+325.0,-1.5,0.45254
+325.0,-0.5,0.35533
+325.0,0.5,0.075555
+425.0,-1.5,0.2823
+425.0,-0.5,0.43719
+425.0,0.5,0.088587
+

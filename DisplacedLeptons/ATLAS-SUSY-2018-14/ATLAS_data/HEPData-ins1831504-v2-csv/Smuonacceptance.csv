@@ -1,0 +1,48 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t17
+#: name: Smuon acceptance
+#: description: Acceptance for $\tilde{\mu}$ of various masses and lifetimes in SR-$\mu\mu$. Acceptance is defined as the number of accepted events at generator level in signal Monte Carlo simulation divided by the total number of events in the sample. To be accepted, events are required to have at least 2 truth muons with $p_\text{T} > 65$ GeV, |$\eta$| $<$ 2.5, $|d_{0}| > 3$ mm, and $\Delta R_{\ell\ell} > 0.2$. Events are also required to fall into one of the acceptance regions of the triggers used. At generator level, events must have one of the following: one electron with $p_\text{T} >$ 160 GeV, 2 electrons each with $p_\text{T} >$ 60 GeV, or 1 muon with $p_\text{T} >$ 60 GeV and $|\eta| < 1.07$.
+#: data_file: smuon_acceptance.yaml
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> SLEPTON SLEPTON
+Mass [GeV],Lifetime [log10(ns)],Acceptance
+75.0,-1.5,0.00045521
+75.0,-0.5,0.0096213
+75.0,0.5,0.021459
+75.0,1.5,0.0040494
+125.0,-1.5,0.0019167
+125.0,-0.5,0.079168
+125.0,0.5,0.15429
+125.0,1.5,0.056003
+225.0,-1.5,0.0081786
+225.0,-0.5,0.21481
+225.0,0.5,0.40487
+225.0,1.5,0.19791
+325.0,-1.5,0.012846
+325.0,-0.5,0.30687
+325.0,0.5,0.58154
+325.0,1.5,0.30356
+425.0,-1.5,0.014215
+425.0,-0.5,0.35973
+425.0,0.5,0.68152
+425.0,1.5,0.37971
+525.0,-1.5,0.016589
+525.0,-0.5,0.3863
+525.0,0.5,0.72336
+525.0,1.5,0.44111
+625.0,-1.5,0.01823
+625.0,-0.5,0.40396
+625.0,0.5,0.76153
+625.0,1.5,0.48378
+725.0,-1.5,0.01398
+725.0,-0.5,0.40485
+725.0,0.5,0.77837
+725.0,1.5,0.50848
+825.0,-1.5,0.016571
+825.0,-0.5,0.40935
+825.0,0.5,0.78816
+825.0,1.5,0.54796
+925.0,-1.5,0.013474
+925.0,-0.5,0.4057
+925.0,0.5,0.79413
+

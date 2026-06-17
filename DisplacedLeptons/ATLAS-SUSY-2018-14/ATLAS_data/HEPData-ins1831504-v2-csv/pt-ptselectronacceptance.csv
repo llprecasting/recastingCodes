@@ -1,0 +1,64 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t20
+#: name: pt-pt selectron acceptance
+#: description: Acceptance as a function of the generator-level $p_\text{T}$ of the leading and subleading lepton in SR-$ee$ from $\tilde{e}$ decays. The plot is made from signal Monte Carlo events with $\tilde{\ell}$ with mass of 400 GeV and lifetime of 1 ns. To be accepted, events are required to have at least 2 truth leptons with $p_\text{T} > 65$ GeV, |$\eta$| $<$ 2.47 for electrons, $|d_{0}| > 3$ mm, and $\Delta R_{\ell\ell} > 0.2$. Events are also required to fall into one of the acceptance regions of the triggers used. At generator level, events must have one of the following: one electron with $p_\text{T} >$ 160 GeV, 2 electrons each with $p_\text{T} >$ 60 GeV, or 1 muon with $p_\text{T} >$ 60 GeV and $|\eta| < 1.07$. The overflow is not shown in these plots.
+#: data_file: pt-pt_selectron_acceptance.yaml
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> SLEPTON SLEPTON
+leading lepton $p_\text{T}$ [GeV],subleading lepton $p_\text{T}$ [GeV],Acceptance
+40.0,40.0,0.099212
+120.0,40.0,0.26993
+120.0,120.0,0.83036
+200.0,40.0,0.25222
+200.0,120.0,0.86285
+200.0,200.0,0.86601
+280.0,40.0,0.2921
+280.0,120.0,0.8633
+280.0,200.0,0.87166
+280.0,280.0,0.87916
+360.0,40.0,0.30173
+360.0,120.0,0.88212
+360.0,200.0,0.93982
+360.0,280.0,0.91736
+360.0,360.0,0.8998
+440.0,40.0,0.34305
+440.0,120.0,0.89074
+440.0,200.0,0.90329
+440.0,280.0,0.9025
+440.0,360.0,0.91349
+440.0,440.0,0.8665
+520.0,40.0,0.30765
+520.0,120.0,0.89853
+520.0,200.0,0.96035
+520.0,280.0,0.94172
+520.0,360.0,0.91432
+520.0,440.0,0.90666
+520.0,520.0,0.78777
+600.0,40.0,0.34069
+600.0,120.0,0.97072
+600.0,200.0,0.95011
+600.0,280.0,0.94396
+600.0,360.0,0.95971
+600.0,440.0,0.97965
+600.0,520.0,0.99178
+600.0,600.0,0.90948
+680.0,40.0,0.23101
+680.0,120.0,1.183
+680.0,200.0,0.85826
+680.0,280.0,0.97378
+680.0,360.0,1.0372
+680.0,440.0,0.95486
+680.0,520.0,0.96414
+680.0,600.0,0.9635
+680.0,680.0,1.0926
+760.0,40.0,0.32384
+760.0,120.0,0.97785
+760.0,200.0,0.98314
+760.0,280.0,1.0401
+760.0,360.0,1.0596
+760.0,440.0,0.82357
+760.0,520.0,0.84218
+760.0,600.0,0.90517
+760.0,680.0,1.001
+760.0,760.0,1.0
+

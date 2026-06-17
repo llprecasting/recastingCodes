@@ -35,6 +35,8 @@ corresponding analysis and authors:
     * [13 TeV ATLAS DT - 36.1/fb](DisappearingTracks/ATLAS-SUSY-2016-06)
     * [13 TeV CMS DT - 140/fb](DisappearingTracks/CMS-EXO-19-010)
     * [13 TeV ATLAS DT - 136/fb](DisappearingTracks/ATLAS-SUSY-2018-19)
+  * [Displaced Leptons](DisplacedLeptons)
+    * [13 TeV ATLAS DL - 139/fb](DisplacedLeptons/ATLAS-SUSY-2018-14)
 
 A README file can be found inside each folder with the required dependencies
 and basic instructions on how to run the recasting codes.

@@ -1,0 +1,42 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t9
+#: name: LH smuon upper limit on cross section
+#: description: Upper limits on observed signal cross section, $\sigma_\text{obs}^\text{95}$, for the superpartners of the left-handed muons, $\tilde{\mu}_L$.  
+#: data_file: lh_smuon_upper_limit_on_cross_section.yaml
+#: keyword reactions: P P --> SLEPTON SLEPTON
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+ $m(\tilde{\mu}_L)$  [GeV], $\tau$  [ns],  $\sigma_\text{obs}^\text{95}$  [pb]
+50,0.1,6.69e-03
+50,1.0,3.03e-02
+100,0.1,8.87e-04
+100,1.0,2.22e-03
+100,10.0,1.34e-01
+200,0.01,7.49e-03
+200,0.1,2.92e-04
+200,1.0,6.78e-04
+200,10.0,2.51e-02
+300,0.01,4.46e-03
+300,0.1,1.88e-04
+300,1.0,3.72e-04
+300,10.0,1.62e-02
+400,0.01,3.89e-03
+400,0.1,1.64e-04
+400,1.0,3.02e-04
+400,10.0,8.49e-03
+500,0.01,2.78e-03
+500,0.1,1.44e-04
+500,1.0,2.77e-04
+500,10.0,1.09e-02
+600,0.01,3.32e-03
+600,0.1,1.43e-04
+600,1.0,2.46e-04
+600,10.0,9.00e-03
+700,0.01,3.22e-03
+700,0.1,1.46e-04
+700,1.0,2.34e-04
+700,10.0,6.95e-03
+800,0.01,2.98e-03
+800,0.1,1.44e-04
+800,1.0,2.12e-04
+800,10.0,6.80e-03
+

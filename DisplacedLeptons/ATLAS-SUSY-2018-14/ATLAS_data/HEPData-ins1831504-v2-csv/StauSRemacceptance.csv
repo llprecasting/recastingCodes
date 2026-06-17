@@ -1,0 +1,24 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t23
+#: name: Stau SRem acceptance
+#: description: Acceptance for $\tilde{\tau}$ of various masses and lifetimes in SR-$e\mu$. Acceptance is defined as the number of accepted events at generator level in signal Monte Carlo simulation divided by the total number of events in the sample. To be accepted, events are required to have at least 2 truth leptons with $p_\text{T} > 65$ GeV, |$\eta$| $<$ 2.5 (2.47) for muons (electrons), $|d_{0}| > 3$ mm, and $\Delta R_{\ell\ell} > 0.2$. Events are also required to fall into one of the acceptance regions of the triggers used. At generator level, events must have one of the following: one electron with $p_\text{T} >$ 160 GeV, 2 electrons each with $p_\text{T} >$ 60 GeV, or 1 muon with $p_\text{T} >$ 60 GeV and $|\eta| < 1.07$.
+#: data_file: stau_srem_acceptance.yaml
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> SLEPTON SLEPTON
+Mass [GeV],Lifetime [log10(ns)],Acceptance
+75.0,-1.5,9.1743e-07
+75.0,-0.5,3.2791e-05
+75.0,0.5,5.6767e-05
+125.0,-1.5,1.4769e-05
+125.0,-0.5,0.00045492
+125.0,0.5,0.00072534
+225.0,-1.5,5.7596e-05
+225.0,-0.5,0.0025066
+225.0,0.5,0.0037629
+325.0,-1.5,0.00010684
+325.0,-0.5,0.004068
+325.0,0.5,0.0097358
+425.0,-1.5,0.00031577
+425.0,-0.5,0.0064505
+425.0,0.5,0.014283
+

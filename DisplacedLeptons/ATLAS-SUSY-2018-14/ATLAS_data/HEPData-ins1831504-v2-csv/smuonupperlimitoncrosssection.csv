@@ -1,0 +1,44 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t8
+#: name: smuon upper limit on cross section
+#: description: Upper limits on observed signal cross section, $\sigma_\text{obs}^\text{95}$, for the smuon signal model. Smuon ($\tilde{\mu}_{L, R}$) refers to the scalar superpartners of left- and right-handed muons. 
+#: data_file: smuon_upper_limit_on_cross_section.yaml
+#: keyword reactions: P P --> SLEPTON SLEPTON
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+" $m(\tilde{\mu}_{L,R})$  [GeV]", $\tau$  [ns], $\sigma_\text{obs}^\text{95}$  [pb]
+50,0.01,2.95e-01
+50,0.1,6.79e-03
+50,1.0,2.86e-02
+100,0.01,4.40e-02
+100,0.1,8.95e-04
+100,1.0,2.18e-03
+100,10.0,1.83e-01
+200,0.01,6.62e-03
+200,0.1,2.90e-04
+200,1.0,6.86e-04
+200,10.0,2.83e-02
+300,0.01,5.01e-03
+300,0.1,1.95e-04
+300,1.0,3.76e-04
+300,10.0,1.35e-02
+400,0.01,4.26e-03
+400,0.1,1.69e-04
+400,1.0,3.25e-04
+400,10.0,8.65e-03
+500,0.01,3.28e-03
+500,0.1,1.49e-04
+500,1.0,2.83e-04
+500,10.0,1.23e-02
+600,0.01,2.95e-03
+600,0.1,1.42e-04
+600,1.0,2.55e-04
+600,10.0,8.17e-03
+700,0.01,3.28e-03
+700,0.1,1.44e-04
+700,1.0,2.39e-04
+700,10.0,6.10e-03
+800,0.01,3.14e-03
+800,0.1,1.43e-04
+800,1.0,2.11e-04
+800,10.0,6.17e-03
+

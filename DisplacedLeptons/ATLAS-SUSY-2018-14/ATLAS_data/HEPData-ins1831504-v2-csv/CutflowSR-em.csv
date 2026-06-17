@@ -1,0 +1,47 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t2
+#: name: Cutflow SR-em
+#: description: Cutflow for SR-$e\mu$ for 2 representative signal points. For the $\tilde{\tau}$ mass and lifetime points, the number of Monte Carlo events generated are: 30,000 for (200 GeV, 0.1 ns), and 104,000 for (300 GeV, 0.1 ns).
+#: data_file: cutflow_sr-em.yaml
+#: keyword reactions: P P --> SLEPTON SLEPTON
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+,"$\tilde{\tau}$ (mass, lifetime) = (200 GeV, 0.1 ns)"
+initial number of events ($\mathcal{L} \times \sigma$),4210.0
+pass trigger and at least 2 baseline leptons ,37.1
+2 leading leptons are a muon and an electron ,13.1
+$p_\text{T} > 65$ GeV  ,9.74
+$3$ mm $ < |d_{0}| < 300$ mm ,7.4
+both leptons pass isolation ,6.73
+muon pass cosmic veto ,6.57
+muon $|t_0^\text{avg}|$$ < 30$ ns ,6.57
+muon ID track $\chi^2/n_{\mathrm{DOF}} < $ 2 ,6.57
+muon number of missing layers $\leq 1$ ,6.57
+muon number of precision hits $\geq 3$ ,6.38
+muon combined track $\chi^2/n_{\mathrm{DOF}} < $ 3 ,6.28
+muon number of $\phi$ layers $> 0$ ,6.28
+electron $(p_\text{T}^\text{track}-p_\text{T}^e)/p_\text{T}^e$ $ \geq -0.5$  ,3.45
+electron ID track $\chi^2/n_{\mathrm{DOF}} <  2$ ,3.45
+electron number of missing layers $\leq 1$ ,3.45
+$\Delta R_{\ell\ell}$ $ > 0.2$ ,3.45
+no additional cosmic muons ,3.45
+
+,"$\tilde{\tau}$ (mass, lifetime)= (300 GeV, 0.1 ns)"
+initial number of events ($\mathcal{L} \times \sigma$),870.0
+pass trigger and at least 2 baseline leptons ,15.7
+2 leading leptons are a muon and an electron ,6.19
+$p_\text{T} > 65$ GeV  ,4.83
+$3$ mm $ < |d_{0}| < 300$ mm ,3.78
+both leptons pass isolation ,3.12
+muon pass cosmic veto ,2.97
+muon $|t_0^\text{avg}|$$ < 30$ ns ,2.97
+muon ID track $\chi^2/n_{\mathrm{DOF}} < $ 2 ,2.97
+muon number of missing layers $\leq 1$ ,2.97
+muon number of precision hits $\geq 3$ ,2.65
+muon combined track $\chi^2/n_{\mathrm{DOF}} < $ 3 ,2.65
+muon number of $\phi$ layers $> 0$ ,2.65
+electron $(p_\text{T}^\text{track}-p_\text{T}^e)/p_\text{T}^e$ $ \geq -0.5$  ,1.47
+electron ID track $\chi^2/n_{\mathrm{DOF}} <  2$ ,1.3
+electron number of missing layers $\leq 1$ ,1.26
+$\Delta R_{\ell\ell}$ $ > 0.2$ ,1.26
+no additional cosmic muons ,1.26
+

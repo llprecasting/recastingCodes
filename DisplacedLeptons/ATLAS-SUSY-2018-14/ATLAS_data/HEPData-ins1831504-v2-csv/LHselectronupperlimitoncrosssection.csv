@@ -1,0 +1,44 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t6
+#: name: LH selectron upper limit on cross section
+#: description: Upper limits on observed signal cross section, $\sigma_\text{obs}^\text{95}$, for the superpartners of the left-handed electrons, $\tilde{e}_L$.  
+#: data_file: lh_selectron_upper_limit_on_cross_section.yaml
+#: keyword reactions: P P --> SLEPTON SLEPTON
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+ $m(\tilde{e}_L)$  [GeV], $\tau$  [ns],  $\sigma_\text{obs}^\text{95}$  [pb]
+50,0.01,5.73e-02
+50,0.1,4.72e-03
+50,1.0,3.52e-02
+100,0.01,1.57e-02
+100,0.1,6.22e-04
+100,1.0,2.63e-03
+100,10.0,1.69e-01
+200,0.01,3.59e-03
+200,0.1,2.04e-04
+200,1.0,5.73e-04
+200,10.0,1.49e-02
+300,0.01,2.54e-03
+300,0.1,1.47e-04
+300,1.0,3.53e-04
+300,10.0,2.43e-02
+400,0.01,2.05e-03
+400,0.1,1.19e-04
+400,1.0,2.68e-04
+400,10.0,2.81e-02
+500,0.01,2.61e-03
+500,0.1,1.13e-04
+500,1.0,2.47e-04
+500,10.0,1.02e-02
+600,0.01,2.51e-03
+600,0.1,1.10e-04
+600,1.0,2.32e-04
+600,10.0,8.98e-03
+700,0.01,2.19e-03
+700,0.1,1.06e-04
+700,1.0,2.05e-04
+700,10.0,1.06e-02
+800,0.01,2.55e-03
+800,0.1,1.12e-04
+800,1.0,1.98e-04
+800,10.0,9.38e-03
+

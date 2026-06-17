@@ -1,0 +1,47 @@
+#: table_doi: 10.17182/hepdata.98796.v2/t14
+#: name: pt-d0 electron efficiency
+#: description: Reconstruction efficiency as a function of $|d_{0}|$ and $p_\text{T}$ for signal electrons. Monte Carlo samples with $\tilde{e}$ or $\tilde{\mu}$ with mass 400 GeV and 1 ns lifetime were used. Efficiency is defined as the number of leptons passing all signal requirements and matched to generator-level muons divided by the number of generator level leptons with $p_\text{T} > 65$ GeV, $|d_{0}| >$ 3 mm, and |$\eta$| $<$ 2.47 for electrons. No event-level selections are made. Reconstructed leptons must pass all quality criteria, including the cosmic veto. Electron selection scale factors are included on the reconstructed leptons. The overflow is not shown in these plots.
+#: data_file: pt-d0_electron_efficiency.yaml
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity violating
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> SLEPTON SLEPTON
+Lepton $p_\text{T}$ [GeV],Lepton $d_0$ [mm],Efficiency
+100.0,25.0,0.49166
+100.0,75.0,0.39232
+100.0,125.0,0.27627
+100.0,175.0,0.20112
+100.0,225.0,0.1297
+100.0,275.0,0.0066304
+170.0,25.0,0.57918
+170.0,75.0,0.42949
+170.0,125.0,0.30936
+170.0,175.0,0.23178
+170.0,225.0,0.1355
+170.0,275.0,0.01032
+240.0,25.0,0.56463
+240.0,75.0,0.42077
+240.0,125.0,0.25466
+240.0,175.0,0.17705
+240.0,225.0,0.083179
+310.0,25.0,0.51151
+310.0,75.0,0.33051
+310.0,125.0,0.20575
+310.0,175.0,0.10741
+310.0,225.0,0.012786
+380.0,25.0,0.50798
+380.0,75.0,0.27183
+380.0,125.0,0.14084
+380.0,175.0,0.040081
+450.0,25.0,0.44582
+450.0,75.0,0.21645
+450.0,125.0,0.077292
+520.0,25.0,0.4114
+520.0,75.0,0.13864
+520.0,125.0,0.015641
+590.0,25.0,0.32767
+590.0,75.0,0.11527
+660.0,25.0,0.3036
+660.0,75.0,0.058557
+730.0,25.0,0.30969
+730.0,75.0,0.029867
+

@@ -32,7 +32,7 @@ A ROOT installation must already be present in the system.
 For running the recast code or reproducing the results in the [validation folder](./validation/) one must first:
 
  1. Generate HepMC events with MadGraph5 plus Pythia8.
- 2. Run Delphes on the HepMC events using a [modified version of Delphes](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP), which stores LLPs and their decays in the output ROOT file. **The PDG codes of the LLP(s) need to explicitly defined in the BSMFilter module of the delphes card**. See [delphes_card_slepton.dat](validation/Cards/delphes_card_slepton.dat) for an example where the LLPs are sleptons and have PDG codes `1000011-1000013` and `1000011-2000013`.
+ 2. Run Delphes on the HepMC events using a [modified version of Delphes](https://github.com/llprecasting/recastingCodes/tree/main/Delphes_LLP), which stores LLPs and their decays in the output ROOT file. **The PDG codes of the LLP(s) need to be explicitly defined in the BSMFilter module of the delphes card**. See [delphes_card_slepton.dat](validation/Cards/delphes_card_slepton.dat) for an example where the LLPs are sleptons and have PDG codes `1000011,1000013,1000015,2000011,2000013,2000015`.
 
  Note that Delphes is used for extracting the required (truth-level) event information and storing it in a compact (ROOT file) format.
  The Delphes detector simulation modules are not used.

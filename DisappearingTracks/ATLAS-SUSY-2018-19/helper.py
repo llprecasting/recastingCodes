@@ -292,24 +292,7 @@ def getModelInfo(bannerFile : str, llpPDG : int) -> Dict[str, Union[float,int]]:
                 if not  l: continue
                 k,v = l.split(':')
                 modelInfoDict[k.replace('#','').strip()] = float(v)
-        if '<MGRunCard>' in data:
-            runInfo = data.split('<MGRunCard>')[1].split('</MGRunCard>')[0]
-            fields = ['custom_fcts','pt_bias_target',
-                      'pt_bias_enhancement_power', 'pt_bias_min']
-            for l in runInfo.split('\n'):
-                l = l.strip()
-                if not  l: continue
-                if l[0] == '#': #skip comments
-                  continue
-                for field in fields:
-                  if field in l:
-                    value = l.split('=')[0].strip()
-                    if not value:
-                      value = None
-                    if field != 'custom_fcts' and value is not None:
-                       value = float(value)
-                    modelInfoDict[field] = value
-                  
+      
     if slhaData is None:
        raise ValueError(f'Error reading banner file {bannerFile}')
     
